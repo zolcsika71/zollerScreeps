@@ -5,6 +5,8 @@ mod.initMemory = function () {
 
     Object.keys(Memory).forEach(segment => {
 
+        console.log(segment);
+
         delete Memory[segment];
 
     });

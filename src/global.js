@@ -7,7 +7,19 @@ mod.BB = function (x) {
 
 mod.execute = function () {
 
-    return false;
+    return true;
+
+};
+
+mod.initMemory = function () {
+
+    Object.keys(Memory).forEach(segment => {
+
+        console.log(segment);
+
+        delete Memory[segment];
+
+    });
 
 };
 
