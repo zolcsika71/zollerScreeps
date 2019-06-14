@@ -34,7 +34,7 @@ let _ = require('lodash'),
         console.log(`alien keys: ${keys}`);
         for (const key of keys) {
             if (typeof alien[key] === "function") {
-                console.log(`it is a FN`);
+                console.log(`it is a fn()`);
                 if (namespace) {
                     let original = base[key];
                     console.log(`nameSpace: ${original}`);
@@ -44,35 +44,38 @@ let _ = require('lodash'),
                         base.baseOf[namespace] = {};
                     if (!base.baseOf[namespace][key])
                         base.baseOf[namespace][key] = original;
-                }
+                } else
+                    console.log(`no namespace`);
                 base[key] = alien[key].bind(base);
-                console.log(`base: `);
 
-            } else if (alien[key] !== null && typeof base[key] === 'object' && !Array.isArray(base[key]) &&
-                typeof alien[key] === 'object' && !Array.isArray(alien[key])) {
+            } else if (alien[key] !== null && typeof base[key] === 'object' && !Array.isArray(base[key])
+                && typeof alien[key] === 'object' && !Array.isArray(alien[key])) {
+                console.log(`it is a object`);
                 _.merge(base[key], alien[key]);
+
             } else {
-                base[key] = alien[key]
+                console.log(`it is a array?`);
+                base[key] = alien[key];
             }
+            console.log(`base: ${key}, ${base[key]}`);
         }
-        console.log(`hello ${json(alien[key])}`);
-        console.log(`base: ${json(base[key])}`);
-    },
-    load = (modName) => {
-        return require('./' + modName);
     },
     json = (x) => {
         return JSON.stringify(x, null, 2);
     };
 
+let Global = require('./global'),
+    Parameter = require(`./parameter`),
+    Util = require (`./util`),
+    MainInjection = require(`./mainInjection`);
 
+inject(global, Global);
 
-
-
-
-
-
-
+_.assign(global, {
+    Parameter: Parameter,
+    Util: Util,
+    MainInjection: MainInjection
+});
 
 
 module.exports.loop = wrapLoop(function () {
@@ -83,12 +86,16 @@ module.exports.loop = wrapLoop(function () {
         return;
 
     try {
+        Global.consoleMe();
+        console.log(`${Parameter.DEBUG}`);
+        Util.consoleMe();
 
-        inject(global, load('global'));
+
 
     }
     catch (e) {
-        json(e.message);
+        console.log(`ERROR`);
+        console.log(e.message, e.stack);
     }
 
 });
