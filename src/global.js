@@ -1,10 +1,13 @@
 let mod = {};
-Util = require (`./util`);
 module.exports = mod;
 
 
 mod.BB = function (x) {
     console.log(JSON.stringify(x, null, 2));
+};
+
+mod.json = (x) => {
+    return JSON.stringify(x, null, 2);
 };
 
 mod.execute = function () {
@@ -18,7 +21,6 @@ mod.execute = function () {
 mod.consoleMe = function () {
 
     console.log(`global`);
-    Util.consoleMe();
 
 };
 

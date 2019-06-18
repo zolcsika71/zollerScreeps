@@ -27,12 +27,17 @@ function wrapLoop(fn) {
     };
 }
 
+const
+    _ = require('lodash'),
+    Global = require('./global'),
+    Parameter = require(`./parameter`),
+    Util = require (`./util`),
+    mainInjection = require(`./mainInjection`);
 
-let _ = require('lodash'),
-    inject = (base, alien, namespace) => {
+let inject = (base, alien, namespace) => {
         let keys = _.keys(alien);
         console.log(`alien keys: ${keys}`);
-        for (const key of keys) {
+        for (let key of keys) {
             if (typeof alien[key] === "function") {
                 console.log(`it is a fn()`);
                 if (namespace) {
@@ -59,23 +64,10 @@ let _ = require('lodash'),
             }
             console.log(`base: ${key}, ${base[key]}`);
         }
-    },
-    json = (x) => {
-        return JSON.stringify(x, null, 2);
     };
-
-let Global = require('./global'),
-    Parameter = require(`./parameter`),
-    Util = require (`./util`),
-    MainInjection = require(`./mainInjection`);
 
 inject(global, Global);
 
-_.assign(global, {
-    Parameter: Parameter,
-    Util: Util,
-    MainInjection: MainInjection
-});
 
 
 module.exports.loop = wrapLoop(function () {
@@ -94,7 +86,7 @@ module.exports.loop = wrapLoop(function () {
 
     }
     catch (e) {
-        console.log(`ERROR`);
+        console.log(`ERROR ;)`);
         console.log(e.message, e.stack);
     }
 
