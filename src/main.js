@@ -29,44 +29,34 @@ function wrapLoop(fn) {
 
 const
     //_ = require('lodash'),
-    //Global = require('./global.global'),
-    //Parameter = require(`./global.parameter`),
-    //Util = require(`./util.util`),
-    //_creep = require('./creep.creep'),
-    //_room = require('./room.room'),
-    //_spawn = require('./spawn'),
-
-
-    _creep = {
+    CREEP = {
         Action: require('./creep.Action'),
         Behaviour: require('./creep.Behaviour'),
         Setup: require('./creep.Setup'),
-        creep: require('./creep.creep'),
+        creep: require('./creep.creep')
 
 
     },
-    _global = {
+    GLOBAL = {
+        global: require('./global.global'),
         parameter: require(`./global.parameter`),
-        global: require('./global.global')
+        util: require(`./util.util`)
 
     },
-    _properties = {
-      structures: require('./properties.structures')
-    },
-    _prototypes = {
+    PROPERTIES = {
+    structures: require('./properties.structures')
+},
+    PROTOTYPES = {
         mineral: require('./prototypes.mineral'),
         roomObject: require('./prototypes.roomObject'),
         roomPosition: require('./prototypes.roomPosition'),
         source: require('./prototypes.source'),
-        structures: require('./prototypes.structures'),
+        structures: require('./prototypes.structures')
     },
-    _room = {
-        room: require('./room.room'),
+    ROOM = {
+        room: require('./room.room')
     },
-    _util = {
-        util: require(`./util.util`)
-    },
-    _root = {
+    ROOT = {
         mainInjection: require(`./mainInjection`),
         spawn: require('./spawn')
     };
@@ -74,56 +64,44 @@ const
 
 let inject = (base, alien, namespace) => {
     let keys = _.keys(alien);
-    console.log(`alien keys: ${keys}`);
     for (let key of keys) {
         if (typeof alien[key] === "function") {
-            console.log(`it is a fn()`);
             if (namespace) {
                 let original = base[key];
-                console.log(`nameSpace: ${original}`);
+                //console.log(`nameSpace: ${original}`);
                 if (!base.baseOf)
                     base.baseOf = {};
                 if (!base.baseOf[namespace])
                     base.baseOf[namespace] = {};
                 if (!base.baseOf[namespace][key])
                     base.baseOf[namespace][key] = original;
-            } else
-                console.log(`no namespace`);
+            }
             base[key] = alien[key].bind(base);
 
         } else if (alien[key] !== null && typeof base[key] === 'object' && !Array.isArray(base[key])
-            && typeof alien[key] === 'object' && !Array.isArray(alien[key])) {
-            console.log(`it is a object`);
+            && typeof alien[key] === 'object' && !Array.isArray(alien[key]))
             _.merge(base[key], alien[key]);
-
-        } else {
-            console.log(`it is a array?`);
+        else
             base[key] = alien[key];
-        }
-        console.log(`base: ${key}, ${base[key]}`);
     }
 };
 
-inject(global, _global.global);
-inject(Creep, _creep.creep);
-inject(Room, _room.room);
-inject(Spawn, _root.spawn);
+inject(global, GLOBAL.global);
+inject(Creep, CREEP.creep);
+inject(Room, ROOM.room);
+inject(Spawn, ROOT.spawn);
 
-Creep.Action = _creep.Action;
-Creep.Behaviour = _creep.Behaviour;
-Creep.Setup = _creep.Setup;
+Creep.Action = CREEP.Action;
+Creep.Behaviour = CREEP.Behaviour;
+Creep.Setup = CREEP.Setup;
 
 
+// make parameter accessible from command line
+_.assign(global, GLOBAL.parameter);
+
+// make util accessible from command line usage: Util.fn();
 _.assign(global, {
-
-    Util: _util.util
-
-});
-
-_.assign(global, {
-
-    Util: _util.util
-
+    Util: GLOBAL.util
 });
 
 
@@ -145,11 +123,11 @@ _.assign(Room, {
     }
 });
 
-Object.keys(_properties).forEach(property => {
-    _properties[property].extend();
+Object.keys(PROPERTIES).forEach(property => {
+    PROPERTIES[property].extend();
 });
-Object.keys(_prototypes).forEach(prototype => {
-    _prototypes[prototype].extend();
+Object.keys(PROTOTYPES).forEach(prototype => {
+    PROTOTYPES[prototype].extend();
 });
 
 
@@ -162,9 +140,9 @@ module.exports.loop = wrapLoop(function () {
         return;
 
     try {
-        _global.global.consoleMe();
-        console.log(`${_global.parameter.DEBUG}`);
-        _util.util.consoleMe();
+        GLOBAL.global.consoleMe();
+        console.log(`${GLOBAL.parameter.DEBUG}`);
+        GLOBAL.util.consoleMe();
 
 
 

@@ -1,10 +1,10 @@
 "use strict";
 
 let mod = {};
-mod.extend = function(){
+mod.init = function () {
 
     // extensions.js
-    if( Memory.pavementArt === undefined )
+    if (_.isUndefined(Memory.pavementArt))
         Memory.pavementArt = {};
 
 };

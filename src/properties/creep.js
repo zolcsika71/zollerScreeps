@@ -1,4 +1,4 @@
-const strategy = require('./strategy');
+"use strict";
 
 let mod = {};
 module.exports = mod;
