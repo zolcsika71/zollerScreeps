@@ -12,7 +12,7 @@ mod.json = (x) => {
 
 mod.execute = function () {
 
-
+    //console.log(Parameter.DEBUG);
 
     return true;
 
