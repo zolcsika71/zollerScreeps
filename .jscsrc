@@ -1,0 +1,15 @@
+{
+	"preset": "crockford",
+        "maximumLineLength": 240,
+        "requireCamelCaseOrUpperCaseIdentifiers": true,
+        "validateIndentation": 4,
+		"maxErrors": 1000,
+        "requireCurlyBraces": [
+          "while",
+          "do",
+          "try",
+          "catch",
+          "switch"
+        ],
+        "disallowKeywords": [""]
+}
