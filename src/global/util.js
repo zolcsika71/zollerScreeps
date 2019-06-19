@@ -9,7 +9,6 @@ const
 
 let mod = {},
     profiler;
-
 module.exports = mod;
 
 /**
