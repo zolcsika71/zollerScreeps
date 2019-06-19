@@ -86,6 +86,8 @@ let inject = (base, alien, namespace) => {
     }
 };
 
+
+
 inject(global, GLOBAL.global);
 inject(Creep, CREEP.creep);
 inject(Room, ROOM.room);
@@ -142,7 +144,7 @@ module.exports.loop = wrapLoop(function () {
     try {
         GLOBAL.global.consoleMe();
         console.log(`${GLOBAL.parameter.DEBUG}`);
-        GLOBAL.util.consoleMe();
+        GLOBAL.util.dye()
 
 
 
