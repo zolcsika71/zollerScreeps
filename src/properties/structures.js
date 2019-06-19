@@ -1,5 +1,11 @@
-
 "use strict";
+
+const
+    GLOBAL = {
+        global: require('./global.global'),
+        parameter: require(`./global.parameter`),
+        util: require(`./util.util`)
+    };
 
 
 let mod = {};
@@ -105,7 +111,7 @@ mod.extend = function () {
     Object.defineProperty(StructureStorage.prototype, 'sum', {
         configurable: true,
         get: function () {
-            if (_.isUndefined(this._sum) || this._sumSet != Game.time) {
+            if (_.isUndefined(this._sum) || this._sumSet !== Game.time) {
                 this._sumSet = Game.time;
                 this._sum = _.sum(this.store);
             }
@@ -124,7 +130,7 @@ mod.extend = function () {
     Object.defineProperty(StructureTerminal.prototype, 'sum', {
         configurable: true,
         get: function () {
-            if (_.isUndefined(this._sum) || this._sumSet != Game.time) {
+            if (_.isUndefined(this._sum) || this._sumSet !== Game.time) {
                 this._sumSet = Game.time;
                 this._sum = _.sum(this.store);
             }
@@ -136,7 +142,7 @@ mod.extend = function () {
         get: function () {
             const needs = this.getNeeds(RESOURCE_ENERGY);
             const terminalTarget = needs ? this.store[RESOURCE_ENERGY] + needs : TERMINAL_ENERGY;
-            return Util.chargeScale(this.store.energy,
+            return GLOBAL.util.chargeScale(this.store.energy,
                 terminalTarget,
                 terminalTarget * 2);
         }
@@ -144,7 +150,7 @@ mod.extend = function () {
     Object.defineProperty(StructureContainer.prototype, 'sum', {
         configurable: true,
         get: function () {
-            if (_.isUndefined(this._sum) || this._sumSet != Game.time) {
+            if (_.isUndefined(this._sum) || this._sumSet !== Game.time) {
                 this._sumSet = Game.time;
                 this._sum = _.sum(this.store);
             }

@@ -5,7 +5,6 @@ const
         global: require('./global.global'),
         parameter: require(`./global.parameter`),
         util: require(`./util.util`)
-
     };
 
 let mod = {},
@@ -117,13 +116,13 @@ mod.logError = function (message, entityWhere) {
 };
 
 /**
- * Log text as a system message showing a "referrer" as a label
- * @param {string} roomName - The name of the room being logged from
+ * Log text as a system message showing a "preFix" as a label
+ * @param {string} preFix - text displaying before message
  * @param {...string} message - The message to log
  */
-mod.logSystem = function (roomName, ...message) {
-    const text = mod.dye(GLOBAL.parameter.CRAYON.system, roomName);
-    console.log(mod.dye(GLOBAL.parameter.CRAYON.system, `<a href="/a/#!/room/${Game.shard.name}/${roomName}">${text}</a> &gt;`), ...message, mod.stack());
+mod.logSystem = function (preFix, ...message) {
+    const text = mod.dye(GLOBAL.parameter.CRAYON.system, preFix);
+    console.log(mod.dye(GLOBAL.parameter.CRAYON.system, `<a href="/a/#!/room/${Game.shard.name}/${preFix}">${text}</a> &gt;`), ...message, mod.stack());
 };
 
 /**

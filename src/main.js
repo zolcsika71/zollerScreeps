@@ -44,8 +44,8 @@ const
 
     },
     PROPERTIES = {
-    structures: require('./properties.structures')
-},
+        structures: require('./properties.structures')
+    },
     PROTOTYPES = {
         mineral: require('./prototypes.mineral'),
         roomObject: require('./prototypes.roomObject'),
