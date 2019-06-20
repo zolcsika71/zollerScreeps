@@ -56,7 +56,7 @@ const
         structures: require('./properties.structures')
     },
     PROTOTYPES = {
-        structures: require('./prototypes.structures')
+        structures: require('./prototypes.structures'),
         creep: require('./prototypes.creep')
     },
     ROOM = {
