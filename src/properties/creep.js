@@ -1,20 +1,5 @@
 "use strict";
 
-const
-    CREEP = {
-        action: {
-            Action: require('./creep.action.Action'),
-        },
-        behaviour: {
-            Behaviour: require('./creep.behaviour.Behaviour'),
-        },
-        setup: {
-            Setup: require('./creep.setup.Setup'),
-        },
-        creep: require('./creep.creep'),
-        population: require('./creep.population')
-    };
-
 let mod = {};
 module.exports = mod;
 mod.extend = function () {
@@ -29,7 +14,7 @@ mod.extend = function () {
                 }
                 if (this.data.flee) {
                     // release when restored
-                    this.data.flee = this.hits !=== this.hitsMax;
+                    this.data.flee = this.hits !== this.hitsMax;
                 } else {
                     // set when low
                     this.data.flee = (this.hits / this.hitsMax) < 0.35;

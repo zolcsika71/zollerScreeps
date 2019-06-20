@@ -53,7 +53,8 @@ const
         roomObject: require('./properties.roomObject'),
         roomPosition: require('./properties.roomPosition'),
         source: require('./properties.source'),
-        structures: require('./properties.structures')
+        structures: require('./properties.structures'),
+        flag: require('./properties.flag')
     },
     PROTOTYPES = {
         structures: require('./prototypes.structures'),
@@ -61,6 +62,9 @@ const
     },
     ROOM = {
         room: require('./room.room')
+    },
+    TASK = {
+        task: require('./task.task')
     },
     ROOT = {
         mainInjection: require(`./mainInjection`),
@@ -113,6 +117,10 @@ _.assign(global, {
     Population: CREEP.population
 });
 
+_.assign(global.Task, {
+
+});
+
 
 _.assign(Creep, {
     action: {
@@ -138,6 +146,12 @@ Object.keys(PROPERTIES).forEach(property => {
 Object.keys(PROTOTYPES).forEach(prototype => {
     PROTOTYPES[prototype].extend();
 });
+ROOT.spawn.extend();
+TASK.task.populate();
+//PROTOTYPES.visual.extend
+
+if (ROOT.mainInjection.extend)
+    ROOT.mainInjection.extend();
 
 
 

@@ -440,6 +440,17 @@ mod.extend = function () {
     Creep.prototype.staticCustomStrategy = function (actionName, behaviourName, taskName) {};
     Creep.prototype.customStrategy = function (actionName, behaviourName, taskName) {};
 
+    // Creep.prototype.strategy = function(actionName, behaviourName, taskName)
+    strategy.decorateAgent(Creep.prototype,
+        {   default: creep => creep.action && creep.action.name,
+            selector: actionName => Creep.action[actionName]},
+        {   default: creep => creep.data.creepType,
+            selector: behaviourName => Creep.behaviour[behaviourName] && Creep.behaviour[behaviourName]},
+        {   default: creep => creep.data.destiny && creep.data.destiny.task,
+            selector: taskName => Task[taskName] && Task[taskName]
+        });
+
 
 
 };
+
