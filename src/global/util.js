@@ -1,6 +1,7 @@
 "use strict";
 
 const
+    _ = require('lodash'),
     GLOBAL = {
         global: require('./global.global'),
         parameter: require(`./global.parameter`),
@@ -48,8 +49,7 @@ mod.dye = function (style, ...text) {
 mod.stack = function (force = false, placeholder = ' ') {
 
     if (GLOBAL.parameter.DEBUG_STACKS || force)
-        return new Error(`
-STACK; param:${GLOBAL.parameter.DEBUG_STACKS}, force:${force}`).stack;
+        return new Error(`\nSTACK; param:${GLOBAL.parameter.DEBUG_STACKS}, force:${force}`).stack;
 
     return placeholder;
 };
@@ -156,8 +156,8 @@ mod.resetProfiler = function () {
  * @returns {{totalCPU(), checkCPU()}} - functions to be called to check usage and output totals
  */
 
-// TODO startCPU: 0?
-mod.startProfiling = function (name, options = {enabled: false, startCPU: 0}) {
+
+mod.startProfiling = function (name, options = {enabled: false, startCPU: undefined}) {
     const
         enabled = options.enabled,
         startCPU = options.startCPU;

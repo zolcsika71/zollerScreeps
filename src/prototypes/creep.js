@@ -1,12 +1,20 @@
 "use strict";
 
 const
+    _ = require('lodash'),
     strategy = require('./strategy'),
     GLOBAL = {
         global: require('./global.global'),
         parameter: require(`./global.parameter`),
         util: require(`./util.util`)
 
+    },
+    CREEP = {
+        Action: require('./creep.Action'),
+        Behaviour: require('./creep.Behaviour'),
+        Setup: require('./creep.Setup'),
+        creep: require('./creep.creep'),
+        population: require('./creep.population')
     };
 
 
@@ -84,23 +92,27 @@ mod.extend = function () {
                 behaviour = Creep.behaviour[this.data.creepType];
                 if (this.room.skip)
                     return;
-                if (Memory.CPU_CRITICAL && !GLOBAL.parameter.CRITICAL_ROLES.includes(this.data.creepType))
+                if (Memory.CPU_CRITICAL && !global.CRITICAL_ROLES.includes(this.data.creepType))
                     return;
             }
-            const total = GLOBAL.util.startProfiling('Creep.run', {enabled: GLOBAL.parameter.PROFILING.CREEPS});
-            const p = Util.startProfiling(this.name + '.run', {enabled: this.data && this.data.creepType && PROFILING.CREEP_TYPE === this.data.creepType});
+            const
+                total = GLOBAL.util.startProfiling('Creep.run', {enabled: global.PROFILING.CREEPS}),
+                p = GLOBAL.util.startProfiling(this.name + '.run', {enabled: this.data && this.data.creepType && global.PROFILING.CREEP_TYPE === this.data.creepType});
+
             if (this.data && !_.contains(['remoteMiner', 'miner', 'upgrader'], this.data.creepType)) {
                 this.repairNearby();
-                p.checkCPU('repairNearby', PROFILING.MIN_THRESHOLD);
+                p.checkCPU('repairNearby', global.PROFILING.MIN_THRESHOLD);
                 this.buildNearby();
-                p.checkCPU('buildNearby', PROFILING.MIN_THRESHOLD);
+                p.checkCPU('buildNearby', global.PROFILING.MIN_THRESHOLD);
             }
-            if (global.DEBUG && global.TRACE) trace('Creep', {creepName: this.name, pos: this.pos, Behaviour: behaviour && behaviour.name, Creep: 'run'});
+            if (global.DEBUG && global.TRACE)
+                GLOBAL.util.trace('Creep', {creepName: this.name, pos: this.pos, Behaviour: behaviour && behaviour.name, Creep: 'run'});
             if (behaviour) {
                 behaviour.run(this);
-                p.checkCPU('behaviour.run', PROFILING.MIN_THRESHOLD);
+                p.checkCPU('behaviour.run', global.PROFILING.MIN_THRESHOLD);
             } else if (!this.data) {
-                if (global.DEBUG && global.TRACE) trace('Creep', {creepName: this.name, pos: this.pos, Creep: 'run'}, 'memory init');
+                if (global.DEBUG && global.TRACE)
+                    GLOBAL.util.trace('Creep', {creepName: this.name, pos: this.pos, Creep: 'run'}, 'memory init');
                 let type = this.memory.setup;
                 let weight = this.memory.cost;
                 let home = this.memory.home;
@@ -108,7 +120,7 @@ mod.extend = function () {
                 let breeding = this.memory.breeding;
                 if (type && weight && home && spawn && breeding) {
                     //console.log( 'Fixing corrupt creep without population entry: ' + this.name );
-                    var entry = Population.setCreep({
+                    let entry = CREEP.population.setCreep({
                         creepName: this.name,
                         creepType: type,
                         weight: weight,
@@ -121,14 +133,14 @@ mod.extend = function () {
                         flagName: null,
                         body: _.countBy(this.body, 'type')
                     });
-                    Population.countCreep(this.room, entry);
+                    CREEP.population.countCreep(this.room, entry);
                 } else {
-                    console.log(dye(CRAYON.error, 'Corrupt creep without population entry!! : ' + this.name), Util.stack());
+                    console.log(GLOBAL.util.dye(global.CRAYON.error, 'Corrupt creep without population entry!! : ' + this.name), GLOBAL.util.stack());
                     // trying to import creep
                     let counts = _.countBy(this.body, 'type');
                     if (counts[WORK] && counts[CARRY]) {
                         let weight = (counts[WORK] * BODYPART_COST[WORK]) + (counts[CARRY] * BODYPART_COST[CARRY]) + (counts[MOVE] * BODYPART_COST[MOVE]);
-                        var entry = Population.setCreep({
+                        let entry = CREEP.population.setCreep({
                             creepName: this.name,
                             creepType: 'worker',
                             weight: weight,
@@ -141,21 +153,22 @@ mod.extend = function () {
                             flagName: null,
                             body: _.countBy(this.body, 'type')
                         });
-                        Population.countCreep(this.room, entry);
+                        CREEP.population.countCreep(this.room, entry);
                     } else this.suicide();
-                    p.checkCPU('!this.data', PROFILING.MIN_THRESHOLD);
+                    p.checkCPU('!this.data', global.PROFILING.MIN_THRESHOLD);
                 }
             }
             if (this.flee) {
                 this.fleeMove();
-                p.checkCPU('fleeMove', PROFILING.MIN_THRESHOLD);
+                p.checkCPU('fleeMove', global.PROFILING.MIN_THRESHOLD);
                 Creep.behaviour.ranger.heal(this);
-                p.checkCPU('heal', PROFILING.MIN_THRESHOLD);
-                if (SAY_ASSIGNMENT) this.say(String.fromCharCode(10133), SAY_PUBLIC);
-            }
-            total.checkCPU(this.name, PROFILING.EXECUTE_LIMIT / 3, this.data ? this.data.creepType : 'noType');
-        }
+                p.checkCPU('heal', global.PROFILING.MIN_THRESHOLD);
+                if (global.SAY_ASSIGNMENT)
+                    this.say(String.fromCharCode(10133), global.SAY_PUBLIC);
 
+            }
+            total.checkCPU(this.name, global.PROFILING.EXECUTE_LIMIT / 3, this.data ? this.data.creepType : 'noType');
+        }
         strategy.freeStrategy(this);
     };
     Creep.prototype.leaveBorder = function () {
@@ -232,9 +245,13 @@ mod.extend = function () {
 
             if (roomPos.x > 0 && roomPos.y > 0) {
 
-                let stuff = roomPos.look();
+                let stuff = roomPos.look(),
+                    // TODO none of them working :(
+                    noObstacle = !_.some(stuff, object => {
+                        return object.type === 'creep' || (object.type === 'structure' && OBSTACLE_OBJECT_TYPES.includes(object.structureType)) || (object.type === 'terrain' && object.terrain === 'wall')
+                    });
 
-                if (_.findIndex(stuff, p => p.type === 'creep' || (p.structure && OBSTACLE_OBJECT_TYPES[p.structure.structureType]) || p.terrain === 'wall') === -1) {
+                if (_.findIndex(stuff, p => p.type === 'creep' || (p.type === 'structure' && OBSTACLE_OBJECT_TYPES.includes(p.structureType)) || (p.type === 'terrain' && p.terrain === 'wall')) === -1) {
                     this.move(direction);
                     return direction;
                 }
@@ -242,7 +259,7 @@ mod.extend = function () {
         }
     };
     Creep.prototype.honk = function () {
-        if (HONK) this.say('\u{26D4}\u{FE0E}', SAY_PUBLIC);
+        if (global.HONK) this.say('\u{26D4}\u{FE0E}', SAY_PUBLIC);
     };
     Creep.prototype.honkEvade = function () {
         if (HONK) this.say('\u{1F500}\u{FE0E}', SAY_PUBLIC);

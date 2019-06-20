@@ -28,14 +28,19 @@ function wrapLoop(fn) {
 }
 
 const
-    //_ = require('lodash'),
+    _ = require('lodash'),
     CREEP = {
-        Action: require('./creep.Action'),
-        Behaviour: require('./creep.Behaviour'),
-        Setup: require('./creep.Setup'),
-        creep: require('./creep.creep')
-
-
+        action: {
+            Action: require('./creep.action.Action'),
+        },
+        behaviour: {
+            Behaviour: require('./creep.behaviour.Behaviour'),
+        },
+        setup: {
+            Setup: require('./creep.setup.Setup'),
+        },
+        creep: require('./creep.creep'),
+        population: require('./creep.population')
     },
     GLOBAL = {
         global: require('./global.global'),
@@ -44,14 +49,15 @@ const
 
     },
     PROPERTIES = {
+        mineral: require('./properties.mineral'),
+        roomObject: require('./properties.roomObject'),
+        roomPosition: require('./properties.roomPosition'),
+        source: require('./properties.source'),
         structures: require('./properties.structures')
     },
     PROTOTYPES = {
-        mineral: require('./prototypes.mineral'),
-        roomObject: require('./prototypes.roomObject'),
-        roomPosition: require('./prototypes.roomPosition'),
-        source: require('./prototypes.source'),
         structures: require('./prototypes.structures')
+        creep: require('./prototypes.creep')
     },
     ROOM = {
         room: require('./room.room')
@@ -93,9 +99,9 @@ inject(Creep, CREEP.creep);
 inject(Room, ROOM.room);
 inject(Spawn, ROOT.spawn);
 
-Creep.Action = CREEP.Action;
-Creep.Behaviour = CREEP.Behaviour;
-Creep.Setup = CREEP.Setup;
+Creep.Action = CREEP.action.Action;
+Creep.Behaviour = CREEP.behaviour.Behaviour;
+Creep.Setup = CREEP.setup.Setup;
 
 
 // make parameter accessible from command line
@@ -103,7 +109,8 @@ _.assign(global, GLOBAL.parameter);
 
 // make util accessible from command line usage: Util.fn();
 _.assign(global, {
-    Util: GLOBAL.util
+    Util: GLOBAL.util,
+    Population: CREEP.population
 });
 
 
@@ -142,9 +149,7 @@ module.exports.loop = wrapLoop(function () {
         return;
 
     try {
-        GLOBAL.global.consoleMe();
-        console.log(`${GLOBAL.parameter.DEBUG}`);
-        GLOBAL.util.dye()
+
 
 
 
