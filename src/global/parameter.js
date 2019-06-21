@@ -27,11 +27,20 @@ let mod = {
     CRITICAL_BUCKET_OVERFILL: 200,
     CRITICAL_ROLES: ['worker', 'collapseWorker', 'melee', 'ranger', 'healer', 'miner', 'hauler', 'upgrader'], // when the bucket drops below the critical bucket level only these creep roles will be executed
 
+    TRAVELER_STUCK_TICKS: 2, // Number of ticks not moving to be considered stuck by the Traveler API
+    TRAVELER_THRESHOLD: 5, // Average creep CPU usage/tick before warning about pathing cost, starts after 25 ticks
+
     CRAYON: { // predefined log colors
         death: {color: 'black', 'font-weight': 'bold'},
         birth: '#e6de99',
         error: '#e79da7',
         system: {color: '#999', 'font-size': '10px'}
+    },
+    MEM_SEGMENTS: {
+        COSTMATRIX_CACHE: {
+            start: 99,
+            end: 95
+        }
     }
 
 
