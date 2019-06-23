@@ -6,13 +6,13 @@ const
     GLOBAL = {
         global: require('./global.global'),
         parameter: require(`./global.parameter`),
-        util: require(`./util.util`)
+        util: require(`./global.util`)
 
     },
     CREEP = {
-        Action: require('./creep.Action'),
-        Behaviour: require('./creep.Behaviour'),
-        Setup: require('./creep.Setup'),
+        Action: require('./creep.action.Action'),
+        Behaviour: require('./creep.behaviour.Behaviour'),
+        Setup: require('./creep.setup.Setup'),
         creep: require('./creep.creep'),
         population: require('./creep.population')
     };

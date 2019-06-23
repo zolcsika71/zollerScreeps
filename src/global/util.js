@@ -1,12 +1,7 @@
 "use strict";
 
 const
-    _ = require('lodash'),
-    GLOBAL = {
-        global: require('./global.global'),
-        parameter: require(`./global.parameter`),
-        util: require(`./util.util`)
-    };
+    _ = require('lodash');
 
 let mod = {},
     profiler;
@@ -48,8 +43,9 @@ mod.dye = function (style, ...text) {
  */
 mod.stack = function (force = false, placeholder = ' ') {
 
-    if (GLOBAL.parameter.DEBUG_STACKS || force)
-        return new Error(`\nSTACK; param:${GLOBAL.parameter.DEBUG_STACKS}, force:${force}`).stack;
+    if (global.DEBUG_STACKS || force)
+        return new Error(`
+STACK; param:${global.DEBUG_STACKS}, force:${force}`).stack;
 
     return placeholder;
 };
@@ -98,7 +94,7 @@ mod.trace = function (category, entityWhere, ...message) {
         }
     }
 
-    console.log(Game.time, mod.dye(GLOBAL.parameter.CRAYON.error, category), ...msg, mod.dye(GLOBAL.parameter.CRAYON.birth, JSON.stringify(entityWhere)), mod.stack());
+    console.log(Game.time, mod.dye(global.CRAYON.error, category), ...msg, mod.dye(global.CRAYON.birth, JSON.stringify(entityWhere)), mod.stack());
 };
 
 /**
@@ -107,7 +103,7 @@ mod.trace = function (category, entityWhere, ...message) {
  * @param {*} [entityWhere] - The entity where the error was caused
  */
 mod.logError = function (message, entityWhere) {
-    const msg = mod.dye(GLOBAL.parameter.CRAYON.error, message);
+    const msg = mod.dye(global.CRAYON.error, message);
     if (entityWhere) {
         mod.trace('error', entityWhere, msg);
     } else {
@@ -121,8 +117,8 @@ mod.logError = function (message, entityWhere) {
  * @param {...string} message - The message to log
  */
 mod.logSystem = function (preFix, ...message) {
-    const text = mod.dye(GLOBAL.parameter.CRAYON.system, preFix);
-    console.log(mod.dye(GLOBAL.parameter.CRAYON.system, `<a href="/a/#!/room/${Game.shard.name}/${preFix}">${text}</a> &gt;`), ...message, mod.stack());
+    const text = mod.dye(global.CRAYON.system, preFix);
+    console.log(mod.dye(global.CRAYON.system, `<a href="/a/#!/room/${Game.shard.name}/${preFix}">${text}</a> &gt;`), ...message, mod.stack());
 };
 
 /**
@@ -150,13 +146,45 @@ mod.resetProfiler = function () {
 };
 
 /**
+ * Gets a property from an object and optionally sets the default
+ * @param {Object} object - The object
+ * @param {string} path - The path to the property within the object
+ * @param {*} defaultValue - The default value if property doesn't exist
+ * @param {Boolean} [setDefault=true] - Will set the property to the default value if property doesn't exist
+ * @returns {*}
+ */
+mod.get(object, path, defaultValue, setDefault = true) {
+    const r = _.get(object, path);
+    if (_.isUndefined(r) && !_.isUndefined(defaultValue) && setDefault) {
+        defaultValue = Util.fieldOrFunction(defaultValue);
+        _.set(object, path, defaultValue);
+        return _.get(object, path);
+    }
+    return r;
+};
+
+
+/**
+ * Sets a property on an object, optionally if the property doesn't already exist
+ * @param {Object} object - The object
+ * @param {string} path - The path to the property within the object
+ * @param {*} value - The value to set
+ * @param {Boolean} [onlyIfNotExists=true] - Will only set the property if it doesn't already exist
+ */
+mod.set(object, path, value, onlyIfNotExists = true) {
+    if (onlyIfNotExists) {
+        mod.get(object, path, value);
+        return;
+    }
+    _.set(object, path, value);
+};
+
+/**
  * Creates and returns a profiling object, use checkCPU to compare usage between calls
  * @param name - The name to use when reporting
  * @param options (enabled true/false)
  * @returns {{totalCPU(), checkCPU()}} - functions to be called to check usage and output totals
  */
-
-
 mod.startProfiling = function (name, options = {enabled: false, startCPU: undefined}) {
     const
         enabled = options.enabled,
@@ -164,19 +192,17 @@ mod.startProfiling = function (name, options = {enabled: false, startCPU: undefi
 
     let returnValue,
         checkCPU = function (localName, limit, type) {
-
-        },
+    },
         totalCPU = function () {
-            // if you would like to do a baseline comparison
-            // if (_.isUndefined(Memory.profiling)) Memory.profiling = {ticks:0, cpu: 0};
-            // let thisTick = Game.cpu.getUsed() - startCPU;
-            // Memory.profiling.ticks++;
-            // Memory.profiling.cpu += thisTick;
-            // logSystem('Total', _.round(thisTick, 2) + ' ' + _.round(Memory.profiling.cpu / Memory.profiling.ticks, 2));
+        // if you would like to do a baseline comparison
+        // if (_.isUndefined(Memory.profiling)) Memory.profiling = {ticks:0, cpu: 0};
+        // let thisTick = Game.cpu.getUsed() - startCPU;
+        // Memory.profiling.ticks++;
+        // Memory.profiling.cpu += thisTick;
+        // logSystem('Total', _.round(thisTick, 2) + ' ' + _.round(Memory.profiling.cpu / Memory.profiling.ticks, 2));
+    };
 
-        };
-
-    if (GLOBAL.parameter.PROFILE && enabled) {
+    if (global.PROFILE && enabled) {
         if (_.isUndefined(Memory.profiler))
             mod.resetProfiler();
         else if (!profiler || profiler.validTick !== Memory.profiler.validTick || profiler.totalTicks < Memory.profiler.totalTicks)
@@ -185,7 +211,7 @@ mod.startProfiling = function (name, options = {enabled: false, startCPU: undefi
         const onLoad = startCPU || Game.cpu.getUsed();
         let start = onLoad;
 
-        if (GLOBAL.parameter.PROFILE && !GLOBAL.parameter.PROFILING.BASIC_ONLY) {
+        if (global.PROFILE && !global.PROFILING.BASIC_ONLY) {
             /**
              * Compares usage since startProfiling or the last call to checkCPU and reports if over limit
              * @param {string} localName - The local name to use when reporting
@@ -217,7 +243,7 @@ mod.startProfiling = function (name, options = {enabled: false, startCPU: undefi
 
             profiler.totalCPU += totalUsed;
             profiler.totalTicks++;
-            if (GLOBAL.parameter.PROFILE && !GLOBAL.parameter.PROFILING.BASIC_ONLY && GLOBAL.parameter.PROFILING.AVERAGE_USAGE && _.size(profiler.types) > 0) {
+            if (global.PROFILE && !global.PROFILING.BASIC_ONLY && global.PROFILING.AVERAGE_USAGE && _.size(profiler.types) > 0) {
                 let string = '',
                     longestType = '';
                 _(profiler.types).map((data, type) => {
@@ -240,15 +266,15 @@ mod.startProfiling = function (name, options = {enabled: false, startCPU: undefi
                 mod.logSystem('Average Usage', `<table style="font-size:80%;"><tr><th>Type${Array(longestType.length + 2).join(' ')}</th><th>(avg/creep/tick)</th><th>(active)</th><th>(weighted avg)</th><th>(executions)</th></tr>`.concat(string));
             }
             mod.logSystem(name, ' loop:' + _.round(totalUsed, 2), 'other:' + _.round(onLoad, 2), 'avg:' + _.round(avgCPU, 2), 'ticks:' + profiler.totalTicks, 'bucket:' + Game.cpu.bucket);
-            if (GLOBAL.parameter.PROFILE && !GLOBAL.parameter.PROFILING.BASIC_ONLY)
+            if (global.PROFILE && !global.PROFILING.BASIC_ONLY)
                 console.log('\n');
-            Memory.profiler = profiler;
+            M emory.profiler = profiler;
         };
     }
 
     returnValue = {
-        checkCPU: checkCPU(),
-        totalCPU: totalCPU()
+        checkCPU: checkCPU,
+        totalCPU: totalCPU
     };
 
     return returnValue;

@@ -4,7 +4,7 @@ const
     GLOBAL = {
         global: require('./global.global'),
         parameter: require(`./global.parameter`),
-        util: require(`./util.util`)
+        util: require(`./global.util`)
 
     };
 

@@ -31,13 +31,13 @@ const
     _ = require('lodash'),
     CREEP = {
         action: {
-            Action: require('./creep.action.Action'),
+            Action: require('./creep.action.Action')
         },
         behaviour: {
-            Behaviour: require('./creep.behaviour.Behaviour'),
+            Behaviour: require('./creep.behaviour.Behaviour')
         },
         setup: {
-            Setup: require('./creep.setup.Setup'),
+            Setup: require('./creep.setup.Setup')
         },
         creep: require('./creep.creep'),
         population: require('./creep.population')
@@ -45,7 +45,7 @@ const
     GLOBAL = {
         global: require('./global.global'),
         parameter: require(`./global.parameter`),
-        util: require(`./util.util`)
+        util: require(`./global.util`)
     },
     PROPERTIES = {
         mineral: require('./properties.mineral'),
@@ -69,8 +69,7 @@ const
         mainInjection: require(`./mainInjection`),
         spawn: require('./spawn'),
         ocsMemory: require('./ocsMemory'),
-        initMemory: require('./initMemory'),
-        traveler: require('./traveler')({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD})
+        initMemory: require('./initMemory')
     };
 
 
@@ -118,10 +117,12 @@ _.assign(global, GLOBAL.parameter);
 // make util accessible from command line usage: Util.fn();
 _.assign(global, {
     Util: GLOBAL.util,
-    Population: CREEP.population
+    Population: CREEP.population,
+    Task: TASK.task
 });
 
 _.assign(global.Task, {
+
 
 });
 
@@ -162,6 +163,8 @@ ROOT.ocsMemory.activateSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, true);
 if (global.DEBUG)
     GLOBAL.util.logSystem('Global.install', 'Code reloaded.');
 
+ROOT.traveler = require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
+
 
 
 module.exports.loop = wrapLoop(function () {
@@ -186,7 +189,7 @@ module.exports.loop = wrapLoop(function () {
             cpuAtFirstLoop = cpuAtLoop;
 
 
-        GLOBAL.util.set(Memory, 'parameters', {});
+        GLOBAL.util.set(Memory, 'parameters', {}, true);
         _.assign(global, {parameters: Memory.parameters}); // allow for shorthand access in console
         // ensure up to date parameters, override in memory
         _.assign(global, GLOBAL.parameter);
