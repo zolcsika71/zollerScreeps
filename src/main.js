@@ -182,8 +182,8 @@ module.exports.loop = wrapLoop(function () {
 
     try {
 
-        const totalUsage = GLOBAL.util.startProfiling('main', {startCPU: cpuAtLoop});
-        const p = GLOBAL.util.startProfiling('main', {enabled: global.PROFILING.MAIN, startCPU: cpuAtLoop});
+        let totalUsage = GLOBAL.util.startProfiling('main', {startCPU: cpuAtLoop}),
+            p = GLOBAL.util.startProfiling('main', {enabled: global.PROFILING.MAIN, startCPU: cpuAtLoop});
 
         p.checkCPU('deserialize memory', 5);
 
@@ -200,7 +200,7 @@ module.exports.loop = wrapLoop(function () {
         _.assign(global, GLOBAL.parameter);
         _.merge(global, parameters);
 
-        OCSMemory.processSegments();
+        ROOT.ocsMemory.processSegments();
         p.checkCPU('processSegments', global.PROFILING.ANALYZE_LIMIT);
 
         // Flush cache

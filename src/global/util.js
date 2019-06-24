@@ -54,8 +54,7 @@ mod.dye = function (style, ...text) {
 mod.stack = function (force = false, placeholder = ' ') {
 
     if (global.DEBUG_STACKS || force)
-        return new Error(`
-STACK; param:${global.DEBUG_STACKS}, force:${force}`).stack;
+        return new Error(`\nSTACK; param:${global.DEBUG_STACKS}, force:${force}`).stack;
 
     return placeholder;
 };

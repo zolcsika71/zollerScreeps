@@ -35,7 +35,8 @@ mod.activateSegment = (id, reset = false) => {
 mod.deactivateSegment = (id) => {
     if (id < 0 || id > 99)
         return GLOBAL.util.logError('RawMemory', 'cannot deactivate invalid segment ' + id);
-    if (_.size(mod.toActivate) === 0) Object.keys(RawMemory.segments).forEach(id => mod.toActivate[id] = true);
+    if (_.size(mod.toActivate) === 0)
+        Object.keys(RawMemory.segments).forEach(id => mod.toActivate[id] = true);
     delete mod.toActivate[id];
 };
 mod.cacheValid = (id) => {
