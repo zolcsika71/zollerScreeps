@@ -1,7 +1,7 @@
 "use strict";
 
 const
-    _ = require('lodash'),
+    //_ = require('lodash'),
     strategy = require('./strategy'),
     GLOBAL = {
         global: require('./global.global'),

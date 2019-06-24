@@ -1,6 +1,6 @@
 "use strict";
 const
-    _ = require('lodash'),
+    //_ = require('lodash'),
     GLOBAL = {
         global: require('./global.global'),
         parameter: require(`./global.parameter`),
@@ -42,7 +42,8 @@ mod.cacheValid = (id) => {
     return global.cacheValid[id] === Memory.cacheValid[id];
 };
 mod.processSegment = (id, process) => {
-    if (_.isUndefined(Memory.cacheValid[id])) Memory.cacheValid[id] = false;
+    if (_.isUndefined(Memory.cacheValid[id]))
+        Memory.cacheValid[id] = false;
     const segment = RawMemory.segments[id];
     if (!mod.cacheValid(id)) {
         try {

@@ -28,7 +28,7 @@ function wrapLoop(fn) {
 }
 
 const
-    _ = require('lodash'),
+    //_ = require('lodash'),
     CREEP = {
         action: {
             Action: require('./creep.action.Action')
@@ -63,13 +63,15 @@ const
         room: require('./room.room')
     },
     TASK = {
-        task: require('./task.task')
+        task: require('./task.task'),
+        mining: require('./task.mining')
     },
     ROOT = {
         mainInjection: require(`./mainInjection`),
         spawn: require('./spawn'),
         ocsMemory: require('./ocsMemory'),
-        initMemory: require('./initMemory')
+        initMemory: require('./initMemory'),
+        events: require('./events')
     };
 
 
@@ -118,10 +120,14 @@ _.assign(global, GLOBAL.parameter);
 _.assign(global, {
     Util: GLOBAL.util,
     Population: CREEP.population,
-    Task: TASK.task
+    Task: TASK.task,
+    OCSMemory: ROOT.ocsMemory,
+    Events: ROOT.events
 });
 
 _.assign(global.Task, {
+
+    mining: TASK.mining
 
 
 });
@@ -176,9 +182,8 @@ module.exports.loop = wrapLoop(function () {
 
     try {
 
-        const
-            totalUsage = GLOBAL.util.startProfiling('main', {startCPU: cpuAtLoop}),
-            p = GLOBAL.util.startProfiling('main', {enabled: global.PROFILING.MAIN, startCPU: cpuAtLoop});
+        const totalUsage = GLOBAL.util.startProfiling('main', {startCPU: cpuAtLoop});
+        const p = GLOBAL.util.startProfiling('main', {enabled: global.PROFILING.MAIN, startCPU: cpuAtLoop});
 
         p.checkCPU('deserialize memory', 5);
 
@@ -189,13 +194,17 @@ module.exports.loop = wrapLoop(function () {
             cpuAtFirstLoop = cpuAtLoop;
 
 
-        GLOBAL.util.set(Memory, 'parameters', {}, true);
+        GLOBAL.util.set(Memory, 'parameters', {});
         _.assign(global, {parameters: Memory.parameters}); // allow for shorthand access in console
         // ensure up to date parameters, override in memory
         _.assign(global, GLOBAL.parameter);
         _.merge(global, parameters);
 
+        OCSMemory.processSegments();
+        p.checkCPU('processSegments', global.PROFILING.ANALYZE_LIMIT);
 
+        // Flush cache
+        ROOT.events.flush();
 
 
 

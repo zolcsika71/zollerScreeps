@@ -1,11 +1,21 @@
 "use strict";
-
+/*
 const
     _ = require('lodash');
-
+*/
 let mod = {},
     profiler;
 module.exports = mod;
+
+/**
+ * Returns the result of the function or the value passed
+ * @param {*} value
+ * @param {...*} [args] - A list of arguments to pass if it's a function
+ * @returns {*}
+ */
+mod.fieldOrFunction =  function (value, ...args) {
+    return typeof value === 'function' ? value(...args) : value;
+};
 
 /**
  * Checks if the value is an object or function
@@ -153,7 +163,7 @@ mod.resetProfiler = function () {
  * @param {Boolean} [setDefault=true] - Will set the property to the default value if property doesn't exist
  * @returns {*}
  */
-mod.get(object, path, defaultValue, setDefault = true) {
+mod.get = function (object, path, defaultValue, setDefault = true) {
     const r = _.get(object, path);
     if (_.isUndefined(r) && !_.isUndefined(defaultValue) && setDefault) {
         defaultValue = Util.fieldOrFunction(defaultValue);
@@ -171,7 +181,7 @@ mod.get(object, path, defaultValue, setDefault = true) {
  * @param {*} value - The value to set
  * @param {Boolean} [onlyIfNotExists=true] - Will only set the property if it doesn't already exist
  */
-mod.set(object, path, value, onlyIfNotExists = true) {
+mod.set = function (object, path, value, onlyIfNotExists = true) {
     if (onlyIfNotExists) {
         mod.get(object, path, value);
         return;
@@ -268,14 +278,11 @@ mod.startProfiling = function (name, options = {enabled: false, startCPU: undefi
             mod.logSystem(name, ' loop:' + _.round(totalUsed, 2), 'other:' + _.round(onLoad, 2), 'avg:' + _.round(avgCPU, 2), 'ticks:' + profiler.totalTicks, 'bucket:' + Game.cpu.bucket);
             if (global.PROFILE && !global.PROFILING.BASIC_ONLY)
                 console.log('\n');
-            M emory.profiler = profiler;
+            Memory.profiler = profiler;
         };
     }
 
-    returnValue = {
-        checkCPU: checkCPU,
-        totalCPU: totalCPU
-    };
+    returnValue = {checkCPU, totalCPU};
 
     return returnValue;
 };
