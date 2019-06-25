@@ -125,11 +125,11 @@ _.assign(global, GLOBAL.parameter);
 // make util accessible from command line usage: Util.fn();
 _.assign(global, {
     Util: GLOBAL.util,
-    Population: CREEP.population,
     Task: TASK.task,
     OCSMemory: ROOT.ocsMemory,
     Events: ROOT.events,
-    FlagDir: ROOT.flagDir
+    FlagDir: ROOT.flagDir,
+    Population: ROOT.population
 });
 
 _.assign(TASK.task, {
@@ -165,6 +165,9 @@ _.assign(Room, {
 
     }
 });
+
+// plus line!!
+ROOT.initMemory.init();
 
 Object.keys(PROPERTIES).forEach(property => {
     PROPERTIES[property].extend();
@@ -215,8 +218,9 @@ module.exports.loop = wrapLoop(function () {
         p.checkCPU('processSegments', global.PROFILING.ANALYZE_LIMIT);
 
         // Flush cache
+
         ROOT.events.flush();
-        ROOT.flag.flush();
+        ROOT.flagDir.flush();
         ROOT.population.flush();
         ROOM.room.flush();
         TASK.task.flush();
@@ -230,13 +234,14 @@ module.exports.loop = wrapLoop(function () {
         ROOM.room.register();
 
         // analyze environment, wait a tick if critical failure
-        if (!ROOT.flag.analyze()) {
-            GLOBAL.util.logError('flag.analyze failed, waiting one tick to sync flags');
+        if (!ROOT.flagDir.analyze()) {
+            GLOBAL.util.logError('flagDir.analyze failed, waiting one tick to sync flags');
             return;
         }
-        p.checkCPU('flag.analyze', global.PROFILING.ANALYZE_LIMIT);
+        p.checkCPU('flagDir.analyze', global.PROFILING.ANALYZE_LIMIT);
         ROOM.room.analyze();
-
+        p.checkCPU('Room.analyze', global.PROFILING.ANALYZE_LIMIT);
+        ROOT.population.analyze();
 
 
 

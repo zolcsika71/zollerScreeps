@@ -1,5 +1,13 @@
 "use strict";
 
+const
+    GLOBAL = {
+        util: require(`./global.util`)
+    },
+    ROOT = {
+        flagDir: require('./flagDir'),
+    };
+
 let mod = {};
 module.exports = mod;
 
@@ -588,7 +596,7 @@ mod.extend = function () {
         'skip': {
             configurable: true,
             get() {
-                return Util.get(this, '_skip', !!FlagDir.find(FLAG_COLOR.command.skipRoom, this));
+                return GLOBAL.util.get(this, '_skip', !!global.FlagDir.find(global.FLAG_COLOR.command.skipRoom, this));
             }
         },
         'nuked': {

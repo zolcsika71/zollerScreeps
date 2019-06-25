@@ -16,6 +16,10 @@ mod.init = function () {
     if (_.isUndefined(Memory.cloaked))
         Memory.cloaked = {};
 
+    // plus line
+    if (_.isUndefined(Memory.rooms))
+        Memory.rooms = {};
+
 
 };
 module.exports = mod;

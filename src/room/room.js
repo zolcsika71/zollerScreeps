@@ -5,6 +5,9 @@ const
         global: require('./global.global'),
         parameter: require(`./global.parameter`),
         util: require(`./global.util`)
+    },
+    ROOT = {
+        mainInjection: require(`./mainInjection`)
     };
 
 
@@ -39,17 +42,24 @@ mod.flush = function () {
     _.forEach(Game.rooms, clean);
 };
 mod.totalSitesChanged = function () {
-    const numSites = _.size(Game.constructionSites);
-    const oldSites = Memory.rooms.myTotalSites || 0;
-    if (numSites > 0) Memory.rooms.myTotalSites = numSites;
-    else delete Memory.rooms.myTotalSites;
+    let numSites = _.size(Game.constructionSites),
+        oldSites = Memory.rooms.myTotalSites || 0;
+
+    if (numSites > 0)
+        Memory.rooms.myTotalSites = numSites;
+    else
+        delete Memory.rooms.myTotalSites;
+
     return oldSites && oldSites !== numSites;
 };
 mod.totalStructuresChanged = function () {
-    const numStructures = _.size(Game.structures);
-    const oldStructures = Memory.rooms.myTotalStructures || 0;
-    if (numStructures > 0) Memory.rooms.myTotalStructures = numStructures;
-    else delete Memory.rooms.myTotalStructures;
+    let numStructures = _.size(Game.structures),
+        oldStructures = Memory.rooms.myTotalStructures || 0;
+    if (numStructures > 0)
+        Memory.rooms.myTotalStructures = numStructures;
+    else delete
+        Memory.rooms.myTotalStructures;
+
     return oldStructures && oldStructures !== numStructures;
 };
 mod.needMemoryResync = function (room) {
@@ -59,28 +69,9 @@ mod.needMemoryResync = function (room) {
     }
     return Game.time % global.MEMORY_RESYNC_INTERVAL === 0 || room.name === 'sim';
 };
-mod.cancelAllInactiveOrder = function () {
 
-    let inactiveOrders = _.filter(Game.market.orders, order => {
-        return !order.active && order.type === 'sell';
-    });
-
-    for (let order of inactiveOrders) {
-
-        let resourceType = order.resourceType,
-            roomName = order.roomName,
-            mineralExist = (Game.rooms[roomName].storage.store[resourceType] || 0) + (Game.rooms[roomName].terminal.store[resourceType] || 0) >= global.SELL_COMPOUND[resourceType].maxStorage + global.MIN_COMPOUND_SELL_AMOUNT;
-
-        if (!mineralExist) {
-            global.logSystem(roomName, `Inactive market order found in ${roomName} for ${resourceType}`);
-            global.logSystem(roomName, `Order cancelled in ${roomName} for ${resourceType}`);
-            Game.market.cancelOrder(order.id);
-        }
-    }
-};
 mod.analyze = function () {
     const p = GLOBAL.util.startProfiling('Room.analyze', {enabled: global.PROFILING.ROOMS});
-    mod.cancelAllInactiveOrder();
     // run analyze in each of our submodules
     for (let key of Object.keys(Room._ext)) {
         if (Room._ext[key].analyze) Room._ext[key].analyze();
@@ -102,13 +93,14 @@ mod.analyze = function () {
         }
         catch (err) {
             Game.notify('Error in room.js (Room.prototype.loop) for "' + room.name + '" : ' + err.stack ? err + '<br/>' + err.stack : err);
-            console.log(dye(CRAYON.error, 'Error in room.js (Room.prototype.loop) for "' + room.name + '": <br/>' + (err.stack || err.toString()) + '<br/>' + err.stack));
+            console.log(global.dye(global.CRAYON.error, 'Error in room.js (Room.prototype.loop) for "' + room.name + '": <br/>' + (err.stack || err.toString()) + '<br/>' + err.stack));
         }
     };
     _.forEach(Game.rooms, r => {
-        if (r.skip) return;
+        if (r.skip)
+            return;
         getEnvironment(r);
-        p.checkCPU(r.name, PROFILING.ANALYZE_LIMIT / 5);
+        p.checkCPU(r.name, global.PROFILING.ANALYZE_LIMIT / 5);
     });
 };
 mod.rebuildCostMatrix = function (roomName) {
@@ -127,7 +119,7 @@ mod.loadCostMatrixCache = function (cache) {
         }
     }
     if (global.DEBUG && count > 0)
-        GLOBAL.util.logSystem('RawMemory', 'loading pathfinder cache.. updated ' + count + ' stale entries.');
+        global.logSystem('RawMemory', 'loading pathfinder cache.. updated ' + count + ' stale entries.');
     mod.pathfinderCacheLoaded = true;
 };
 
