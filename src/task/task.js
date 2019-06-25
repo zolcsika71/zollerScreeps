@@ -1,5 +1,9 @@
 "use strict";
 
+const
+    TASK = {
+        mining: require('./task.mining')
+    };
 
 let mod = {};
 module.exports = mod;
@@ -14,7 +18,7 @@ mod.populate = function() {
         //Task.defense,
         //Task.guard,
         //Task.labTech,
-        Task.mining,
+        TASK.mining
         //Task.pioneer,
         //Task.reputation,
         //Task.reserve,
@@ -23,4 +27,11 @@ mod.populate = function() {
         //Task.scheduler
     ]);
 };
-mod.addTasks = (...task) => Task.tasks.push(...task);
+mod.addTasks = (...task) => mod.tasks.push(...task);
+
+mod.flush = function () {
+    mod.tasks.forEach(task => {
+        if (task.flush) task.flush();
+    });
+};
+

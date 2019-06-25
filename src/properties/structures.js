@@ -9,6 +9,7 @@ const
 
 
 let mod = {};
+module.exports = mod;
 mod.extend = function () {
 
     // extensions.js
@@ -161,4 +162,4 @@ mod.extend = function () {
 
 };
 
-module.exports = mod;
+

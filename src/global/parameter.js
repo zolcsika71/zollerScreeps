@@ -91,7 +91,8 @@ let mod = {
                 secondaryColor: COLOR_BLUE
             }
         }
-    }
+    },
+    MEMORY_RESYNC_INTERVAL: 250, // interval to reload spawns & towers present in a room
 
 
 

@@ -1,6 +1,7 @@
 "use strict";
 
 let mod = {};
+module.exports = mod;
 mod.extend = function(){
 
     // extensions.js
@@ -17,6 +18,7 @@ mod.extend = function(){
             }
         }
     });
+
     Object.defineProperty(RoomObject.prototype, 'cloak', {
         configurable: true,
         get: function() {
@@ -46,4 +48,3 @@ mod.extend = function(){
     });
 
 };
-module.exports = mod;

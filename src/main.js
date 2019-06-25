@@ -31,7 +31,8 @@ const
     //_ = require('lodash'),
     CREEP = {
         action: {
-            Action: require('./creep.action.Action')
+            Action: require('./creep.action.Action'),
+            mining: require('./creep.action.mining')
         },
         behaviour: {
             Behaviour: require('./creep.behaviour.Behaviour')
@@ -39,8 +40,7 @@ const
         setup: {
             Setup: require('./creep.setup.Setup')
         },
-        creep: require('./creep.creep'),
-        population: require('./creep.population')
+        creep: require('./creep.creep')
     },
     GLOBAL = {
         global: require('./global.global'),
@@ -48,16 +48,21 @@ const
         util: require(`./global.util`)
     },
     PROPERTIES = {
+        creep: require('./properties.creep'),
         mineral: require('./properties.mineral'),
         roomObject: require('./properties.roomObject'),
         roomPosition: require('./properties.roomPosition'),
         source: require('./properties.source'),
         structures: require('./properties.structures'),
-        flag: require('./properties.flag')
+        flag: require('./properties.flag'),
+        room: require('./properties.room')
     },
     PROTOTYPES = {
         structures: require('./prototypes.structures'),
-        creep: require('./prototypes.creep')
+        creep: require('./prototypes.creep'),
+        spawn: require('./prototypes.spawn'),
+        room: require('./prototypes.room'),
+        roomPosition: require ('./prototypes.roomPosition')
     },
     ROOM = {
         room: require('./room.room')
@@ -68,10 +73,11 @@ const
     },
     ROOT = {
         mainInjection: require(`./mainInjection`),
-        spawn: require('./spawn'),
         ocsMemory: require('./ocsMemory'),
         initMemory: require('./initMemory'),
-        events: require('./events')
+        events: require('./events'),
+        flag: require('./flag'),
+        population: require('./population')
     };
 
 
@@ -125,7 +131,7 @@ _.assign(global, {
     Events: ROOT.events
 });
 
-_.assign(global.Task, {
+_.assign(TASK.task, {
 
     mining: TASK.mining
 
@@ -135,6 +141,7 @@ _.assign(global.Task, {
 
 _.assign(Creep, {
     action: {
+        mining: CREEP.action.mining
 
     },
     behaviour: {
@@ -151,27 +158,30 @@ _.assign(Room, {
     }
 });
 
+inject(Room, ROOM.room);
+_.assign(Room, {
+    _ext: {
+
+    }
+});
+
 Object.keys(PROPERTIES).forEach(property => {
     PROPERTIES[property].extend();
 });
 Object.keys(PROTOTYPES).forEach(prototype => {
     PROTOTYPES[prototype].extend();
 });
-ROOT.spawn.extend();
+
 TASK.task.populate();
-//PROTOTYPES.visual.extend
 
 if (ROOT.mainInjection.extend)
     ROOT.mainInjection.extend();
 
 ROOT.ocsMemory.activateSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, true);
+ROOT.traveler = require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
 
 if (global.DEBUG)
     GLOBAL.util.logSystem('Global.install', 'Code reloaded.');
-
-ROOT.traveler = require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
-
-
 
 module.exports.loop = wrapLoop(function () {
 
@@ -205,6 +215,26 @@ module.exports.loop = wrapLoop(function () {
 
         // Flush cache
         ROOT.events.flush();
+        ROOT.flag.flush();
+        ROOT.population.flush();
+        ROOM.room.flush();
+        TASK.task.flush();
+
+        if (ROOT.mainInjection.flush)
+            ROOT.mainInjection.flush();
+
+        p.checkCPU('flush', global.PROFILING.ANALYZE_LIMIT);
+
+        // Room event hooks must be registered before analyze for costMatrixInvalid
+        ROOM.room.register();
+
+        // analyze environment, wait a tick if critical failure
+        if (!ROOT.flag.analyze()) {
+            GLOBAL.util.logError('flag.analyze failed, waiting one tick to sync flags');
+            return;
+        }
+        p.checkCPU('flag.analyze', global.PROFILING.ANALYZE_LIMIT);
+        ROOM.room.analyze();
 
 
 

@@ -25,6 +25,7 @@ mod.extend = function(){
             Memory.sources[this.id] = value;
         }
     });
+
     Object.defineProperty(Source.prototype, 'container', {
         configurable: true,
         get: function() {
@@ -50,6 +51,7 @@ mod.extend = function(){
             return this._container;
         }
     });
+
     Object.defineProperty(Source.prototype, 'link', {
         configurable: true,
         get: function() {

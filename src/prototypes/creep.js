@@ -8,13 +8,6 @@ const
         parameter: require(`./global.parameter`),
         util: require(`./global.util`)
 
-    },
-    CREEP = {
-        Action: require('./creep.action.Action'),
-        Behaviour: require('./creep.behaviour.Behaviour'),
-        Setup: require('./creep.setup.Setup'),
-        creep: require('./creep.creep'),
-        population: require('./creep.population')
     };
 
 
@@ -311,7 +304,7 @@ mod.extend = function () {
         .size();
         if (needToMove) {
             if (!this.data.idle || !this.data.idle.path || !this.data.idle.path.length || this.pos.isEqualTo(this.data.idle.lastPos)) {
-                const idleFlag = FlagDir.find(FLAG_COLOR.command.idle, this.pos, true, (r, flagEntry) => {
+                const idleFlag = flag.find(FLAG_COLOR.command.idle, this.pos, true, (r, flagEntry) => {
                     const flag = Game.flags[flagEntry.name];
                     const occupied = flag.pos.lookFor(LOOK_CREEPS);
                     if (occupied && occupied.length) {

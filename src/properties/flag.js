@@ -2,7 +2,6 @@
 
 let mod = {};
 module.exports = mod;
-
 mod.extend = function () {
 
     Object.defineProperty(Flag.prototype, 'cloaking', {

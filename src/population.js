@@ -7,9 +7,6 @@ mod.setCreep = function (val) {
     Memory.population[val.creepName] = val;
     return Memory.population[val.creepName];
 };
-
-
-
 mod.countCreep = function (room, entry) {
     entry.roomName = room.name;
     if (room.population === undefined) {
@@ -40,5 +37,18 @@ mod.countCreep = function (room, entry) {
         this.typeWeight[entry.creepType] = entry.weight;
     else
         this.typeWeight[entry.creepType] += entry.weight;
+};
+mod.flush = function () {
+    this.typeCount = {};
+    this.typeWeight = {};
+    this.actionCount = {};
+    this.actionWeight = {};
+    this.died = [];
+    this.predictedRenewal = [];
+    this.spawned = [];
+    this.spawnsToProbe = [];
+    if (_.isUndefined(Memory.population))
+        Memory.population = {};
+
 };
 
