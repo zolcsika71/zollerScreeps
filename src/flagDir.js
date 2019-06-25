@@ -21,8 +21,7 @@ mod.analyze = function () {
     let register = flag => {
         try {
             flag.creeps = {};
-            if (flag.cloaking && flag.cloaking > 0)
-                flag.cloaking--;
+            if (flag.cloaking && flag.cloaking > 0) flag.cloaking--;
             this.list.push({
                 name: flag.name,
                 color: flag.color,

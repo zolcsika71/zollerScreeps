@@ -88,7 +88,7 @@ mod.extend = function () {
                                     (structure.structureType != STRUCTURE_CONTAINER || structure.hits < MAX_FORTIFY_CONTAINER) &&
                                     (!DECAYABLES.includes(structure.structureType) || (structure.hitsMax - structure.hits) > GAP_REPAIR_DECAYABLE * 3) &&
                                     (Memory.pavementArt[that.room.name] === undefined || Memory.pavementArt[that.room.name].indexOf('x' + structure.pos.x + 'y' + structure.pos.y + 'x') < 0) &&
-                                    (!flag.list.some(f => f.roomName == structure.pos.roomName && f.color == COLOR_ORANGE && f.x == structure.pos.x && f.y == structure.pos.y))
+                                    (!FlagDir.list.some(f => f.roomName == structure.pos.roomName && f.color == COLOR_ORANGE && f.x == structure.pos.x && f.y == structure.pos.y))
                                 )
                             ),
                             'hits'
@@ -150,7 +150,7 @@ mod.extend = function () {
                 get: function () {
                     if (_.isUndefined(this._piles)) {
                         const room = this.room;
-                        this._piles = flag.filter(FLAG_COLOR.command.drop, room.getPositionAt(25, 25), true)
+                        this._piles = FlagDir.filter(FLAG_COLOR.command.drop, room.getPositionAt(25, 25), true)
                             .map(function (flagInformation) {
                                 const flag = Game.flags[flagInformation.name];
                                 const piles = room.lookForAt(LOOK_ENERGY, flag.pos.x, flag.pos.y);
@@ -241,7 +241,7 @@ mod.extend = function () {
         'flags': {
             configurable: true,
             get() {
-                return Util.get(this, '_flags', _.filter(flag.list, {roomName: this.name}));
+                return Util.get(this, '_flags', _.filter(FlagDir.list, {roomName: this.name}));
             }
         },
         'structures': {
@@ -362,7 +362,7 @@ mod.extend = function () {
                         let that = this;
                         let adjacent, ownNeighbor, room, mult;
 
-                        let flagEntries = flag.filter(FLAG_COLOR.invade.exploit);
+                        let flagEntries = FlagDir.filter(FLAG_COLOR.invade.exploit);
                         let countOwn = roomName => {
                             if (roomName == that.name) return;
                             if (Room.isMine(roomName)) ownNeighbor++;
@@ -398,7 +398,7 @@ mod.extend = function () {
                     let distance, reserved, flag;
                     let rcl = this.controller.level;
 
-                    let flagEntries = flag.filter([FLAG_COLOR.claim, FLAG_COLOR.claim.reserve, FLAG_COLOR.invade.exploit]);
+                    let flagEntries = FlagDir.filter([FLAG_COLOR.claim, FLAG_COLOR.claim.reserve, FLAG_COLOR.invade.exploit]);
                     let calcWeight = flagEntry => {
                         // don't spawn claimer for reservation at RCL < 4 (claimer not big enough)
                         if (rcl > 3 || (flagEntry.color == FLAG_COLOR.claim.color && flagEntry.secondaryColor == FLAG_COLOR.claim.secondaryColor)) {
@@ -588,7 +588,7 @@ mod.extend = function () {
         'skip': {
             configurable: true,
             get() {
-                return Util.get(this, '_skip', !!flag.find(FLAG_COLOR.command.skipRoom, this));
+                return Util.get(this, '_skip', !!FlagDir.find(FLAG_COLOR.command.skipRoom, this));
             }
         },
         'nuked': {

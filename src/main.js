@@ -76,7 +76,7 @@ const
         ocsMemory: require('./ocsMemory'),
         initMemory: require('./initMemory'),
         events: require('./events'),
-        flag: require('./flag'),
+        flagDir: require('./flagDir'),
         population: require('./population')
     };
 
@@ -128,7 +128,8 @@ _.assign(global, {
     Population: CREEP.population,
     Task: TASK.task,
     OCSMemory: ROOT.ocsMemory,
-    Events: ROOT.events
+    Events: ROOT.events,
+    FlagDir: ROOT.flagDir
 });
 
 _.assign(TASK.task, {

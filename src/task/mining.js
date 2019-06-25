@@ -8,7 +8,7 @@ mod.handleFlagRemoved = flagName => {
     const flagMem = Memory.flags[flagName];
     if (flagMem && flagMem.task === mod.name && flagMem.roomName) {
         // if there is still a mining flag in that room ignore.
-        const flags = flag.filter(FLAG_COLOR.claim.mining, new RoomPosition(25,25,flagMem.roomName), true);
+        const flags = FlagDir.filter(FLAG_COLOR.claim.mining, new RoomPosition(25,25,flagMem.roomName), true);
         if (flags && flags.length > 0)
             return;
         else {
@@ -357,7 +357,7 @@ mod.heal = function(roomName, partChange) {
     return `Task.${this.name}: healing capacity for ${roomName} ${memory.healSize >= 0 ? 'increased' : 'decreased'} to ${Math.abs(memory.healSize)} per miner.`;
 };
 mod.getFlag = function (roomName) {
-    return flag.find(FLAG_COLOR.claim.mining, new RoomPosition(25, 25, roomName));
+    return FlagDir.find(FLAG_COLOR.claim.mining, new RoomPosition(25, 25, roomName));
 };
 mod.carry = function (roomName, partChange) {
     const memory = Task.mining.memory(roomName);
