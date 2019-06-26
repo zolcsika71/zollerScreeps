@@ -27,6 +27,7 @@ mod.populate = function () {
         //Task.scheduler
     ]);
 };
+
 mod.addTasks = (...task) => mod.tasks.push(...task);
 
 mod.flush = function () {
@@ -67,6 +68,16 @@ mod.register = function () {
             Room.goneInvader.on(invaderID => task.handleGoneInvader(invaderID));
         if (task.handleRoomDied)
             Room.collapsed.on(room => task.handleRoomDied(room));
+    });
+};
+
+mod.execute = function () {
+    _.forEach(Task.executeCache, function (n, k) {
+        try {
+            n.execute();
+        } catch (e) {
+            console.log(`Error executing Task "${k}"<br>${e.stack || e.toString()}`);
+        }
     });
 };
 

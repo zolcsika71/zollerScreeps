@@ -4,8 +4,10 @@
 "use strict";
 
 const
-    ROOT = {
-        population: require('./population')
+    GLOBAL = {
+        global: require('./global.global'),
+        parameter: require(`./global.parameter`),
+        util: require(`./global.util`)
     };
 
 let Setup = function (typeName) {
@@ -153,7 +155,7 @@ let Setup = function (typeName) {
             maxCreepWeight = maxWeight - existingWeight;
         }
         if (global.DEBUG && global.TRACE)
-            global.trace('Setup', {setupType: this.type, room: room.name, Setup: 'parts',
+            GLOBAL.util.trace('Setup', {setupType: this.type, room: room.name, Setup: 'parts',
             maxWeight, minMulti, maxMulti});
         return Creep.compileBody(room, {
             fixedBody, multiBody, minMulti, maxMulti,

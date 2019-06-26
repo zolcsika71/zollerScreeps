@@ -33,11 +33,12 @@ let mod = {
 
     SPAWN_INTERVAL: 5, // loops between regular spawn probe
 
+
     CRAYON: { // predefined log colors
         death: {color: 'black', 'font-weight': 'bold'},
         birth: '#e6de99',
         error: '#e79da7',
-        system: {color: '#999', 'font-size': '10px'}
+        system: {color: '#999', 'font-size': '12px'}
     },
     MEM_SEGMENTS: {
         COSTMATRIX_CACHE: {
@@ -243,7 +244,7 @@ let mod = {
                 }
             }
         },
-    MEMORY_RESYNC_INTERVAL: 250 // interval to reload spawns & towers present in a room
+    MEMORY_RESYNC_INTERVAL: 500 // interval to reload spawns & towers present in a room
 
 
 

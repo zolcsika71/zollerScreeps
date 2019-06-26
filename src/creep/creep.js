@@ -1,7 +1,74 @@
-const strategy = require('./strategy');
+const
+    GLOBAL = {
+        global: require('./global.global'),
+        parameter: require(`./global.parameter`),
+        util: require(`./global.util`)
+    },
+    strategy = require('./strategy');
 
 let mod = {};
 module.exports = mod;
+
+mod.execute = function () {
+    if (global.DEBUG && Memory.CPU_CRITICAL)
+        GLOBAL.util.logSystem('system', `${Game.time}: CPU Bucket level is critical (${Game.cpu.bucket}). Skipping non critical creep roles.`);
+    let run = creep => {
+        try {
+            creep.run();
+        } catch (e) {
+            console.log('<span style="color:FireBrick">Creep ' + creep.name + (e.stack || e.toString()) + '</span>', GLOBAL.util.stack());
+        }
+    };
+    _.forEach(Game.creeps, run);
+};
+
+mod.bodyCosts = function (body) {
+    let costs = 0;
+    if (body) {
+        body.forEach(function (part) {
+            costs += BODYPART_COST[part];
+        });
+    }
+    return costs;
+};
+
+mod.multi = function (room, params = {}) {
+    let minMulti = params.minMulti || 0,
+        fixedCosts = Creep.bodyCosts(params.fixedBody),
+        multiCosts = Creep.bodyCosts(params.multiBody);
+    if (multiCosts === 0) return 0; // prevent divide-by-zero
+    let maxThreatMulti = Infinity;
+    if (params.minThreat) {
+        let fixedThreat = Creep.bodyThreat(params.fixedBody),
+            multiThreat = Creep.bodyThreat(params.multiBody);
+        maxThreatMulti = 0;
+        let threat = fixedThreat;
+        while (threat < params.minThreat) {
+            maxThreatMulti += 1;
+            threat += multiThreat;
+        }
+    }
+    let minWeightMulti = 0;
+    if (params.minWeight) {
+        let weight = fixedCosts;
+        while (weight < params.minWeight) {
+            minWeightMulti += 1;
+            weight += multiCosts;
+        }
+    }
+    let maxPartsMulti = Math.floor((50 - params.fixedBody.length) / params.multiBody.length),
+        maxEnergy = params.currentEnergy ? room.energyAvailable : room.energyCapacityAvailable,
+        maxAffordableMulti = Math.floor((maxEnergy - fixedCosts) / multiCosts),
+        maxWeightMulti = params.maxWeight ? Math.floor((params.maxWeight - fixedCosts) / multiCosts) : Infinity,
+        maxMulti = params.maxMulti || Infinity,
+        // find the smallest maximum to set our upper bound
+        max = _.min([maxAffordableMulti, maxThreatMulti, maxWeightMulti, maxMulti]),
+        // ensure we are above our lower bound
+        min = _.max([minMulti, minWeightMulti, max]);
+
+    // ensure this won't result in more than 50 parts
+    return _.min([maxPartsMulti, min]);
+};
 
 mod.partsComparator = function (a, b) {
     let partsOrder = [TOUGH, CLAIM, WORK, CARRY, ATTACK, RANGED_ATTACK, HEAL, MOVE];
@@ -74,7 +141,7 @@ mod.bodyThreat = function (body) {
     return threat;
 };
 
-mod.register = function() {
+mod.register = function () {
     for (const action in Creep.action) {
         if (Creep.action[action].register) Creep.action[action].register(this);
     }

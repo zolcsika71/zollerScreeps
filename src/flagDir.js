@@ -10,7 +10,7 @@ const
 let mod = {};
 module.exports = mod;
 
-mod.flagFilter = function(flagColour) {
+mod.flagFilter = function (flagColour) {
     if (!flagColour) return;
     let filter;
     if (flagColour.filter) {
@@ -123,6 +123,40 @@ mod.analyze = function () {
     const specialFlag = mod.specialFlag(true);
     return !!specialFlag;
 };
+mod.execute = function () {
+    let triggerFound = entry => {
+        try {
+            if (!entry.cloaking || entry.cloaking === 0) {
+                let p = GLOBAL.util.startProfiling('Flag.execute', {enabled: global.PROFILING.FLAGS}),
+                    flag = Game.flags[entry.name];
+                Flag.found.trigger(flag);
+                p.checkCPU(entry.name, global.PROFILING.EXECUTE_LIMIT, mod.flagType(flag));
+            }
+        } catch (e) {
+            Util.logError(e.stack || e.message);
+        }
+    };
+    this.list.forEach(triggerFound);
+
+    let triggerRemoved = flagName => Flag.FlagRemoved.trigger(flagName);
+    this.stale.forEach(triggerRemoved);
+};
+mod.flagType = function (flag) {
+    if (mod.isSpecialFlag(flag)) return '_OCS';
+    for (let primary in global.FLAG_COLOR) {
+        let type = global.FLAG_COLOR[primary];
+        if (Flag.compare(flag, type))
+            return primary;
+
+        for (let secondary in type) {
+            let subType = type[secondary];
+            if (Flag.compare(flag, subType))
+                return `${primary}.${secondary}`;
+        }
+    }
+    GLOBAL.util.logError(`Unknown flag type for flag: ${flag ? flag.name : 'undefined flag'}.`);
+    return 'undefined';
+};
 mod.specialFlag = function (create) {
     let name = '_OCS',
         flag = Game.flags[name];
@@ -137,4 +171,7 @@ mod.specialFlag = function (create) {
         }
     }
     return flag;
+};
+mod.isSpecialFlag = function (object) {
+    return object.name === '_OCS';
 };

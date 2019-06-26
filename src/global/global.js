@@ -58,3 +58,12 @@ mod.LiteEvent = function () {
     }
 };
 
+mod.addById = function (array, id) {
+    if (array == null)
+        array = [];
+    let obj = Game.getObjectById(id);
+    if (obj)
+        array.push(obj);
+    return array;
+};
+

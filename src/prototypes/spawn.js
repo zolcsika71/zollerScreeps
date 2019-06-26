@@ -1,5 +1,12 @@
 "use strict";
 
+const
+    GLOBAL = {
+        global: require('./global.global'),
+        parameter: require(`./global.parameter`),
+        util: require(`./global.util`)
+    };
+
 let mod = {};
 module.exports = mod;
 mod.extend = function () {
@@ -13,10 +20,10 @@ mod.extend = function () {
             return setup.isValidSetup(room) && that.createCreepBySetup(setup);
         };
 
-        const spawnDelay = Util.get(this.room.memory, 'spawnDelay', {});
+        const spawnDelay = GLOBAL.util.get(this.room.memory, 'spawnDelay', {});
         let busy = this.createCreepByQueue(room.spawnQueueHigh, 'High');
         // don't spawn lower if there is one waiting in the higher queue
-        if (!busy && (room.spawnQueueHigh.length === 0  || room.spawnQueueHigh.length === spawnDelay.High) && Game.time % SPAWN_INTERVAL === 0) {
+        if (!busy && (room.spawnQueueHigh.length === 0  || room.spawnQueueHigh.length === spawnDelay.High) && Game.time % global.SPAWN_INTERVAL === 0) {
             busy = _.some(Spawn.priorityHigh, probe);
             if (!busy) busy = this.createCreepByQueue(room.spawnQueueMedium, 'Medium');
             if (!busy && (room.spawnQueueMedium.length === 0 || room.spawnQueueMedium.length === spawnDelay.Medium)) {
@@ -27,8 +34,9 @@ mod.extend = function () {
         return busy;
     };
     Spawn.prototype.createCreepBySetup = function (setup) {
-        if (global.DEBUG && global.TRACE) trace('Spawn', {setupType: this.type, rcl: this.room.controller.level, energy: this.room.energyAvailable, maxEnergy: this.room.energyCapacityAvailable, Spawn: 'createCreepBySetup'}, 'creating creep');
-        var params = setup.buildParams(this);
+        if (global.DEBUG && global.TRACE)
+            GLOBAL.util.trace('Spawn', {setupType: this.type, rcl: this.room.controller.level, energy: this.room.energyAvailable, maxEnergy: this.room.energyCapacityAvailable, Spawn: 'createCreepBySetup'}, 'creating creep');
+        let params = setup.buildParams(this);
         if (this.create(params.parts, params.name, params.setup))
             return params;
         return null;

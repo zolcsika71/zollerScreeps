@@ -53,6 +53,7 @@ mod.extend = function () {
             this.saveSpawns();
         } else delete this.memory.myTotalStructures;
     };
+
     Room.prototype.getBorder = function (roomName) {
         return _.findKey(Game.map.describeExits(this.name), function (name) {
             return this.name === name;
@@ -103,6 +104,7 @@ mod.extend = function () {
         };
         return look.filter(invalidObject).length == 0;
     };
+
     Room.prototype.exits = function (findExit, point) {
         if (point === true) point = 0.5;
         let positions;
@@ -143,6 +145,7 @@ mod.extend = function () {
         }
         return ret;
     }
+
     Room.prototype.showCostMatrix = function (matrix = this.structureMatrix, aroundPos) {
         const vis = new RoomVisual(this.name);
         let startY = 0;
@@ -168,6 +171,7 @@ mod.extend = function () {
             }
         }
     };
+
     // toAvoid - a list of creeps to avoid sorted by owner
     Room.prototype.getAvoidMatrix = function (toAvoid) {
         const avoidMatrix = this.structureMatrix.clone();
@@ -188,6 +192,7 @@ mod.extend = function () {
         }
         return avoidMatrix;
     };
+
     Room.prototype.invalidateCostMatrix = function () {
         Room.costMatrixInvalid.trigger(this.name);
     };
@@ -196,6 +201,7 @@ mod.extend = function () {
         if (!Room.isHighwayRoom(this.name)) return false;
         return !!_.find(this.getPositionAt(25, 25).lookFor(LOOK_STRUCTURES), s => s instanceof StructureWall);
     };
+
     Room.prototype.isTargetAccessible = function (object, target) {
         if (!object || !target) return;
         // Checks. Accept RoomObject, RoomPosition, and mock position
@@ -283,6 +289,7 @@ mod.extend = function () {
         }
         return true;
     };
+
     Room.prototype.targetAccessible = function (target) {
         if (!target) return;
         if (target instanceof RoomObject) target = target.pos;
@@ -338,6 +345,7 @@ mod.extend = function () {
         }
         return true;
     };
+
     Room.prototype.getCreepMatrix = function (structureMatrix = this.structureMatrix) {
         if (_.isUndefined(this._creepMatrix)) {
             const costs = structureMatrix.clone();
@@ -439,6 +447,7 @@ mod.extend = function () {
 
 
     };
+
     Room.prototype.GCOffers = function () {
 
         let data = this.memory.resources,
@@ -561,6 +570,7 @@ mod.extend = function () {
             terminalOrderPlaced: terminalOrderPlaced
         };
     };
+
     Room.prototype.GCLabs = function () {
 
         if (global.DEBUG)
@@ -607,6 +617,7 @@ mod.extend = function () {
             }
         }
     };
+
     Room.prototype.checkOffers = function () {
 
 
@@ -694,6 +705,7 @@ mod.extend = function () {
 
 
     };
+
     Room.prototype.allOrdersWithOffers = function () {
         let orders = this.memory.resources.orders;
         if (orders.length === 0)
@@ -704,6 +716,7 @@ mod.extend = function () {
         });
         return ordersDone.length === orders.length;
     };
+
     Room.prototype.ordersWithOffers = function () {
         let orders = this.memory.resources.orders;
         if (orders.length === 0)
@@ -713,6 +726,7 @@ mod.extend = function () {
             return orderOffersAmount >= order.amount && order.amount > 0;
         });
     };
+
     Room.prototype.makeReaction = function () {
 
         if (this.nuked)
@@ -1051,6 +1065,7 @@ mod.extend = function () {
         //    returnValue = 0;
         return returnValue;
     };
+
     Room.prototype.countCheckRoomAt = function () {
         let data = this.memory.resources,
             boostTiming = data.boostTiming,
@@ -1064,6 +1079,7 @@ mod.extend = function () {
 
         boostTiming.checkRoomAt = boostTiming.reactionMaking + global.roundUpTo(amount / allLabsProducedAmountPerTick, reactionCoolDown);
     };
+
     Room.prototype.getSeedLabOrders = function () {
 
         let data = this.memory.resources;
@@ -1165,19 +1181,19 @@ mod.extend = function () {
 
                     if (_.isUndefined(Memory.allocateProperties.lastAllocated[GUID]))
                         if (type === 'defense') {
-                            Memory.allocateProperties.lastAllocated[GUID] = {
-                                type: type,
-                                compounds: [],
-                                allocateRooms: [],
-                                invadedRooms: []
-                            };
-                        } else {
-                            Memory.allocateProperties.lastAllocated[GUID] = {
-                                type: type,
-                                compounds: [],
-                                allocateRooms: []
-                            };
-                        }
+                        Memory.allocateProperties.lastAllocated[GUID] = {
+                            type: type,
+                            compounds: [],
+                            allocateRooms: [],
+                            invadedRooms: []
+                        };
+                    } else {
+                        Memory.allocateProperties.lastAllocated[GUID] = {
+                            type: type,
+                            compounds: [],
+                            allocateRooms: []
+                        };
+                    }
 
                     if (!_.some(Memory.allocateProperties.lastAllocated[GUID].compounds, compound => {
                         return compound === boost;
@@ -1206,4 +1222,81 @@ mod.extend = function () {
         }
     };
 
+    // from room.spawn
+    Room.prototype.saveSpawns = function () {
+        let spawns = this.find(FIND_MY_SPAWNS);
+        if (spawns.length > 0) {
+            let id = o => o.id;
+            this.memory.spawns = _.map(spawns, id);
+        } else delete this.memory.spawns;
+    };
+
+    // from room.defense
+    Room.prototype.processInvaders = function () {
+        let that = this;
+        if (this.memory.hostileIds === undefined)
+            this.memory.hostileIds = [];
+        if (!SEND_STATISTIC_REPORTS) delete this.memory.statistics;
+        else if (this.memory.statistics === undefined) {
+            this.memory.statistics = {};
+        }
+
+        let registerHostile = creep => {
+            if (Room.isCenterNineRoom(this.name)) return;
+            // if invader id unregistered
+            if (!that.memory.hostileIds.includes(creep.id)) {
+                // handle new invader
+                // register
+                that.memory.hostileIds.push(creep.id);
+                // save to trigger subscribers later
+                that.newInvader.push(creep);
+                // create statistics
+                if (SEND_STATISTIC_REPORTS) {
+                    let bodyCount = JSON.stringify(_.countBy(creep.body, 'type'));
+                    if (that.memory.statistics.invaders === undefined)
+                        that.memory.statistics.invaders = [];
+                    that.memory.statistics.invaders.push({
+                        owner: creep.owner.username,
+                        id: creep.id,
+                        body: bodyCount,
+                        enter: Game.time,
+                        time: Date.now()
+                    });
+                }
+            }
+        };
+        _.forEach(this.hostiles, registerHostile);
+
+        let registerHostileLeave = id => {
+            const creep = Game.getObjectById(id);
+            const stillHostile = creep && Task.reputation.hostileOwner(creep);
+            // for each known invader
+            if (!stillHostile) {
+                // save to trigger subscribers later
+                that.goneInvader.push(id);
+                // update statistics
+                if (SEND_STATISTIC_REPORTS && that.memory.statistics && that.memory.statistics.invaders !== undefined && that.memory.statistics.invaders.length > 0) {
+                    let select = invader => invader.id == id && invader.leave === undefined;
+                    let entry = _.find(that.memory.statistics.invaders, select);
+                    if (entry != undefined) entry.leave = Game.time;
+                }
+            }
+        };
+        _.forEach(this.memory.hostileIds, registerHostileLeave);
+
+        this.memory.hostileIds = this.hostileIds;
+    };
+
+    Room.prototype.registerIsHostile = function () {
+        if (this.controller) {
+            if (_.isUndefined(this.hostile) || typeof this.hostile === 'number') { // not overridden by user
+                if (this.controller.owner && !this.controller.my && !this.ally) {
+                    this.memory.hostile = this.controller.level;
+                } else {
+                    delete this.memory.hostile;
+                }
+            }
+        }
+    };
 };
+

@@ -80,7 +80,8 @@ const
     },
     TASK = {
         task: require('./task.task'),
-        mining: require('./task.mining')
+        mining: require('./task.mining'),
+        reputation: require('./task.reputation')
     },
     ROOT = {
         mainInjection: require(`./mainInjection`),
@@ -144,7 +145,8 @@ _.assign(global, {
 
 _.assign(TASK.task, {
 
-    mining: TASK.mining
+    mining: TASK.mining,
+    reputation: TASK.reputation
 
 
 });
@@ -266,10 +268,29 @@ module.exports.loop = wrapLoop(function () {
 
         if (ROOT.mainInjection.register)
             ROOT.mainInjection.register();
+
         p.checkCPU('register', global.PROFILING.REGISTER_LIMIT);
 
         // Execution
         ROOT.population.execute();
+        p.checkCPU('population.execute', global.PROFILING.EXECUTE_LIMIT);
+
+        ROOT.flagDir.execute();
+        p.checkCPU('flagDir.execute', global.PROFILING.EXECUTE_LIMIT);
+
+        ROOM.room.execute();
+        p.checkCPU('room.execute', global.PROFILING.EXECUTE_LIMIT);
+
+        CREEP.creep.execute();
+        p.checkCPU('creep.execute', global.PROFILING.EXECUTE_LIMIT);
+
+        ROOT.spawn.execute();
+        p.checkCPU('spawn.execute', global.PROFILING.EXECUTE_LIMIT);
+
+        TASK.task.execute();
+
+
+
 
 
 

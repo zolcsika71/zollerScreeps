@@ -103,6 +103,39 @@ mod.analyze = function () {
         p.checkCPU(r.name, global.PROFILING.ANALYZE_LIMIT / 5);
     });
 };
+mod.execute = function () {
+    const p = GLOBAL.util.startProfiling('Room.execute', {enabled: global.PROFILING.ROOMS});
+    // run execute in each of our submodules
+    for (let key of Object.keys(Room._ext))
+        if (Room._ext[key].execute) Room._ext[key].execute();
+
+    let run = (memory, roomName) => {
+        try {
+            // run executeRoom in each of our submodules
+            for (const key of Object.keys(Room._ext)) {
+                if (Room._ext[key].executeRoom) Room._ext[key].executeRoom(memory, roomName);
+            }
+            const room = Game.rooms[roomName];
+            if (room) { // has sight
+                if (room.collapsed) {
+                    const p2 = GLOBAL.util.startProfiling(roomName + 'execute', {enabled: global.PROFILING.ROOMS});
+                    Room.collapsed.trigger(room);
+                    p2.checkCPU('collapsed', 0.5);
+                }
+            }
+        } catch (e) {
+            GLOBAL.util.logError(e.stack || e.message);
+        }
+    };
+    _.forEach(Memory.rooms, (memory, roomName) => {
+        run(memory, roomName);
+        p.checkCPU(roomName + '.run', 1);
+        if (Game.time % MEMORY_RESYNC_INTERVAL === 0 && !Game.rooms[roomName] && typeof Memory.rooms[roomName].hostile !== 'boolean') {
+            // clean up stale room memory for rooms no longer in use, but preserve manually set 'hostile' entries
+            delete Memory.rooms[roomName];
+        }
+    });
+};
 mod.rebuildCostMatrix = function (roomName) {
     if (global.DEBUG)
         GLOBAL.global.logSystem(roomName, 'Invalidating costmatrix to force a rebuild when we have vision.');
@@ -121,5 +154,41 @@ mod.loadCostMatrixCache = function (cache) {
     if (global.DEBUG && count > 0)
         global.logSystem('RawMemory', 'loading pathfinder cache.. updated ' + count + ' stale entries.');
     mod.pathfinderCacheLoaded = true;
+};
+
+
+// from room.spawn
+mod.bestSpawnRoomFor = function (targetRoomName) {
+    var range = room => room.my ? routeRange(room.name, targetRoomName) : Infinity;
+    return _.min(Game.rooms, range);
+};
+
+// find a room to spawn
+// params: { targetRoom, minRCL = 0, maxRange = Infinity, minEnergyAvailable = 0, minEnergyCapacity = 0, callBack = null, allowTargetRoom = false, rangeRclRatio = 3, rangeQueueRatio = 51 }
+// requiredParams: targetRoom
+mod.findSpawnRoom = function (params) {
+    if (!params || !params.targetRoom) return null;
+    // filter validRooms
+    let isValidRoom = room => (
+        room.my &&
+        (params.maxRange === undefined || Util.routeRange(room.name, params.targetRoom) <= params.maxRange) &&
+        (params.minEnergyCapacity === undefined || params.minEnergyCapacity <= room.energyCapacityAvailable) &&
+        (params.minEnergyAvailable === undefined || params.minEnergyAvailable <= room.energyAvailable) &&
+        (room.name != params.targetRoom || params.allowTargetRoom === true) &&
+        (params.minRCL === undefined || room.controller.level >= params.minRCL) &&
+        (params.callBack === undefined || params.callBack(room))
+    );
+    let validRooms = _.filter(Game.rooms, isValidRoom);
+    if (validRooms.length == 0) return null;
+    // select "best"
+    // range + roomLevelsUntil8/rangeRclRatio + spawnQueueDuration/rangeQueueRatio
+    let queueTime = queue => _.sum(queue, c => (c.parts.length * 3));
+    let roomTime = room => ((queueTime(room.spawnQueueLow) * 0.9) + queueTime(room.spawnQueueMedium) + (queueTime(room.spawnQueueHigh) * 1.1)) / room.structures.spawns.length;
+    let evaluation = room => {
+        return routeRange(room.name, params.targetRoom) +
+               ((8 - room.controller.level) / (params.rangeRclRatio || 3)) +
+               (roomTime(room) / (params.rangeQueueRatio || 51));
+    };
+    return _.min(validRooms, evaluation);
 };
 
