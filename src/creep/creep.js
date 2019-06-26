@@ -73,3 +73,15 @@ mod.bodyThreat = function (body) {
     if (body) body.forEach(evaluatePart);
     return threat;
 };
+
+mod.register = function() {
+    for (const action in Creep.action) {
+        if (Creep.action[action].register) Creep.action[action].register(this);
+    }
+    for (const behaviour in Creep.behaviour) {
+        if (Creep.behaviour[behaviour].register) Creep.behaviour[behaviour].register(this);
+    }
+    for (const setup in Creep.setup) {
+        if (Creep.setup[setup].register) Creep.setup[setup].register(this);
+    }
+};

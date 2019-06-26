@@ -27,18 +27,29 @@ function wrapLoop(fn) {
     };
 }
 
+_.assign(Creep, {
+    Action: require('./creep.action.Action'),
+    Behaviour: require('./creep.behaviour.Behaviour'),
+    Setup: require('./creep.setup.Setup'),
+
+});
+
 const
     //_ = require('lodash'),
+    cpuAtLoad = Game.cpu.getUsed(),
     CREEP = {
         action: {
-            Action: require('./creep.action.Action'),
-            mining: require('./creep.action.mining')
+            mining: require('./creep.action.mining'),
+            recycling: require('./creep.action.recycling')
         },
         behaviour: {
-            Behaviour: require('./creep.behaviour.Behaviour')
+
+            miner: require('./creep.behaviour.miner')
         },
         setup: {
-            Setup: require('./creep.setup.Setup')
+            miner: require('./creep.setup.miner'),
+            worker: require('./creep.setup.worker')
+
         },
         creep: require('./creep.creep')
     },
@@ -112,11 +123,10 @@ let inject = (base, alien, namespace) => {
 inject(global, GLOBAL.global);
 inject(Creep, CREEP.creep);
 inject(Room, ROOM.room);
-inject(Spawn, ROOT.spawn);
 
-Creep.Action = CREEP.action.Action;
-Creep.Behaviour = CREEP.behaviour.Behaviour;
-Creep.Setup = CREEP.setup.Setup;
+
+
+
 
 
 // make parameter accessible from command line
@@ -142,13 +152,17 @@ _.assign(TASK.task, {
 
 _.assign(Creep, {
     action: {
-        mining: CREEP.action.mining
+        mining: CREEP.action.mining,
+        recycling: CREEP.action.recycling
 
     },
     behaviour: {
+        miner: CREEP.behaviour.miner
 
     },
     setup: {
+        miner: CREEP.setup.miner,
+        worker: CREEP.setup.worker
 
     }
 });
@@ -159,12 +173,8 @@ _.assign(Room, {
     }
 });
 
-inject(Room, ROOM.room);
-_.assign(Room, {
-    _ext: {
-
-    }
-});
+ROOT.spawn = require('./spawn');
+inject(Spawn, ROOT.spawn);
 
 // plus line!!
 ROOT.initMemory.init();
@@ -242,7 +252,14 @@ module.exports.loop = wrapLoop(function () {
         ROOM.room.analyze();
         p.checkCPU('Room.analyze', global.PROFILING.ANALYZE_LIMIT);
         ROOT.population.analyze();
+        p.checkCPU('Population.analyze', global.PROFILING.ANALYZE_LIMIT);
 
+        if (ROOT.mainInjection.analyze)
+            ROOT.mainInjection.analyze();
+
+        // Register event hooks
+        CREEP.creep.register();
+        ROOT.spawn.register();
 
 
     }

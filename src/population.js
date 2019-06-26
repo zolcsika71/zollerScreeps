@@ -83,7 +83,7 @@ mod.analyze = function () {
                 creep.data.nearDeath = true;
 
                 if (global.CENSUS_ANNOUNCEMENTS)
-                    console.log(global.dye(CRAYON.system, entry.creepName + ' &gt; ') + dye(CRAYON.death, 'Farewell!'), Util.stack());
+                    console.log(global.dye(global.CRAYON.system, entry.creepName + ' &gt; ') + global.dye(CRAYON.death, 'Farewell!'), Util.stack());
 
                 this.predictedRenewal.push(creep.name);
 

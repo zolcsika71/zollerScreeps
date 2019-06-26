@@ -1,16 +1,7 @@
-const
-    //_ = require('lodash'),
-    CREEP = {
-        action: {
-            Action: require('./creep.action.Action'),
-        }
-    };
-
-Creep.Action = CREEP.action.Action;
-
-
+"use strict";
 
 let action = new Creep.Action('mining');
+
 module.exports = action;
 action.renewTarget = true;
 action.isValidTarget = function(target, creep) {
