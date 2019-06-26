@@ -31,6 +31,8 @@ let mod = {
     TRAVELER_STUCK_TICKS: 2, // Number of ticks not moving to be considered stuck by the Traveler API
     TRAVELER_THRESHOLD: 5, // Average creep CPU usage/tick before warning about pathing cost, starts after 25 ticks
 
+    SPAWN_INTERVAL: 5, // loops between regular spawn probe
+
     CRAYON: { // predefined log colors
         death: {color: 'black', 'font-weight': 'bold'},
         birth: '#e6de99',

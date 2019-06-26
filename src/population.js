@@ -155,3 +155,30 @@ mod.analyze = function () {
     });
 };
 
+mod.execute = function(){
+    const p = GLOBAL.util.startProfiling('Population.execute', {enabled: global.PROFILING.CREEPS});
+    let triggerCompleted = name => Creep.spawningCompleted.trigger(Game.creeps[name]);
+    this.spawned.forEach(triggerCompleted);
+    p.checkCPU('triggerCompleted', global.PROFILING.EXECUTE_LIMIT / 4);
+
+    // Creep.died.on(n => console.log(`Creep ${n} died!`));
+    Creep.died.on(c => {
+        let data = Memory.population[c];
+        if (data && data.determinatedSpot && data.roomName)
+            Room.costMatrixInvalid.trigger(data.roomName);
+    });
+    let triggerDied = name => Creep.died.trigger(name);
+    this.died.forEach(triggerDied);
+    p.checkCPU('triggerDied', global.PROFILING.EXECUTE_LIMIT / 4);
+
+    let triggerRenewal = name => Creep.predictedRenewal.trigger(Game.creeps[name]);
+    this.predictedRenewal.forEach(triggerRenewal);
+    p.checkCPU('triggerRenewal', global.PROFILING.EXECUTE_LIMIT / 4);
+
+    if (Game.time % global.SPAWN_INTERVAL !== 0) {
+        let probeSpawn = spawnName => Game.spawns[spawnName].execute();
+        this.spawnsToProbe.forEach(probeSpawn);
+        p.checkCPU('probeSpawn', global.PROFILING.EXECUTE_LIMIT / 4);
+    }
+};
+

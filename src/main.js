@@ -30,7 +30,7 @@ function wrapLoop(fn) {
 _.assign(Creep, {
     Action: require('./creep.action.Action'),
     Behaviour: require('./creep.behaviour.Behaviour'),
-    Setup: require('./creep.setup.Setup'),
+    Setup: require('./creep.setup.Setup')
 
 });
 
@@ -206,6 +206,8 @@ module.exports.loop = wrapLoop(function () {
 
     try {
 
+
+
         let totalUsage = GLOBAL.util.startProfiling('main', {startCPU: cpuAtLoop}),
             p = GLOBAL.util.startProfiling('main', {enabled: global.PROFILING.MAIN, startCPU: cpuAtLoop});
 
@@ -260,6 +262,15 @@ module.exports.loop = wrapLoop(function () {
         // Register event hooks
         CREEP.creep.register();
         ROOT.spawn.register();
+        TASK.task.register();
+
+        if (ROOT.mainInjection.register)
+            ROOT.mainInjection.register();
+        p.checkCPU('register', global.PROFILING.REGISTER_LIMIT);
+
+        // Execution
+        ROOT.population.execute();
+
 
 
     }
