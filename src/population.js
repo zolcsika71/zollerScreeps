@@ -14,6 +14,25 @@ mod.setCreep = function (val) {
     Memory.population[val.creepName] = val;
     return Memory.population[val.creepName];
 };
+
+mod.registerCreep = function (creepName, creepType, creepCost, room, spawnName, body, destiny = null) {
+    let entry = this.setCreep({
+        creepName: creepName,
+        creepType: creepType,
+        weight: creepCost,
+        roomName: room.name,
+        homeRoom: room.name,
+        motherSpawn: spawnName,
+        actionName: null,
+        targetId: null,
+        spawningTime: 0,
+        flagName: null,
+        body: _.countBy(body),
+        destiny: destiny
+    });
+    this.countCreep(room, entry);
+};
+
 mod.countCreep = function (room, entry) {
     entry.roomName = room.name;
     if (room.population === undefined) {
@@ -45,6 +64,7 @@ mod.countCreep = function (room, entry) {
     else
         this.typeWeight[entry.creepType] += entry.weight;
 };
+
 mod.flush = function () {
     this.typeCount = {};
     this.typeWeight = {};
@@ -58,13 +78,14 @@ mod.flush = function () {
         Memory.population = {};
 
 };
+
 mod.analyze = function () {
     let p = GLOBAL.util.startProfiling('Population.analyze', {enabled: global.PROFILING.CREEPS}),
         register = entry => {
         let creep = Game.creeps[entry.creepName];
         if (!creep) {
             if (global.CENSUS_ANNOUNCEMENTS)
-                global.logSystem(entry.homeRoom, global.dye(CRAYON.death, 'Good night ' + entry.creepName + '!'));
+                GLOBAL.util.logSystem(entry.homeRoom, GLOBAL.util.dye(CRAYON.death, 'Good night ' + entry.creepName + '!'));
             this.died.push(entry.creepName);
         } else {
             creep.data = entry;
@@ -83,7 +104,7 @@ mod.analyze = function () {
                 creep.data.nearDeath = true;
 
                 if (global.CENSUS_ANNOUNCEMENTS)
-                    console.log(global.dye(global.CRAYON.system, entry.creepName + ' &gt; ') + global.dye(CRAYON.death, 'Farewell!'), Util.stack());
+                    console.log(GLOBAL.util.dye(global.CRAYON.system, entry.creepName + ' &gt; ') + GLOBAL.util.dye(CRAYON.death, 'Farewell!'), Util.stack());
 
                 this.predictedRenewal.push(creep.name);
 
@@ -155,7 +176,7 @@ mod.analyze = function () {
     });
 };
 
-mod.execute = function(){
+mod.execute = function () {
     const p = GLOBAL.util.startProfiling('Population.execute', {enabled: global.PROFILING.CREEPS});
     let triggerCompleted = name => Creep.spawningCompleted.trigger(Game.creeps[name]);
     this.spawned.forEach(triggerCompleted);
@@ -180,5 +201,24 @@ mod.execute = function(){
         this.spawnsToProbe.forEach(probeSpawn);
         p.checkCPU('probeSpawn', global.PROFILING.EXECUTE_LIMIT / 4);
     }
+};
+
+mod.getCombatStats = function (body) {
+    let i = 0;
+
+    let hull = 99;
+    let coreHits = body.length * 100 - 99;
+    for (; i < body.length; i++) {
+        if (global.CREEP_STATS.creep.coreParts[body[i].type]) {
+            break;
+        }
+        hull = hull + (global.CREEP_STATS.creep.boost.hits[body[i].boost] || 100);
+        coreHits = coreHits - 100;
+    }
+
+    return {
+        hull, // damage needed to impede movement
+        coreHits // if (hits < coreHits) missing moves!
+    };
 };
 

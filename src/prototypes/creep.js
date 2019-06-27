@@ -22,6 +22,7 @@ mod.extend = function () {
             return;
         return action.assign(this, target);
     };
+
     Creep.prototype.assignBehaviour = function (behaviour) {
         if (typeof behaviour === 'string')
             behaviour = Creep.behaviour[behaviour];
@@ -29,10 +30,12 @@ mod.extend = function () {
             return;
         return behaviour.assign(this);
     };
+
     // to maintain legacy code for now
     Creep.prototype.findGroupMemberByType = function (creepType, flagName) {
         return Creep.prototype.findGroupMemberBy(c => c.creepType === creepType, flagName);
     };
+
     Creep.prototype.findGroupMemberBy = function (findFunc, flagName) {
         if (_.isUndefined(flagName))
             flagName = this.data.flagName;
@@ -44,6 +47,7 @@ mod.extend = function () {
         }
         return null;
     };
+
     Creep.prototype.findByType = function (creepType) {
 
         let creep;
@@ -66,6 +70,7 @@ mod.extend = function () {
     Creep.prototype.hasActiveBodyparts = function (partTypes) {
         return this.hasBodyparts(partTypes, this.body.length - Math.ceil(this.hits * 0.01));
     };
+
     Creep.prototype.hasBodyparts = function (partTypes, start = 0) {
         const body = this.body,
              limit = body.length;
@@ -79,6 +84,7 @@ mod.extend = function () {
         }
         return false;
     };
+
     Creep.prototype.run = function (behaviour) {
         if (!this.spawning) {
             if (!behaviour && this.data && this.data.creepType) {
@@ -164,6 +170,8 @@ mod.extend = function () {
         }
         strategy.freeStrategy(this);
     };
+
+
     Creep.prototype.leaveBorder = function () {
 
         RoomPosition.prototype.fromDirection = function (direction) {
@@ -254,11 +262,13 @@ mod.extend = function () {
     Creep.prototype.honk = function () {
         if (global.HONK) this.say('\u{26D4}\u{FE0E}', SAY_PUBLIC);
     };
+
     Creep.prototype.honkEvade = function () {
         if (HONK) this.say('\u{1F500}\u{FE0E}', SAY_PUBLIC);
     };
+
     Creep.prototype.fleeMove = function () {
-        if (global.DEBUG && global.TRACE) trace('Creep', {creepName: this.name, pos: this.pos, Action: 'fleeMove', Creep: 'run'});
+        if (global.DEBUG && global.TRACE) GLOBAL.util.trace('Creep', {creepName: this.name, pos: this.pos, Action: 'fleeMove', Creep: 'run'});
         let drop = r => {
             if (this.carry[r] > 0) this.drop(r);
         };
@@ -295,6 +305,7 @@ mod.extend = function () {
         if (path && path.length > 0)
             this.move(this.pos.getDirectionTo(new RoomPosition(path[0].x,path[0].y,path[0].roomName)));
     };
+
     Creep.prototype.idleMove = function () {
         if (this.fatigue > 0) return;
         // check if on road/structure
@@ -369,6 +380,7 @@ mod.extend = function () {
             }
         }
     };
+
     Creep.prototype.repairNearby = function () {
         // only repair in rooms that we own, have reserved, or belong to our allies, also SK rooms and highways.
         if (this.room.controller && this.room.controller.owner && !(this.room.my || this.room.reserved || this.room.ally)) return;
@@ -377,13 +389,16 @@ mod.extend = function () {
             const repairRange = this.data && this.data.creepType === 'remoteHauler' ? global.REMOTE_HAULER.DRIVE_BY_REPAIR_RANGE : global.DRIVE_BY_REPAIR_RANGE;
             const repairTarget = _(this.pos.findInRange(FIND_STRUCTURES, repairRange)).find(s => Room.shouldRepair(this.room, s));
             if (repairTarget) {
-                if (global.DEBUG && global.TRACE) trace('Creep', {creepName: this.name, Action: 'repairing', Creep: 'repairNearby'}, repairTarget.pos);
+                if (global.DEBUG && global.TRACE) GLOBAL.util.trace('Creep', {creepName: this.name, Action: 'repairing', Creep: 'repairNearby'}, repairTarget.pos);
                 this.repair(repairTarget);
             }
         } else {
-            if (global.DEBUG && global.TRACE) trace('Creep', {creepName: this.name, pos: this.pos, Action: 'repairing', Creep: 'repairNearby'}, 'not repairing');
+            if (global.DEBUG && global.TRACE)
+                GLOBAL.util.trace('Creep', {creepName: this.name, pos: this.pos, Action: 'repairing', Creep: 'repairNearby'}, 'not repairing');
+
         }
     };
+
     Creep.prototype.buildNearby = function () {
         // enable remote haulers to build their own roads and containers
         if (!global.REMOTE_HAULER.DRIVE_BY_BUILDING || !this.data || this.data.creepType !== 'remoteHauler') return;
@@ -392,18 +407,22 @@ mod.extend = function () {
             (s.structureType === STRUCTURE_CONTAINER ||
                 s.structureType === STRUCTURE_ROAD));
         if (buildTarget) {
-            if (global.DEBUG && global.TRACE) trace('Creep', {creepName: this.name, Action: 'building', Creep: 'buildNearby'}, buildTarget.pos);
+            if (global.DEBUG && global.TRACE)
+                GLOBAL.util.trace('Creep', {creepName: this.name, Action: 'building', Creep: 'buildNearby'}, buildTarget.pos);
             this.build(buildTarget);
         } else {
-            if (global.DEBUG && global.TRACE) trace('Creep', {creepName: this.name, Action: 'building', Creep: 'buildNearby'}, 'not building');
+            if (global.DEBUG && global.TRACE)
+                GLOBAL.util.trace('Creep', {creepName: this.name, Action: 'building', Creep: 'buildNearby'}, 'not building');
         }
     };
+
     Creep.prototype.controllerSign = function () {
         const signMessage = Util.fieldOrFunction(CONTROLLER_SIGN_MESSAGE, this.room);
         if (CONTROLLER_SIGN && (!this.room.controller.sign || this.room.controller.sign.username !== this.owner.username || (CONTROLLER_SIGN_UPDATE && this.room.controller.sign.text !== signMessage))) {
             this.signController(this.room.controller, signMessage);
         }
     };
+
     // errorData = {errorCode, action, target, ...}
     Creep.prototype.handleError = function (errorData) {
         if (Creep.resolvingError) return;
@@ -422,6 +441,7 @@ mod.extend = function () {
             Creep.resolvingError = null;
         }
     };
+
     // Explain API extension
     Creep.prototype.explainAgent = function () {
         if (this.action) {
@@ -429,6 +449,7 @@ mod.extend = function () {
         }
         return `ttl:${this.ticksToLive} pos:${this.pos}`;
     };
+
     // API
     Creep.prototype.staticCustomStrategy = function (actionName, behaviourName, taskName) {};
     Creep.prototype.customStrategy = function (actionName, behaviourName, taskName) {};

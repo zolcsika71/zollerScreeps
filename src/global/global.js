@@ -1,3 +1,13 @@
+"use strict";
+
+const
+    GLOBAL = {
+        parameter: require(`./global.parameter`),
+        util: require(`./global.util`)
+    };
+
+
+
 let mod = {};
 module.exports = mod;
 
@@ -53,7 +63,7 @@ mod.LiteEvent = function () {
         try {
             this.handlers.slice(0).forEach(h => h(data));
         } catch (e) {
-            global.logError('Error in LiteEvent.trigger: ' + (e.stack || e));
+            GLOBAL.util.logError('Error in LiteEvent.trigger: ' + (e.stack || e));
         }
     }
 };

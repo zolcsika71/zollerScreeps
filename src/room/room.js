@@ -138,7 +138,7 @@ mod.execute = function () {
 };
 mod.rebuildCostMatrix = function (roomName) {
     if (global.DEBUG)
-        GLOBAL.global.logSystem(roomName, 'Invalidating costmatrix to force a rebuild when we have vision.');
+        GLOBAL.util.logSystem(roomName, 'Invalidating costmatrix to force a rebuild when we have vision.');
     _.set(Room, ['pathfinderCache', roomName, 'stale'], true);
     _.set(Room, ['pathfinderCache', roomName, 'updated'], Game.time);
     Room.pathfinderCacheDirty = true;
@@ -154,6 +154,39 @@ mod.loadCostMatrixCache = function (cache) {
     if (global.DEBUG && count > 0)
         global.logSystem('RawMemory', 'loading pathfinder cache.. updated ' + count + ' stale entries.');
     mod.pathfinderCacheLoaded = true;
+};
+
+mod.validFields = function (roomName, minX, maxX, minY, maxY, checkWalkable = false, where = null) {
+    const
+        room = Game.rooms[roomName],
+        look = checkWalkable ? room.lookAtArea(minY, minX, maxY, maxX) : null;
+
+    let fields = [];
+
+    for (let x = minX; x <= maxX; x++) {
+        for (let y = minY; y <= maxY; y++) {
+            if (x >= 1 && x <= 48 && y >= 1 && y <= 48) {
+                if (!checkWalkable || room.isWalkable(x, y, look)) {
+                    let p = new RoomPosition(x, y, roomName);
+                    if (!where || where(p))
+                        fields.push(p);
+                }
+            }
+        }
+    }
+    return fields;
+};
+
+mod.fieldsInRange = function (args) {
+    let plusRangeX = args.spots.map(spot => spot.pos.x + spot.range);
+    let plusRangeY = args.spots.map(spot => spot.pos.y + spot.range);
+    let minusRangeX = args.spots.map(spot => spot.pos.x - spot.range);
+    let minusRangeY = args.spots.map(spot => spot.pos.y - spot.range);
+    let minX = Math.max(...minusRangeX);
+    let maxX = Math.min(...plusRangeX);
+    let minY = Math.max(...minusRangeY);
+    let maxY = Math.min(...plusRangeY);
+    return Room.validFields(args.roomName, minX, maxX, minY, maxY, args.checkWalkable, args.where);
 };
 
 
@@ -191,4 +224,92 @@ mod.findSpawnRoom = function (params) {
     };
     return _.min(validRooms, evaluation);
 };
+
+mod.Containers = function(room){
+    this.room = room;
+    Object.defineProperties(this, {
+        'all': {
+            configurable: true,
+            get: function() {
+                if( _.isUndefined(this._container) ){
+                    this._container = [];
+                    let add = entry => {
+                        let cont = Game.getObjectById(entry.id);
+                        if( cont ) {
+                            _.assign(cont, entry);
+                            this._container.push(cont);
+                        }
+                    };
+                    _.forEach(this.room.memory.container, add);
+                }
+                return this._container;
+            }
+        },
+        'controller': {
+            configurable: true,
+            get: function() {
+                if( _.isUndefined(this._controller) ){
+                    if( this.room.my && this.room.controller.memory.storage ){
+                        this._controller = [Game.getObjectById(this.room.controller.memory.storage)];
+                        if( !this._controller[0] ) delete this.room.controller.memory.storage;
+                    } else {
+                        let byType = c => c.controller == true;
+                        this._controller = _.filter(this.all, byType);
+                    }
+                }
+                return this._controller;
+            }
+        },
+        'in': {
+            configurable: true,
+            get: function() {
+                if( _.isUndefined(this._in) ){
+                    let byType = c => c.controller == false;
+                    this._in = _.filter(this.all, byType);
+                    // add managed
+                    let isFull = c => c.sum >= (c.storeCapacity * (1-MANAGED_CONTAINER_TRIGGER));
+                    this._in = this._in.concat(this.managed.filter(isFull));
+                }
+                return this._in;
+            }
+        },
+        'out': {
+            configurable: true,
+            get: function() {
+                if( _.isUndefined(this._out) ){
+                    let byType = c => c.controller == true;
+                    this._out = _.filter(this.all, byType);
+                    // add managed
+                    let isEmpty = c => c.sum <= (c.storeCapacity * MANAGED_CONTAINER_TRIGGER);
+                    this._out = this._out.concat(this.managed.filter(isEmpty));
+                }
+                return this._out;
+            }
+        },
+        'privateers': {
+            configurable: true,
+            get: function() {
+                if( _.isUndefined(this._privateers) ){
+                    let byType = c => (c.source === false && !c.mineral && c.sum < c.storeCapacity);
+                    this._privateers = _.filter(this.all, byType);
+                }
+                return this._privateers;
+            }
+        },
+        'managed': {
+            configurable: true,
+            get: function() {
+                if( _.isUndefined(this._managed) ){
+                    let byType = c => c.source === true && c.controller == true;
+                    this._managed = _.filter(this.all, byType);
+                }
+                return this._managed;
+            }
+        }
+    });
+};
+
+// Container related Room variables go here
+
+// New Room methods go here
 

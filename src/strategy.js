@@ -1,6 +1,13 @@
 "use strict";
 
-const mod = {};
+const
+    GLOBAL = {
+        global: require('./global.global'),
+        parameter: require(`./global.parameter`),
+        util: require(`./global.util`)
+    };
+
+let mod = {};
 module.exports = mod;
 
 mod.decorateAgent = function (prototype, ...definitions) {
@@ -11,19 +18,20 @@ mod.decorateAgent = function (prototype, ...definitions) {
         const returnValOrMethod = currentStrategy[method];
         const strategyKey = currentStrategy.key;
         const strategyName = currentStrategy.name;
-        if (global.DEBUG && global.TRACE) trace('Strategy', {agent: this.name, strategyKey, strategyName, method});
+        if (global.DEBUG && global.TRACE)
+            GLOBAL.util.trace('Strategy', {agent: this.name, strategyKey, strategyName, method});
         if (returnValOrMethod === undefined) {
-            logError('strategy handler returned undefined', {agent: this.name || this.id, strategyKey, strategyName, method, stack: new Error().stack});
+            GLOBAL.util.logError('strategy handler returned undefined', {agent: this.name || this.id, strategyKey, strategyName, method, stack: new Error().stack});
             return;
         }
         if (args.length === 0) {
             return returnValOrMethod;
         }
-        const returnVal = returnValOrMethod.apply(this.currentStrategy, args);
+        let returnVal = returnValOrMethod.apply(this.currentStrategy, args);
         if (returnVal !== undefined) {
             return returnVal;
         }
-        logError('handler returned undefined for args', {agent: this.name || this.id, strategyKey, strategyName, method, args: args.toString(), stack: new Error().stack});
+        GLOBAL.util.logError('handler returned undefined for args', {agent: this.name || this.id, strategyKey, strategyName, method, args: args.toString(), stack: new Error().stack});
     };
     prototype._strategyCache = {};
     prototype.strategyKey = function (ids) {

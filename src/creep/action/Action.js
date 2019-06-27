@@ -1,5 +1,10 @@
 "use strict";
 
+const
+    GLOBAL = {
+        util: require(`./global.util`)
+    };
+
 
 
 
@@ -105,7 +110,7 @@ let Action = function (actionName) {
     this.assign = function (creep, target) {
         if (target === undefined) target = this.newTarget(creep);
         if (target && this.isAddableTarget(target, creep)) {
-            if (global.DEBUG && global.TRACE) trace('Action', {creepName: creep.name, assign: this.name, target: !target || target.name || target.id, Action: 'assign'});
+            if (global.DEBUG && global.TRACE) GLOBAL.util.trace('Action', {creepName: creep.name, assign: this.name, target: !target || target.name || target.id, Action: 'assign'});
             if (!creep.action || creep.action.name != this.name || !creep.target || creep.target.id !== target.id || creep.target.name != target.name) {
                 Population.registerAction(creep, this, target);
                 this.onAssignment(creep, target);

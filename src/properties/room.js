@@ -891,20 +891,20 @@ mod.extend = function () {
                 return this._ticksToNextRegeneration;
             }
         },
-        // from room.defense
+        //from room.defense
         'combatCreeps': {
             configurable: true,
-            get: function() {
-                if( _.isUndefined(this._combatCreeps) ){
-                    this._combatCreeps = this.creeps.filter( c => ['melee','ranger','healer', 'warrior'].includes(c.data.creepType) );
+            get: function () {
+                if (_.isUndefined(this._combatCreeps)) {
+                    this._combatCreeps = this.creeps.filter(c => ['melee','ranger','healer', 'warrior'].includes(c.data.creepType));
                 }
                 return this._combatCreeps;
             }
         },
         'casualties': {
             configurable: true,
-            get: function() {
-                if( _.isUndefined(this._casualties) ){
+            get: function () {
+                if (_.isUndefined(this._casualties)) {
                     var isInjured = creep => creep.hits < creep.hitsMax &&
                         (creep.towers === undefined || creep.towers.length == 0);
                     this._casualties = _.sortBy(_.filter(this.creeps, isInjured), 'hits');
@@ -921,7 +921,7 @@ mod.extend = function () {
         'defenseLevel': {
             configurable: true,
             get: function () {
-                if (_.isUndefined(this._defenseLevel) ) {
+                if (_.isUndefined(this._defenseLevel)) {
                     this._defenseLevel = {
                         towers: 0,
                         creeps: 0,
@@ -939,14 +939,14 @@ mod.extend = function () {
         },
         'hostile': {
             configurable: true,
-            get: function() {
+            get: function () {
                 return this.memory.hostile;
             }
         },
         'hostiles': {
             configurable: true,
-            get: function() {
-                if( _.isUndefined(this._hostiles) ){
+            get: function () {
+                if (_.isUndefined(this._hostiles)) {
                     this._hostiles = this.find(FIND_HOSTILE_CREEPS, { filter : Task.reputation.hostileOwner });
                 }
                 return this._hostiles;
@@ -954,8 +954,8 @@ mod.extend = function () {
         },
         'hostileIds': {
             configurable: true,
-            get: function() {
-                if( _.isUndefined(this._hostileIds) ){
+            get: function () {
+                if (_.isUndefined(this._hostileIds)) {
                     this._hostileIds = _.map(this.hostiles, 'id');
                 }
                 return this._hostileIds;
@@ -964,7 +964,7 @@ mod.extend = function () {
         'hostileThreatLevel': {
             configurable: true,
             get: function () {
-                if (_.isUndefined(this._hostileThreatLevel) ) {
+                if (_.isUndefined(this._hostileThreatLevel)) {
                     // TODO: add towers when in foreign room
                     this._hostileThreatLevel = 0;
                     let evaluateBody = creep => {

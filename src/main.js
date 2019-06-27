@@ -73,10 +73,13 @@ const
         creep: require('./prototypes.creep'),
         spawn: require('./prototypes.spawn'),
         room: require('./prototypes.room'),
-        roomPosition: require ('./prototypes.roomPosition')
+        roomPosition: require ('./prototypes.roomPosition'),
+        compounds: require ('./prototypes.compounds')
     },
     ROOM = {
-        room: require('./room.room')
+        room: require('./room.room'),
+        defense: require('./room.defense'),
+        spawn: require('./room.spawn')
     },
     TASK = {
         task: require('./task.task'),
