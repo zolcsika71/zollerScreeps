@@ -45,3 +45,5 @@ setup.RCL = {
     7: setup.default,
     8: setup.high
 };
+
+global.BB(setup);

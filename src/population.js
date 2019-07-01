@@ -4,11 +4,18 @@ const
     GLOBAL = {
         parameter: require(`./global.parameter`),
         util: require(`./global.util`)
+    },
+    ROOT = {
+        flagDir: require('./flagDir')
     };
 
 
 let mod = {};
 module.exports = mod;
+
+mod.getCreep = function (creepName) {
+    return Memory.population[creepName];
+};
 
 mod.setCreep = function (val) {
     Memory.population[val.creepName] = val;
@@ -31,6 +38,88 @@ mod.registerCreep = function (creepName, creepType, creepCost, room, spawnName, 
         destiny: destiny
     });
     this.countCreep(room, entry);
+};
+
+mod.registerAction = function (creep, action, target, entry) {
+    if (global.DEBUG && global.TRACE)
+        GLOBAL.util.trace('Population', {creepName: this.name, registerAction: action.name, target: target.name || target.id, Population: 'registerAction'});
+
+    if (creep === target)
+        throw new Error('attempt to register self target');
+    if (entry === undefined)
+        entry = this.getCreep(creep.name);
+    entry.carryCapacityLeft = creep.carryCapacity - creep.sum;
+    let room = creep.room;
+    if (room.population === undefined) {
+        room.population = {
+            typeCount: {},
+            typeWeight: {},
+            actionCount: {},
+            actionWeight: {}
+        };
+    }
+    if (creep.action) {
+        // unregister action
+        if (room.population.actionCount[creep.action.name] === undefined)
+            room.population.actionCount[creep.action.name] = 0;
+        else room.population.actionCount[creep.action.name]--;
+        if (room.population.actionWeight[creep.action.name] === undefined)
+            room.population.actionWeight[creep.action.name] = 0;
+        else room.population.actionWeight[creep.action.name] -= entry.weight;
+        if (this.actionCount[creep.action.name] === undefined)
+            this.actionCount[creep.action.name] = 0;
+        else this.actionCount[creep.action.name]--;
+        if (this.actionWeight[creep.action.name] === undefined)
+            this.actionWeight[creep.action.name] = 0;
+        else this.actionWeight[creep.action.name] -= entry.weight;
+
+        delete creep.data.determinatedSpot;
+        delete creep.data.determinatedTarget;
+    }
+    // register action
+    entry.actionName = action.name;
+    if (room.population.actionCount[action.name] === undefined)
+        room.population.actionCount[action.name] = 1;
+    else room.population.actionCount[action.name]++;
+    if (room.population.actionWeight[action.name] === undefined)
+        room.population.actionWeight[action.name] = entry.weight;
+    else room.population.actionWeight[action.name] += entry.weight;
+    if (this.actionCount[action.name] === undefined)
+        this.actionCount[action.name] = 1;
+    else this.actionCount[action.name]++;
+    if (this.actionWeight[action.name] === undefined)
+        this.actionWeight[action.name] = entry.weight;
+    else this.actionWeight[action.name] += entry.weight;
+
+    let targetId = target.id || target.name;
+    let oldTargetId;
+    if (entry.targetId) {
+        // unregister target
+        let oldTarget = entry.targetId ? Game.getObjectById(entry.targetId) || Game.spawns[entry.targetId] || Game.flags[entry.targetId] : null;
+        if (oldTarget) {
+            oldTargetId = oldTarget.id || oldTarget.name;
+            if (oldTarget.targetOf) {
+                let byName = elem => elem.creepName === creep.name;
+                let index = oldTarget.targetOf.findIndex(byName);
+                if (index > -1) oldTarget.targetOf.splice(index, 1);
+            }
+        }
+    }
+    // register target
+    entry.targetId = targetId;
+    if (target && !ROOT.flagDir.isSpecialFlag(target)) {
+        if (target.targetOf === undefined)
+            target.targetOf = [entry];
+        else target.targetOf.push(entry);
+    }
+    // clear saved path
+    if (targetId !== oldTargetId) {
+        delete entry.path;
+    }
+
+    creep.action = action;
+    creep.target = target;
+    creep.data = entry;
 };
 
 mod.countCreep = function (room, entry) {

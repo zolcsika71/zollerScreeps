@@ -8,7 +8,8 @@ const
     },
     ROOT = {
         population: require('./population')
-    };
+    },
+    setup = require(`./creep.setup.Setup`);
 
 let mod = {};
 module.exports = mod;
@@ -20,7 +21,7 @@ mod.extend = function () {
         let room = this.room;
         // old spawning system
         let that = this;
-        let probe = setup => {
+        let probe = (setup) => {
             return setup.isValidSetup(room) && that.createCreepBySetup(setup);
         };
 
