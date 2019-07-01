@@ -46,4 +46,4 @@ setup.RCL = {
     8: setup.high
 };
 
-global.BB(setup);
+

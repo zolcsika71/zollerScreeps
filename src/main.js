@@ -197,7 +197,7 @@ if (ROOT.mainInjection.extend)
     ROOT.mainInjection.extend();
 
 ROOT.ocsMemory.activateSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, true);
-ROOT.traveler = require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
+let Traveler = require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
 
 if (global.DEBUG)
     GLOBAL.util.logSystem('Global.install', 'Code reloaded.');

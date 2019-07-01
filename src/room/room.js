@@ -112,13 +112,13 @@ mod.execute = function () {
     let run = (memory, roomName) => {
         try {
             // run executeRoom in each of our submodules
-            for (const key of Object.keys(Room._ext)) {
+            for (let key of Object.keys(Room._ext)) {
                 if (Room._ext[key].executeRoom) Room._ext[key].executeRoom(memory, roomName);
             }
-            const room = Game.rooms[roomName];
+            let room = Game.rooms[roomName];
             if (room) { // has sight
                 if (room.collapsed) {
-                    const p2 = GLOBAL.util.startProfiling(roomName + 'execute', {enabled: global.PROFILING.ROOMS});
+                    let p2 = GLOBAL.util.startProfiling(roomName + 'execute', {enabled: global.PROFILING.ROOMS});
                     Room.collapsed.trigger(room);
                     p2.checkCPU('collapsed', 0.5);
                 }
@@ -130,11 +130,46 @@ mod.execute = function () {
     _.forEach(Memory.rooms, (memory, roomName) => {
         run(memory, roomName);
         p.checkCPU(roomName + '.run', 1);
-        if (Game.time % MEMORY_RESYNC_INTERVAL === 0 && !Game.rooms[roomName] && typeof Memory.rooms[roomName].hostile !== 'boolean') {
+        if (Game.time % global.MEMORY_RESYNC_INTERVAL === 0 && !Game.rooms[roomName] && typeof Memory.rooms[roomName].hostile !== 'boolean') {
             // clean up stale room memory for rooms no longer in use, but preserve manually set 'hostile' entries
             delete Memory.rooms[roomName];
         }
     });
+};
+mod.routeCallback = function (origin, destination, options) {
+    if (_.isUndefined(origin) || _.isUndefined(destination))
+        GLOBAL.util.logError('Room.routeCallback', 'both origin and destination must be defined - origin:' + origin + ' destination:' + destination);
+    return function (roomName) {
+        if (Game.map.getRoomLinearDistance(origin, roomName) > options.restrictDistance)
+            return false;
+        if (roomName !== destination && global.ROUTE_ROOM_COST[Game.shard.name] && global.ROUTE_ROOM_COST[Game.shard.name][roomName]) {
+            return global.ROUTE_ROOM_COST[Game.shard.name][roomName];
+        }
+        let isHighway = false;
+        if (options.preferHighway) {
+            const parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
+            isHighway = (parsed[1] % 10 === 0) || (parsed[2] % 10 === 0);
+        }
+        let isMyOrNeutralRoom = false,
+            hostile = _.get(Memory.rooms[roomName], 'hostile', false);
+        if (options.checkOwner) {
+            let room = Game.rooms[roomName];
+            // allow for explicit overrides of hostile rooms using hostileRooms[roomName] = false
+            isMyOrNeutralRoom = !hostile || (room && room.controller && (room.controller.my || room.controller.owner === undefined));
+        }
+        if (!options.allowSK && mod.isSKRoom(roomName)) return 10;
+        if (!options.allowHostile && hostile &&
+            roomName !== destination && roomName !== origin) {
+            return Number.POSITIVE_INFINITY;
+        }
+        if (isMyOrNeutralRoom || roomName == origin || roomName == destination)
+            return 1;
+        else if (isHighway)
+            return 3;
+        else if (Game.map.isRoomAvailable(roomName))
+            return (options.checkOwner || options.preferHighway) ? 11 : 1;
+        return Number.POSITIVE_INFINITY;
+    };
 };
 mod.rebuildCostMatrix = function (roomName) {
     if (global.DEBUG)
@@ -175,6 +210,46 @@ mod.validFields = function (roomName, minX, maxX, minY, maxY, checkWalkable = fa
         }
     }
     return fields;
+};
+
+mod.calcGlobalCoordinates = function (roomName, callBack) {
+    if (!callBack) return null;
+    const parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
+    let x = +parsed[1],
+        y = +parsed[2];
+
+    return callBack(x, y);
+};
+mod.calcCoordinates = function (roomName, callBack) {
+    if (!callBack) return null;
+    return Room.calcGlobalCoordinates(roomName, (x, y) => {
+        return callBack(x % 10, y % 10);
+    });
+};
+mod.isCenterRoom = function (roomName) {
+    return Room.calcCoordinates(roomName, (x,y) => {
+        return x === 5 && y === 5;
+    });
+};
+mod.isCenterNineRoom = function (roomName) {
+    return Room.calcCoordinates(roomName, (x,y) => {
+        return x > 3 && x < 7 && y > 3 && y < 7;
+    });
+};
+mod.isControllerRoom = function (roomName) {
+    return Room.calcCoordinates(roomName, (x,y) => {
+        return x !== 0 && y !== 0 && (x < 4 || x > 6 || y < 4 || y > 6);
+    });
+};
+mod.isSKRoom = function (roomName) {
+    return Room.calcCoordinates(roomName, (x,y) => {
+        return x > 3 && x < 7 && y > 3 && y < 7 && (x !== 5 || y !== 5);
+    });
+};
+mod.isHighwayRoom = function (roomName) {
+    return Room.calcCoordinates(roomName, (x,y) => {
+        return x === 0 || y === 0;
+    });
 };
 
 mod.fieldsInRange = function (args) {
@@ -225,17 +300,17 @@ mod.findSpawnRoom = function (params) {
     return _.min(validRooms, evaluation);
 };
 
-mod.Containers = function(room){
+mod.Containers = function (room) {
     this.room = room;
     Object.defineProperties(this, {
         'all': {
             configurable: true,
-            get: function() {
-                if( _.isUndefined(this._container) ){
+            get: function () {
+                if (_.isUndefined(this._container)) {
                     this._container = [];
                     let add = entry => {
                         let cont = Game.getObjectById(entry.id);
-                        if( cont ) {
+                        if (cont) {
                             _.assign(cont, entry);
                             this._container.push(cont);
                         }
@@ -247,11 +322,11 @@ mod.Containers = function(room){
         },
         'controller': {
             configurable: true,
-            get: function() {
-                if( _.isUndefined(this._controller) ){
-                    if( this.room.my && this.room.controller.memory.storage ){
+            get: function () {
+                if (_.isUndefined(this._controller)) {
+                    if (this.room.my && this.room.controller.memory.storage) {
                         this._controller = [Game.getObjectById(this.room.controller.memory.storage)];
-                        if( !this._controller[0] ) delete this.room.controller.memory.storage;
+                        if (!this._controller[0]) delete this.room.controller.memory.storage;
                     } else {
                         let byType = c => c.controller == true;
                         this._controller = _.filter(this.all, byType);
@@ -262,12 +337,12 @@ mod.Containers = function(room){
         },
         'in': {
             configurable: true,
-            get: function() {
-                if( _.isUndefined(this._in) ){
+            get: function () {
+                if (_.isUndefined(this._in)) {
                     let byType = c => c.controller == false;
                     this._in = _.filter(this.all, byType);
                     // add managed
-                    let isFull = c => c.sum >= (c.storeCapacity * (1-MANAGED_CONTAINER_TRIGGER));
+                    let isFull = c => c.sum >= (c.storeCapacity * (1 - MANAGED_CONTAINER_TRIGGER));
                     this._in = this._in.concat(this.managed.filter(isFull));
                 }
                 return this._in;
@@ -275,8 +350,8 @@ mod.Containers = function(room){
         },
         'out': {
             configurable: true,
-            get: function() {
-                if( _.isUndefined(this._out) ){
+            get: function () {
+                if (_.isUndefined(this._out)) {
                     let byType = c => c.controller == true;
                     this._out = _.filter(this.all, byType);
                     // add managed
@@ -288,8 +363,8 @@ mod.Containers = function(room){
         },
         'privateers': {
             configurable: true,
-            get: function() {
-                if( _.isUndefined(this._privateers) ){
+            get: function () {
+                if (_.isUndefined(this._privateers)) {
                     let byType = c => (c.source === false && !c.mineral && c.sum < c.storeCapacity);
                     this._privateers = _.filter(this.all, byType);
                 }
@@ -298,8 +373,8 @@ mod.Containers = function(room){
         },
         'managed': {
             configurable: true,
-            get: function() {
-                if( _.isUndefined(this._managed) ){
+            get: function () {
+                if (_.isUndefined(this._managed)) {
                     let byType = c => c.source === true && c.controller == true;
                     this._managed = _.filter(this.all, byType);
                 }
