@@ -1,6 +1,7 @@
 "use strict";
 
 const
+    //setup = require(`./creep.setup.Setup`),
     GLOBAL = {
         global: require('./global.global'),
         parameter: require(`./global.parameter`),
@@ -8,19 +9,23 @@ const
     },
     ROOT = {
         population: require('./population')
-    },
-    setup = require(`./creep.setup.Setup`);
+    };
+
 
 let mod = {};
 module.exports = mod;
 mod.extend = function () {
 
     Spawn.prototype.execute = function () {
+
+        console.log(`REAL`);
+
         if (this.spawning)
             return;
         let room = this.room;
         // old spawning system
         let that = this;
+
         let probe = (setup) => {
             return setup.isValidSetup(room) && that.createCreepBySetup(setup);
         };

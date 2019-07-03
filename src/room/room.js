@@ -442,5 +442,91 @@ mod.Containers = function (room) {
 
 // Container related Room variables go here
 
+// Construction related Room variables go here
+
+// from room.construction
+Room.roomLayoutArray =
+    [[,,,,,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],
+    [,,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],
+    [,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_SPAWN,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],
+    [,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD],
+    [,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],
+    [STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_NUKER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],
+    [STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_EXTENSION,STRUCTURE_SPAWN,STRUCTURE_ROAD,STRUCTURE_POWER_SPAWN,STRUCTURE_LINK,STRUCTURE_TERMINAL,STRUCTURE_ROAD,STRUCTURE_OBSERVER,STRUCTURE_EXTENSION,STRUCTURE_TOWER,STRUCTURE_ROAD],
+    [STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_STORAGE,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],
+    [,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],
+    [,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD],
+    [,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_SPAWN,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],
+    [,,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],
+    [,,,,,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION]];
+
+
 // New Room methods go here
 
+// from room.construction
+Room.roomLayout = function (flag) {
+    if (!Flag.compare(flag, global.FLAG_COLOR.command.roomLayout)) return;
+    flag = Game.flags[flag.name];
+    const room = flag.room;
+    if (!room) return;
+    let layout = Room.roomLayoutArray,
+        constructionFlags = {
+        [STRUCTURE_SPAWN]: global.FLAG_COLOR.construct.spawn,
+        [STRUCTURE_TOWER]: global.FLAG_COLOR.construct.tower,
+        [STRUCTURE_EXTENSION]: global.FLAG_COLOR.construct,
+        [STRUCTURE_LINK]: global.FLAG_COLOR.construct.link,
+        [STRUCTURE_STORAGE]: global.FLAG_COLOR.construct.storage,
+        [STRUCTURE_TERMINAL]: global.FLAG_COLOR.construct.terminal,
+        [STRUCTURE_NUKER]: global.FLAG_COLOR.construct.nuker,
+        [STRUCTURE_POWER_SPAWN]: global.FLAG_COLOR.construct.powerSpawn,
+        [STRUCTURE_OBSERVER]: global.FLAG_COLOR.construct.observer
+    };
+
+    let [centerX, centerY] = [flag.pos.x, flag.pos.y],
+        placed = [],
+        sites = [],
+        failed = () => {
+        flag.pos.newFlag(global.FLAG_COLOR.command.invalidPosition, 'NO_ROOM');
+        flag.remove();
+        return false;
+    };
+
+    for (let x = 0; x < layout.length; x++) {
+        for (let y = 0; y < layout[x].length; y++) {
+            let xPos = Math.floor(centerX + (x - layout.length / 2) + 1),
+                yPos = Math.floor(centerY + (y - layout.length / 2) + 1);
+            if (xPos >= 50 || xPos < 0 || yPos >= 50 || yPos < 0)
+                return failed();
+
+            let pos = room.getPositionAt(xPos, yPos),
+                structureType = layout[x] && layout[x][y];
+
+            if (structureType) {
+
+                let terrain = Game.map.getRoomTerrain(room.name);
+                if (terrain.get(xPos, yPos) === TERRAIN_MASK_WALL)
+                    return failed();
+
+                if (structureType === STRUCTURE_ROAD)
+                    sites.push(pos);
+
+                else {
+                    let flagColour = constructionFlags[structureType];
+                    placed.push({
+                        flagColour, pos
+                    });
+                }
+            }
+        }
+    }
+
+    placed.forEach(f => {
+        f.pos.newFlag(f.flagColour);
+    });
+    _.forEach(sites, p => {
+        if (_.size(Game.constructionSites) >= 100) return false;
+        p.createConstructionSite(STRUCTURE_ROAD);
+    });
+
+    flag.remove();
+};

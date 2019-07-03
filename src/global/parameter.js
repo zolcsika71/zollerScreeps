@@ -2,7 +2,7 @@ let mod = {
 
     SAY_ASSIGNMENT: true, // say a symbol representing the assiged action
     SAY_PUBLIC: true, // creeps talk public
-    CENSUS_ANNOUNCEMENTS: true, // log birth and death
+    CENSUS_ANNOUNCEMENTS: false, // log birth and death
     DEBUG: true,
     DEBUG_STACKS: false, // add stack frame to EVERY console.log message (spammy!)
     PROFILE: true, // enable CPU profiling
@@ -49,6 +49,12 @@ let mod = {
 
     MINERS_AUTO_BUILD: true, // miners and remoteMiners will build their own containers if they are missing.
 
+    ROAD_CONSTRUCTION_ENABLE: false, // Set to False to disable automatic road construction, or to a number to enable for owned rooms reaching that RC Level. WARNING: HIGH MEMORY USAGE
+    ROAD_CONSTRUCTION_FORCED_ROOMS: {'shard0': []}, //Add room names to force automatic road construction regardless of ROAD_CONSTRUCTION_ENABLE e.g. {'shard0':['W0N0','W1N0'],'shard1':['W0N0', 'W1N0']}. No dependency with ROAD_CONSTRUCTION_ENABLE
+    ROAD_CONSTRUCTION_INTERVAL: 500,
+    ROAD_CONSTRUCTION_MIN_DEVIATION: 1.2,
+    ROAD_CONSTRUCTION_ABS_MIN: 3,
+
 
 
     MEMORY_RESYNC_INTERVAL: 500, // interval to reload spawns & towers present in a room
@@ -56,6 +62,39 @@ let mod = {
     COMPRESS_COST_MATRICES: false, // enable to compress cached cost matrices (1/5 the size, but currently about 2x CPU usage)
 
     // constants
+    ACTION_SAY: { // what gets said on creep.action.*.onAssignment
+        ATTACK_CONTROLLER: String.fromCodePoint(0x1F5E1) + String.fromCodePoint(0x26F3), // 🗡⛳
+        AVOIDING: String.fromCodePoint(0x21A9), // ↩
+        BOOSTING: String.fromCodePoint(0x1F4AA), // 💪🏼
+        BUILDING: String.fromCodePoint(0x2692), // ⚒
+        BULLDOZING: String.fromCodePoint(0x1F69C), // 🚜
+        CHARGING: String.fromCodePoint(0x1F50C), // 🔌
+        CLAIMING: String.fromCodePoint(0x26F3), // ⛳
+        DEFENDING: String.fromCodePoint(0x2694), // ⚔
+        DISMANTLING: String.fromCodePoint(0x1F527), // 🔧
+        DROPPING: String.fromCodePoint(0x1F4A9), // 💩
+        FEEDING: String.fromCodePoint(0x1F355), // 🍕
+        FORTIFYING: String.fromCodePoint(0x1F528), // 🔨
+        FUELING: String.fromCodePoint(0x26FD), // ⛽
+        GUARDING: String.fromCodePoint(0x1F46E) + String.fromCodePoint(0x1F3FC), // 👮🏼
+        HARVESTING: String.fromCodePoint(0x26CF), // ⛏
+        HEALING: String.fromCodePoint(0x26E8), // ⛨
+        IDLE: String.fromCodePoint(0x1F3B5), // 🎵
+        INVADING: String.fromCodePoint(0x1F52B), // 🔫
+        MINING: String.fromCodePoint(0x26CF), // ⛏
+        PICKING: String.fromCodePoint(0x23EC), // ⏬
+        REALLOCATING: String.fromCodePoint(0x2194), // ↔
+        RECYCLING: String.fromCodePoint(0x267B), // ♻
+        REPAIRING: String.fromCodePoint(0x1F528), // 🔨
+        RESERVING: String.fromCodePoint(0x26F3), // ⛳
+        ROBBING: String.fromCodePoint(0x1F480), // 💀
+        STORING: String.fromCodePoint(0x1F4E5) + String.fromCodePoint(0xFE0E), // 📥
+        TRAVELLING: String.fromCodePoint(0x1F3C3), // 🏃
+        UNCHARGING: String.fromCodePoint(0x1F50B), // 🔋
+        UPGRADING: String.fromCodePoint(0x1F5FD), // 🗽
+        WITHDRAWING: String.fromCodePoint(0x1F4E4) + String.fromCodePoint(0xFE0E), // 📤
+        SAFEGEN: String.fromCodePoint(0x1F512) // 🔒
+    },
 
     CRAYON: { // predefined log colors
         death: {color: 'black', 'font-weight': 'bold'},

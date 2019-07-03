@@ -17,7 +17,6 @@ mod.extend = function () {
 
     let Structures = function (room) {
         this.room = room;
-
         Object.defineProperties(this, {
             'all': {
                 configurable: true,
@@ -436,7 +435,8 @@ mod.extend = function () {
                     if (cachedMatrix) {
                         this._structureMatrix = cachedMatrix;
                     } else {
-                        if (global.DEBUG) logSystem(this.name, 'Calculating cost matrix');
+                        if (global.DEBUG)
+                            GLOBAL.util.logSystem(this.name, 'Calculating cost matrix');
                         const costMatrix = new PathFinder.CostMatrix;
                         let setCosts = structure => {
                             const site = structure instanceof ConstructionSite;
@@ -465,7 +465,8 @@ mod.extend = function () {
                             version: Room.COSTMATRIX_CACHE_VERSION
                         };
                         Room.pathfinderCacheDirty = true;
-                        if (global.DEBUG && global.TRACE) trace('PathFinder', {roomName: this.name, prevTime, structures: this.structures.all.length, PathFinder: 'CostMatrix'}, 'updated costmatrix');
+                        if (global.DEBUG && global.TRACE)
+                            GLOBAL.util.trace('PathFinder', {roomName: this.name, prevTime, structures: this.structures.all.length, PathFinder: 'CostMatrix'}, 'updated costmatrix');
                         this._structureMatrix = costMatrix;
                     }
                 }
@@ -974,7 +975,36 @@ mod.extend = function () {
                 }
                 return this._hostileThreatLevel;
             }
+        },
+        // from room.construction
+        'constructionSites': {
+            configurable: true,
+            get: function () {
+                if (_.isUndefined(this._constructionSites)) {
+                    this._constructionSites = this.find(FIND_CONSTRUCTION_SITES);
+                }
+                return this._constructionSites;
+            }
+        },
+        'myConstructionSites': {
+            configurable: true,
+            get: function () {
+                if (_.isUndefined(this._myConstructionSites)) {
+                    this._myConstructionSites = this.find(FIND_MY_CONSTRUCTION_SITES);
+                }
+                return this._myConstructionSites;
+            }
+        },
+        'roadConstructionTrace': {
+            configurable: true,
+            get: function () {
+                if (_.isUndefined(this.memory.roadConstructionTrace)) {
+                    this.memory.roadConstructionTrace = {};
+                }
+                return this.memory.roadConstructionTrace;
+            }
         }
+
     });
 
 };

@@ -193,11 +193,11 @@ mod.analyze = function () {
                 creep.data.nearDeath = true;
 
                 if (global.CENSUS_ANNOUNCEMENTS)
-                    console.log(GLOBAL.util.dye(global.CRAYON.system, entry.creepName + ' &gt; ') + GLOBAL.util.dye(CRAYON.death, 'Farewell!'), Util.stack());
+                    console.log(GLOBAL.util.dye(global.CRAYON.system, entry.creepName + ' &gt; ') + GLOBAL.util.dye(global.CRAYON.death, 'Farewell!'), GLOBAL.util.stack());
 
                 this.predictedRenewal.push(creep.name);
 
-                if (!this.spawnsToProbe.includes(entry.motherSpawn) && entry.motherSpawn != 'unknown' && Game.spawns[entry.motherSpawn])
+                if (!this.spawnsToProbe.includes(entry.motherSpawn) && entry.motherSpawn !== 'unknown' && Game.spawns[entry.motherSpawn])
                     this.spawnsToProbe.push(entry.motherSpawn);
             }
 
@@ -210,7 +210,7 @@ mod.analyze = function () {
             }
 
             if (entry.flagName) {
-                var flag = Game.flags[entry.flagName];
+                let flag = Game.flags[entry.flagName];
                 if (!flag)
                     delete entry.flagName;
                 else {
@@ -222,7 +222,7 @@ mod.analyze = function () {
             let action = (entry.actionName && Creep.action[entry.actionName]) ? Creep.action[entry.actionName] : null;
             let target = action && entry.targetId ? Game.getObjectById(entry.targetId) || Game.spawns[entry.targetId] || Game.flags[entry.targetId] : null;
             if (target && target.id === creep.id) {
-                target = FlagDir.specialFlag();
+                target = GLOBAL.flagDir.specialFlag();
             }
             if (action && target) this.registerAction(creep, action, target, entry);
             else {
@@ -241,7 +241,7 @@ mod.analyze = function () {
     };
     _.forEach(Memory.population, c => {
         register(c);
-        p.checkCPU('Register: ' + c.creepName, PROFILING.ANALYZE_LIMIT / 2);
+        p.checkCPU('Register: ' + c.creepName, global.PROFILING.ANALYZE_LIMIT / 2);
     });
 
     let validateAssignment = entry => {
@@ -254,7 +254,7 @@ mod.analyze = function () {
                 delete entry.targetId;
                 creep.action = null;
                 creep.target = null;
-            } else if (oldId != target.id || target.name) {
+            } else if (oldId !== target.id || target.name) {
                 this.registerAction(creep, creep.action, target, entry);
             }
         }

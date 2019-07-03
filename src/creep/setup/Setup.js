@@ -1,5 +1,5 @@
-"use strict";
-
+//"use strict";
+/*
 const
     GLOBAL = {
         util: require(`./global.util`)
@@ -7,7 +7,7 @@ const
     ROOT = {
         population: require('./population')
     };
-
+*/
 let Setup = function (typeName) {
     this.none = {
         fixedBody: [],
@@ -28,15 +28,14 @@ let Setup = function (typeName) {
         7: this.none,
         8: this.none
     };
-
     this.type = typeName;
     this.minControllerLevel = 0;
     this.globalMeasurement = false;
     this.measureByHome = false;
     this.sortedParts = true;
     this.mixMoveParts = false;
-
     this.rclProperty = Setup.rclProperty;
+
     this.SelfOrCall = function (obj, param) {
         if (obj == null)
             return null;
@@ -76,7 +75,7 @@ let Setup = function (typeName) {
     this.isValidSetup = function (room) {
         if (room.controller.level < this.minControllerLevel) {
             if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('Setup', {setupType: this.type, room: room.name, rcl: room.controller.level, Setup: 'isValidSetup'}, 'low RCL');
+                Util.trace('Setup', {setupType: this.type, room: room.name, rcl: room.controller.level, Setup: 'isValidSetup'}, 'low RCL');
             return false;
         }
 
@@ -88,7 +87,7 @@ let Setup = function (typeName) {
         if (absEnergy < minAbsEnergyAvailable ||
             energy < minEnergyAvailable) {
             if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('Setup', {setupType: this.type, room: room.name, absEnergy, energy, Setup: 'isValidSetup'}, 'not enough energy');
+                Util.trace('Setup', {setupType: this.type, room: room.name, absEnergy, energy, Setup: 'isValidSetup'}, 'not enough energy');
             return false;
         }
 
@@ -96,7 +95,7 @@ let Setup = function (typeName) {
             maxWeight = this.SelfOrCall(this._maxWeight, room);
         if (maxCount === 0 || maxWeight === 0) {
             if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('Setup', {setupType: this.type, room: room.name, maxCount, maxWeight, Setup: 'isValidSetup'}, 'too many creeps');
+                Util.trace('Setup', {setupType: this.type, room: room.name, maxCount, maxWeight, Setup: 'isValidSetup'}, 'too many creeps');
             return false;
         }
         if (maxCount == null)
@@ -124,7 +123,7 @@ let Setup = function (typeName) {
         }
         const returnVal = existingCount < maxCount && existingWeight < maxWeight;
         if (global.DEBUG && global.TRACE)
-            GLOBAL.util.trace('Setup', {setupType: this.type, room: room.name, returnVal, Setup: 'isValidSetup'}, 'count:', existingCount, '<', maxCount, 'weight:', existingWeight, '<', maxWeight);
+            Util.trace('Setup', {setupType: this.type, room: room.name, returnVal, Setup: 'isValidSetup'}, 'count:', existingCount, '<', maxCount, 'weight:', existingWeight, '<', maxWeight);
         return returnVal;
     };
     this.existingWeight = function (room) {
@@ -155,7 +154,7 @@ let Setup = function (typeName) {
             maxCreepWeight = maxWeight - existingWeight;
         }
         if (global.DEBUG && global.TRACE)
-            GLOBAL.util.trace('Setup', {setupType: this.type, room: room.name, Setup: 'parts',
+            Util.trace('Setup', {setupType: this.type, room: room.name, Setup: 'parts',
             maxWeight, minMulti, maxMulti});
         return Creep.compileBody(room, {
             fixedBody, multiBody, minMulti, maxMulti,
@@ -207,7 +206,6 @@ Setup.rclProperty = function (property) {
         if (property === undefined) {
             return rcl;
         }
-
         return creepSetup.SelfOrCall(rcl(room)[property], room);
     };
 };
