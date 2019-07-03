@@ -2,8 +2,6 @@
 
 const
     GLOBAL = {
-        global: require('./global.global'),
-        parameter: require(`./global.parameter`),
         util: require(`./global.util`)
     },
     ROOT = {
@@ -118,7 +116,7 @@ let Setup = function (typeName) {
             };
             _.forEach(Memory.population, count);
         } else {
-            let population = this.globalMeasurement ? Population : room.population;
+            let population = this.globalMeasurement ? ROOT.population : room.population;
             if (!population || !population.typeCount[this.type])
                 return true;
             existingCount = population.typeCount[this.type] || 0;

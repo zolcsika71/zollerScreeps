@@ -2,7 +2,6 @@
 
 const
     GLOBAL = {
-        global: require('./global.global'),
         parameter: require(`./global.parameter`),
         util: require(`./global.util`)
     },
@@ -27,7 +26,9 @@ mod.register = function () {
 };
 module.exports = mod;
 mod.pathfinderCache = {};
+mod.pathfinderCacheDirty = false;
 mod.pathfinderCacheLoaded = false;
+mod.COSTMATRIX_CACHE_VERSION = global.COMPRESS_COST_MATRICES ? 4 : 5; // change this to invalidate previously cached costmatrices
 
 mod.flush = function () {
     // run flush in each of our submodules
@@ -93,7 +94,7 @@ mod.analyze = function () {
         }
         catch (err) {
             Game.notify('Error in room.js (Room.prototype.loop) for "' + room.name + '" : ' + err.stack ? err + '<br/>' + err.stack : err);
-            console.log(global.dye(global.CRAYON.error, 'Error in room.js (Room.prototype.loop) for "' + room.name + '": <br/>' + (err.stack || err.toString()) + '<br/>' + err.stack));
+            console.log(GLOBAL.util.dye(global.CRAYON.error, 'Error in room.js (Room.prototype.loop) for "' + room.name + '": <br/>' + (err.stack || err.toString()) + '<br/>' + err.stack));
         }
     };
     _.forEach(Game.rooms, r => {
@@ -232,9 +233,12 @@ mod.isCenterRoom = function (roomName) {
     });
 };
 mod.isCenterNineRoom = function (roomName) {
+    if (roomName === 'sim')
+        return false;
+
     return Room.calcCoordinates(roomName, (x,y) => {
-        return x > 3 && x < 7 && y > 3 && y < 7;
-    });
+            return x > 3 && x < 7 && y > 3 && y < 7;
+        });
 };
 mod.isControllerRoom = function (roomName) {
     return Room.calcCoordinates(roomName, (x,y) => {
@@ -242,6 +246,8 @@ mod.isControllerRoom = function (roomName) {
     });
 };
 mod.isSKRoom = function (roomName) {
+    if (roomName === 'sim')
+        return false;
     return Room.calcCoordinates(roomName, (x,y) => {
         return x > 3 && x < 7 && y > 3 && y < 7 && (x !== 5 || y !== 5);
     });
@@ -250,6 +256,56 @@ mod.isHighwayRoom = function (roomName) {
     return Room.calcCoordinates(roomName, (x,y) => {
         return x === 0 || y === 0;
     });
+};
+
+mod.getCachedStructureMatrix = function (roomName) {
+    const cacheValid = (roomName) => {
+        if (_.isUndefined(Room.pathfinderCache)) {
+            Room.pathfinderCache = {};
+            Room.pathfinderCache[roomName] = {};
+            return false;
+        } else if (_.isUndefined(Room.pathfinderCache[roomName])) {
+            Room.pathfinderCache[roomName] = {};
+            return false;
+        }
+        let mem = Room.pathfinderCache[roomName],
+            ttl = Game.time - mem.updated;
+        if (mem.version === Room.COSTMATRIX_CACHE_VERSION && (mem.serializedMatrix || mem.costMatrix) && !mem.stale && ttl < COST_MATRIX_VALIDITY) {
+            if (global.DEBUG && global.TRACE) trace('PathFinder', {roomName: roomName, ttl, PathFinder: 'CostMatrix'}, 'cached costmatrix');
+            return true;
+        }
+        return false;
+    };
+
+    if (cacheValid(roomName)) {
+        let cache = Room.pathfinderCache[roomName];
+        if (cache.costMatrix) {
+            return cache.costMatrix;
+        } else if (cache.serializedMatrix) {
+            // disabled until the CPU efficiency can be improved
+            let costMatrix = global.COMPRESS_COST_MATRICES ? CompressedMatrix.deserialize(cache.serializedMatrix) : PathFinder.CostMatrix.deserialize(cache.serializedMatrix);
+            cache.costMatrix = costMatrix;
+            return costMatrix;
+        } else {
+            GLOBAL.util.logError('Room.getCachedStructureMatrix', `Cached costmatrix for ${roomName} is invalid ${cache}`);
+            delete Room.pathfinderCache[roomName];
+        }
+    }
+};
+mod.getStructureMatrix = function (roomName, options) {
+    const room = Game.rooms[roomName];
+    let matrix;
+    if (Room.isSKRoom(roomName) && options.avoidSKCreeps) {
+        matrix = _.get(room, 'avoidSKMatrix');
+    } else {
+        matrix = _.get(room, 'structureMatrix');
+    }
+
+    if (!matrix) {
+        matrix = _.get(Room.getCachedStructureMatrix(roomName), 'costMatrix');
+    }
+
+    return matrix;
 };
 
 mod.fieldsInRange = function (args) {

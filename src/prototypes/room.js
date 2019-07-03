@@ -372,7 +372,7 @@ mod.extend = function () {
         let that = this;
         if (this.memory.hostileIds === undefined)
             this.memory.hostileIds = [];
-        if (!SEND_STATISTIC_REPORTS) delete this.memory.statistics;
+        if (!global.SEND_STATISTIC_REPORTS) delete this.memory.statistics;
         else if (this.memory.statistics === undefined) {
             this.memory.statistics = {};
         }
@@ -387,7 +387,7 @@ mod.extend = function () {
                 // save to trigger subscribers later
                 that.newInvader.push(creep);
                 // create statistics
-                if (SEND_STATISTIC_REPORTS) {
+                if (global.SEND_STATISTIC_REPORTS) {
                     let bodyCount = JSON.stringify(_.countBy(creep.body, 'type'));
                     if (that.memory.statistics.invaders === undefined)
                         that.memory.statistics.invaders = [];
@@ -411,7 +411,7 @@ mod.extend = function () {
                 // save to trigger subscribers later
                 that.goneInvader.push(id);
                 // update statistics
-                if (SEND_STATISTIC_REPORTS && that.memory.statistics && that.memory.statistics.invaders !== undefined && that.memory.statistics.invaders.length > 0) {
+                if (global.SEND_STATISTIC_REPORTS && that.memory.statistics && that.memory.statistics.invaders !== undefined && that.memory.statistics.invaders.length > 0) {
                     let select = invader => invader.id == id && invader.leave === undefined;
                     let entry = _.find(that.memory.statistics.invaders, select);
                     if (entry != undefined) entry.leave = Game.time;

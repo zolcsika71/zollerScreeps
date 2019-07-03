@@ -52,6 +52,8 @@ let mod = {
 
 
     MEMORY_RESYNC_INTERVAL: 500, // interval to reload spawns & towers present in a room
+    SEND_STATISTIC_REPORTS: true, // Set to true to receive room statistics per mail, otherwise set to false.
+    COMPRESS_COST_MATRICES: false, // enable to compress cached cost matrices (1/5 the size, but currently about 2x CPU usage)
 
     // constants
 

@@ -92,7 +92,14 @@ mod.stack = function (force = false, placeholder = ' ') {
 mod.trace = function (category, entityWhere, ...message) {
     function reduceMemoryWhere(result, value, key) {
         const setting = Memory.debugTrace[key];
+        /*
         if (!Reflect.has(Memory.debugTrace, key))
+            return result;
+
+         */
+        if (_.some(_.keys(Memory.debugTrace), prop => {
+          return key === prop;
+        }))
             return result;
         else if (result)
             return setting === value || (!value && setting === `${value}`);

@@ -5,11 +5,19 @@ const
         mining: require('./task.mining')
     };
 
-let mod = {};
+let mod = {},
+    cache = {};
+
 module.exports = mod;
 
 mod.tasks = [];
 mod.executeCache = {};
+
+mod.cache = (task, s) => {
+    if (!cache[task]) cache[task] = {};
+    if (!cache[task][s]) cache[task][s] = {};
+    return cache[task][s];
+};
 
 mod.populate = function () {
     mod.addTasks(...[

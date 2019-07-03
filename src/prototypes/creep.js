@@ -8,6 +8,9 @@ const
         parameter: require(`./global.parameter`),
         util: require(`./global.util`)
 
+    },
+    ROOT = {
+        population: require('./population')
     };
 
 
@@ -139,7 +142,7 @@ mod.extend = function () {
                     let counts = _.countBy(this.body, 'type');
                     if (counts[WORK] && counts[CARRY]) {
                         let weight = (counts[WORK] * BODYPART_COST[WORK]) + (counts[CARRY] * BODYPART_COST[CARRY]) + (counts[MOVE] * BODYPART_COST[MOVE]);
-                        let entry = CREEP.population.setCreep({
+                        let entry = ROOT.population.setCreep({
                             creepName: this.name,
                             creepType: 'worker',
                             weight: weight,
@@ -152,7 +155,7 @@ mod.extend = function () {
                             flagName: null,
                             body: _.countBy(this.body, 'type')
                         });
-                        CREEP.population.countCreep(this.room, entry);
+                        ROOT.population.countCreep(this.room, entry);
                     } else this.suicide();
                     p.checkCPU('!this.data', global.PROFILING.MIN_THRESHOLD);
                 }

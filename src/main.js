@@ -27,37 +27,12 @@ function wrapLoop(fn) {
     };
 }
 
-_.assign(Creep, {
-    Action: require('./creep.action.Action'),
-    Behaviour: require('./creep.behaviour.Behaviour'),
-    Setup: require('./creep.setup.Setup')
 
-});
 
-const
-    //_ = require('lodash'),
+let //_ = require('lodash'),
     cpuAtLoad = Game.cpu.getUsed(),
-    CREEP = {
-        action: {
-            mining: require('./creep.action.mining'),
-            recycling: require('./creep.action.recycling')
-        },
-        behaviour: {
-
-            miner: require('./creep.behaviour.miner')
-        },
-        setup: {
-            miner: require('./creep.setup.miner'),
-            worker: require('./creep.setup.worker')
-
-        },
-        creep: require('./creep.creep')
-    },
-    GLOBAL = {
-        global: require('./global.global'),
-        parameter: require(`./global.parameter`),
-        util: require(`./global.util`)
-    },
+    CREEP = {},
+    GLOBAL = {},
     PROPERTIES = {
         creep: require('./properties.creep'),
         mineral: require('./properties.mineral'),
@@ -76,24 +51,9 @@ const
         roomPosition: require ('./prototypes.roomPosition'),
         compounds: require ('./prototypes.compounds')
     },
-    ROOM = {
-        room: require('./room.room'),
-        defense: require('./room.defense'),
-        spawn: require('./room.spawn')
-    },
-    TASK = {
-        task: require('./task.task'),
-        mining: require('./task.mining'),
-        reputation: require('./task.reputation')
-    },
-    ROOT = {
-        mainInjection: require(`./mainInjection`),
-        ocsMemory: require('./ocsMemory'),
-        initMemory: require('./initMemory'),
-        events: require('./events'),
-        flagDir: require('./flagDir'),
-        population: require('./population')
-    };
+    ROOM = {},
+    TASK = {},
+    ROOT = {};
 
 
 let inject = (base, alien, namespace) => {
@@ -122,21 +82,33 @@ let inject = (base, alien, namespace) => {
     cpuAtFirstLoop;
 
 
-
+_.assign(GLOBAL, {
+    global: require('./global.global'),
+    parameter: require(`./global.parameter`)
+});
 
 inject(global, GLOBAL.global);
-inject(Creep, CREEP.creep);
-inject(Room, ROOM.room);
-
-
-
-
-
-
 // make parameter accessible from command line
 _.assign(global, GLOBAL.parameter);
 
-// make util accessible from command line usage: Util.fn();
+_.assign(ROOT, {
+    mainInjection: require(`./mainInjection`),
+    initMemory: require('./initMemory'),
+});
+
+
+// Load modules
+
+GLOBAL.util = require(`./global.util`);
+TASK.task = require('./task.task');
+_.assign(ROOT, {
+    ocsMemory: require('./ocsMemory'),
+    events: require('./events'),
+    flagDir: require('./flagDir'),
+    population: require('./population')
+});
+
+// global assign
 _.assign(global, {
     Util: GLOBAL.util,
     Task: TASK.task,
@@ -146,12 +118,35 @@ _.assign(global, {
     Population: ROOT.population
 });
 
-_.assign(TASK.task, {
+_.assign(TASK, {
+    mining: require('./task.mining'),
+    reputation: require('./task.reputation')
+});
 
+// TASK assign
+_.assign(TASK.task, {
     mining: TASK.mining,
     reputation: TASK.reputation
+});
 
+Creep.Action = require('./creep.action.Action');
+Creep.Behaviour = require('./creep.behaviour.Behaviour');
+Creep.Setup = require('./creep.setup.Setup');
 
+_.assign(CREEP, {
+
+    action: {
+        mining: require('./creep.action.mining'),
+        recycling: require('./creep.action.recycling')
+    },
+    behaviour: {
+        miner: require('./creep.behaviour.miner')
+    },
+    setup: {
+        miner: require('./creep.setup.miner'),
+        worker: require('./creep.setup.worker')
+    },
+    creep: require('./creep.creep')
 });
 
 
@@ -172,8 +167,17 @@ _.assign(Creep, {
     }
 });
 
+inject(Creep, CREEP.creep);
+
+ROOM.room = require('./room.room');
+inject(Room, ROOM.room);
+
+ROOM.defense = require('./room.defense');
+
 _.assign(Room, {
     _ext: {
+
+        defense: ROOM.defense
 
     }
 });
@@ -197,7 +201,8 @@ if (ROOT.mainInjection.extend)
     ROOT.mainInjection.extend();
 
 ROOT.ocsMemory.activateSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, true);
-let Traveler = require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
+//let Traveler = require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
+require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
 
 if (global.DEBUG)
     GLOBAL.util.logSystem('Global.install', 'Code reloaded.');

@@ -5,9 +5,6 @@ const
         util: require(`./global.util`)
     };
 
-
-
-
 // base class for every action
 let Action = function (actionName) {
     // action name
