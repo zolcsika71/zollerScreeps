@@ -216,8 +216,6 @@ module.exports.loop = wrapLoop(function () {
 
     try {
 
-
-
         let totalUsage = GLOBAL.util.startProfiling('main', {startCPU: cpuAtLoop}),
             p = GLOBAL.util.startProfiling('main', {enabled: global.PROFILING.MAIN, startCPU: cpuAtLoop});
 
