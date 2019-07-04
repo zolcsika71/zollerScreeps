@@ -34,7 +34,7 @@ mod.extend = function () {
                 return false;
 
             let returnValue = setup.isValidSetup(room) && that.createCreepBySetup(setup);
-            console.log(`probe: ${setup.type} returns: ${returnValue}`);
+            console.log(`probe: ${setup.type} returns: ${global.json(returnValue)}`);
 
             return returnValue;
         };
