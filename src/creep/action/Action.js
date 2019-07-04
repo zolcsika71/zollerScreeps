@@ -117,7 +117,7 @@ let Action = function (actionName) {
         return false;
     };
     this.showAssignment = function (creep, target) {
-        if (global.SAY_ASSIGNMENT && ACTION_SAY[this.name.toUpperCase()]) creep.say(ACTION_SAY[this.name.toUpperCase()], global.SAY_PUBLIC);
+        if (global.SAY_ASSIGNMENT && global.ACTION_SAY[this.name.toUpperCase()]) creep.say(global.ACTION_SAY[this.name.toUpperCase()], global.SAY_PUBLIC);
         if (target instanceof RoomObject || target instanceof RoomPosition && VISUALS.ACTION_ASSIGNMENT) {
             Visuals.drawArrow(creep, target);
         }

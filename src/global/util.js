@@ -196,7 +196,7 @@ mod.resetProfiler = function () {
 mod.get = function (object, path, defaultValue, setDefault = true) {
     const r = _.get(object, path);
     if (_.isUndefined(r) && !_.isUndefined(defaultValue) && setDefault) {
-        defaultValue = Util.fieldOrFunction(defaultValue);
+        defaultValue = mod.fieldOrFunction(defaultValue);
         _.set(object, path, defaultValue);
         return _.get(object, path);
     }

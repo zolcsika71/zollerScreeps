@@ -1,5 +1,10 @@
 "use strict";
 
+const
+    GLOBAL = {
+        global: require('./global.global')
+    };
+
 let mod = {};
 module.exports = mod;
 mod.analyzeRoom = function (room) {
@@ -8,9 +13,10 @@ mod.analyzeRoom = function (room) {
 let triggerNewInvaders = creep => {
     // create notification
     const bodyCount = JSON.stringify(_.countBy(creep.body, 'type'));
-    if (global.DEBUG || NOTIFICATE_INVADER || (NOTIFICATE_INTRUDER && creep.room.my) || NOTIFICATE_HOSTILES) logSystem(creep.pos.roomName, `Hostile intruder (${bodyCount}) from "${creep.owner.username}".`);
-    if (NOTIFICATE_INVADER || (NOTIFICATE_INTRUDER && creep.owner.username !== 'Invader' && creep.room.my) || (NOTIFICATE_HOSTILES && creep.owner.username !== 'Invader')) {
-        Game.notify(`Hostile intruder ${creep.id} (${bodyCount}) from "${creep.owner.username}" in room ${creep.pos.roomName} at ${toDateTimeString(toLocalDate(new Date()))}`);
+    if (global.DEBUG || global.NOTIFICATE_INVADER || (global.NOTIFICATE_INTRUDER && creep.room.my) || global.NOTIFICATE_HOSTILES)
+        GLOBAL.util.logSystem(creep.pos.roomName, `Hostile intruder (${bodyCount}) from "${creep.owner.username}".`);
+    if (global.NOTIFICATE_INVADER || (global.NOTIFICATE_INTRUDER && creep.owner.username !== 'Invader' && creep.room.my) || (global.NOTIFICATE_HOSTILES && creep.owner.username !== 'Invader')) {
+        Game.notify(`Hostile intruder ${creep.id} (${bodyCount}) from "${creep.owner.username}" in room ${creep.pos.roomName} at ${global.toDateTimeString(global.toLocalDate(new Date()))}`);
     }
     // trigger subscribers
     Room.newInvader.trigger(creep);

@@ -20,6 +20,33 @@ mod.json = (x) => {
     return JSON.stringify(x, null, 2);
 };
 
+mod.len = function (number) {
+    return ("00" + number).slice(-2);
+};
+
+mod.toLocalDate = function (date) {
+    if (!date)
+        date = new Date();
+    let offset = global.TIME_ZONE;
+    if (global.USE_SUMMERTIME && mod.isSummerTime(date)) offset++;
+    return new Date(date.getTime() + (3600000 * offset));
+};
+// for notify mails: format dateTime (as date & time)
+mod.toDateTimeString = function (date) {
+    return (mod.len(date.getDate()) + "." + mod.len(date.getMonth() + 1) + "." + mod.len(date.getFullYear()) + " " + mod.len(date.getHours()) + ":" + mod.len(date.getMinutes()) + ":" + mod.len(date.getSeconds()));
+};
+mod.isSummerTime = function (date) {
+    let year = date.getFullYear();
+    // last sunday of march
+    let temp = new Date(year, 2, 31),
+        begin = new Date(year, 2, temp.getDate() - temp.getDay(), 2, 0, 0);
+    // last sunday of october
+    temp = new Date(year, 9, 31);
+    let end = new Date(year, 9, temp.getDate() - temp.getDay(), 3, 0, 0);
+
+    return (begin < date && date < end);
+};
+
 mod.execute = function () {
 
     //console.log(Parameter.DEBUG);
@@ -37,11 +64,8 @@ mod.consoleMe = function () {
 mod.initMemory = function () {
 
     Object.keys(Memory).forEach(segment => {
-
         console.log(segment);
-
         delete Memory[segment];
-
     });
 
 };

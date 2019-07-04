@@ -48,8 +48,9 @@ let //_ = require('lodash'),
         creep: require('./prototypes.creep'),
         spawn: require('./prototypes.spawn'),
         room: require('./prototypes.room'),
-        roomPosition: require ('./prototypes.roomPosition'),
-        compounds: require ('./prototypes.compounds')
+        roomPosition: require('./prototypes.roomPosition'),
+        compounds: require('./prototypes.compounds'),
+        visuals: require('./prototypes.visuals')
     },
     ROOM = {},
     TASK = {},
@@ -105,7 +106,8 @@ _.assign(ROOT, {
     ocsMemory: require('./ocsMemory'),
     events: require('./events'),
     flagDir: require('./flagDir'),
-    population: require('./population')
+    population: require('./population'),
+    visuals: require('./visuals')
 });
 
 // global assign
@@ -115,7 +117,8 @@ _.assign(global, {
     OCSMemory: ROOT.ocsMemory,
     Events: ROOT.events,
     FlagDir: ROOT.flagDir,
-    Population: ROOT.population
+    Population: ROOT.population,
+    Visuals: ROOT.visuals
 });
 
 _.assign(TASK, {

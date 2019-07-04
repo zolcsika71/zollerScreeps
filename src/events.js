@@ -1,8 +1,6 @@
 const
     GLOBAL = {
         global: require('./global.global'),
-        parameter: require(`./global.parameter`),
-        util: require(`./global.util`)
     };
 
 

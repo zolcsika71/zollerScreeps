@@ -31,6 +31,11 @@ let mod = {
     TRAVELER_STUCK_TICKS: 2, // Number of ticks not moving to be considered stuck by the Traveler API
     TRAVELER_THRESHOLD: 5, // Average creep CPU usage/tick before warning about pathing cost, starts after 25 ticks
     ROUTE_ROOM_COST: { 'shard0': {}}, // custom room routing cost: e.g. `{'shard0':{ 'W0N0':5, 'W4N4': 11 },'shard1':...}`. Affects bestSpawnRoomFor, Creep.Setup calculations, and travel cost predictions. Please call 'delete Memory.routeRange;' whenever you change this property.
+    NOTIFICATE_INVADER: false, // Also log common 'Invader' hostiles
+    NOTIFICATE_INTRUDER: false, // Log any hostiles in your rooms
+    NOTIFICATE_HOSTILES: true, // Log any hostiles - Ignores NOTIFICATE_INTRUDER and NOTIFICATE_INVADER
+    TIME_ZONE: 2, // zone offset in hours (-12 through +12) from UTC
+    USE_SUMMERTIME: true, // Please define isSummerTime in global.js to suit to your local summertime rules
 
 
     SPAWN_INTERVAL: 5, // loops between regular spawn probe
