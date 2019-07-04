@@ -2,7 +2,7 @@
 
 const
     GLOBAL = {
-        global: require('./global.global')
+        util: require('./global.util')
     };
 
 let mod = {};
@@ -24,8 +24,8 @@ let triggerNewInvaders = creep => {
 let triggerKnownInvaders = id =>  Room.knownInvader.trigger(id);
 let triggerGoneInvaders = id =>  Room.goneInvader.trigger(id);
 mod.executeRoom = function (memory, roomName) {
-    const p = Util.startProfiling(roomName + '.defense.execute', {enabled: PROFILING.ROOMS});
-    const room = Game.rooms[roomName];
+    let p = GLOBAL.util.startProfiling(roomName + '.defense.execute', {enabled: global.PROFILING.ROOMS}),
+        room = Game.rooms[roomName];
     if (room) { // has sight
         room.goneInvader.forEach(triggerGoneInvaders);
         p.checkCPU('goneInvader', 0.5);
