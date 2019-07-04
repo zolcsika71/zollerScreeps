@@ -2,7 +2,8 @@
 
 const
     TASK = {
-        mining: require('./task.mining')
+        mining: require('./task.mining'),
+        reputation: require('./task.reputation')
     };
 
 let mod = {},
@@ -26,9 +27,9 @@ mod.populate = function () {
         //Task.defense,
         //Task.guard,
         //Task.labTech,
-        TASK.mining
+        TASK.mining,
         //Task.pioneer,
-        //Task.reputation,
+        TASK.reputation,
         //Task.reserve,
         //Task.robbing,
         //Task.safeGen,
@@ -80,7 +81,7 @@ mod.register = function () {
 };
 
 mod.execute = function () {
-    _.forEach(Task.executeCache, function (n, k) {
+    _.forEach(mod.executeCache, function (n, k) {
         try {
             n.execute();
         } catch (e) {

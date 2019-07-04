@@ -140,10 +140,20 @@ _.assign(CREEP, {
 
     action: {
         mining: require('./creep.action.mining'),
-        recycling: require('./creep.action.recycling')
+        recycling: require('./creep.action.recycling'),
+        building: require('./creep.action.building'),
+        harvesting: require('./creep.action.harvesting'),
+        reallocating: require('./creep.action.reallocating'),
+        storing: require('./creep.action.storing'),
+        uncharging: require('./creep.action.uncharging'),
+        withdrawing: require('./creep.action.withdrawing'),
+        fueling: require('./creep.action.fueling'),
+        feeding: require('./creep.action.feeding'),
+        repairing: require('./creep.action.repairing')
     },
     behaviour: {
-        miner: require('./creep.behaviour.miner')
+        miner: require('./creep.behaviour.miner'),
+        worker: require('./creep.behaviour.worker')
     },
     setup: {
         miner: require('./creep.setup.miner'),
@@ -156,11 +166,21 @@ _.assign(CREEP, {
 _.assign(Creep, {
     action: {
         mining: CREEP.action.mining,
-        recycling: CREEP.action.recycling
+        recycling: CREEP.action.recycling,
+        building: CREEP.action.building,
+        harvesting: CREEP.action.harvesting,
+        reallocating: CREEP.action.reallocating,
+        storing: CREEP.action.storing,
+        uncharging: CREEP.action.uncharging,
+        withdrawing: CREEP.action.withdrawing,
+        fueling: CREEP.action.fueling,
+        feeding: CREEP.action.feeding,
+        repairing: CREEP.action.repairing
 
     },
     behaviour: {
-        miner: CREEP.behaviour.miner
+        miner: CREEP.behaviour.miner,
+        worker: CREEP.behaviour.worker
 
     },
     setup: {
@@ -175,12 +195,24 @@ inject(Creep, CREEP.creep);
 ROOM.room = require('./room.room');
 inject(Room, ROOM.room);
 
-ROOM.defense = require('./room.defense');
+
+
+_.assign(ROOM, {
+    container: require('./room.container'),
+    defense: require('./room.defense'),
+    link: require('./room.link'),
+    spawn: require('./room.spawn')
+
+
+});
 
 _.assign(Room, {
     _ext: {
+        containers: ROOM.container,
+        defense: ROOM.defense,
+        links: ROOM.link,
+        spawns: ROOM.spawn
 
-        defense: ROOM.defense
 
     }
 });
@@ -297,6 +329,7 @@ module.exports.loop = wrapLoop(function () {
         p.checkCPU('spawn.execute', global.PROFILING.EXECUTE_LIMIT);
 
         TASK.task.execute();
+        p.checkCPU('task.execute', global.PROFILING.EXECUTE_LIMIT);
 
 
 

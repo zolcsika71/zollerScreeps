@@ -78,9 +78,9 @@ const
             return Creep.action.idle.assign(creep);
         };
         this.selectAction = function (creep, actions) {
-            const p = GLOBAL.util.startProfiling('selectAction' + creep.name, {enabled: PROFILING.BEHAVIOUR});
-            const actionChecked = {};
-            for (const action of actions) {
+            let p = GLOBAL.util.startProfiling('selectAction' + creep.name, {enabled: global.PROFILING.BEHAVIOUR}),
+                actionChecked = {};
+            for (let action of actions) {
                 if (!actionChecked[action.name]) {
                     actionChecked[action.name] = true;
                     if (this.assignAction(creep, action)) {

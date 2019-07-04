@@ -39,6 +39,36 @@ let mod = {
 
 
     SPAWN_INTERVAL: 5, // loops between regular spawn probe
+    ROOM_VISUALS: true, // display basic room statistics with RoomVisuals
+    ROOM_VISUALS_ALL: false, // displays visuals in all rooms you have vision in. Only your rooms when false.
+    VISUALS: { // if ROOM_VISUALS is enabled, you can select what you want to display - All is a bit much for some people.
+        VISIBLE_ONLY: false, // depends on userscript: https://github.com/Esryok/screeps-browser-ext/blob/master/visible-room-tracker.user.js
+        ROOM: true, // displays basic info relative to the room
+        ROOM_GLOBAL: true, // displays basic info relative to your account - requires ROOM: true
+        INFO_PIE_CHART: true, // replaces the info bars with pie charts
+        CPU: true, // display a graph containing CPU used, CPU limit, and bucket
+        ROOM_ORDERS: true, // display orders the room creates
+        ROOM_OFFERS: true, // display what a room will offer another
+        SPAWN: true, // displays creep name and spawn progress percentage when spawning
+        CONTROLLER: true, // displays level, progress, and ticks to downgrade if active
+        STORAGE: true, // displays storage contents
+        TERMINAL: true, // displays terminal contents
+        TOWER: true, // displays tower contents
+        TRANSACTIONS: true, // displays 2 most recent transactions over room terminal
+        LABS: true, // displays lab energy, mineral, or cooldown
+        MINERAL: true, // displays mineral amount, or ticks to regen
+        SOURCE: true, // displays energy amount, or ticks to regen
+        CREEP: true, // draws creep paths
+        WALL: true, // highlight weakest wall and display hits
+        RAMPART: true, // highlight weakest rampart and display hits
+        ROAD: true, // highlight weakest road and display hits
+        HEATMAP: true, // collects creep positioning to display a heatmap. WARNING: HIGH MEMORY USAGE
+        HEATMAP_INTERVAL: 2, // intervals between collections
+        ACTION_ASSIGNMENT: true, // draws a line from a creep and it's new assignment
+        CONTAINER: true, // displays container amount of resources in x/2000 format
+        DRAW_ARROW: true, // draw arrow to the target
+        HIGHLIGHT_STRUCTURE: true // highlight target structure
+    },
 
     REMOTE_HAULER: {
         ALLOW_OVER_CAPACITY: 2450, // Hauler capacity rounds up by MIN_WEIGHT, or this number value.

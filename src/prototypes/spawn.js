@@ -3,7 +3,6 @@
 const
     //setup = require(`./creep.setup.Setup`),
     GLOBAL = {
-        global: require('./global.global'),
         parameter: require(`./global.parameter`),
         util: require(`./global.util`)
     },
@@ -63,8 +62,20 @@ mod.extend = function () {
         if (global.DEBUG && global.TRACE)
             GLOBAL.util.trace('Spawn', {setupType: this.type, rcl: this.room.controller.level, energy: this.room.energyAvailable, maxEnergy: this.room.energyCapacityAvailable, Spawn: 'createCreepBySetup'}, 'creating creep');
         let params = setup.buildParams(this);
-        console.log(`by setup: ${global.json(params)}`);
-        if (this.create(params.parts, params.name, params.setup))
+        //console.log(`by setup: ${global.json(params)}`);
+        // plus lines
+        let cost = 0;
+        params.parts.forEach(function (part) {
+            cost += BODYPART_COST[part];
+        });
+
+        // no parts
+        if (cost === 0) {
+            GLOBAL.util.logSystem(this.pos.roomName, GLOBAL.util.dye(global.CRAYON.error, 'Zero parts body creep queued. Removed.'));
+            return false;
+        }
+
+        if (cost <= this.room.remainingEnergyAvailable && this.create(params.parts, params.name, params.setup))
             return params;
         return null;
     };

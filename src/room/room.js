@@ -530,3 +530,70 @@ Room.roomLayout = function (flag) {
 
     flag.remove();
 };
+
+// from room.link
+// Links constructor
+Room.Links = function (room) {
+    this.room = room;
+
+    Object.defineProperties(this, {
+        'all': {
+            configurable: true,
+            get: function () {
+                if (_.isUndefined(this._all)) {
+                    this._all = [];
+                    let add = entry => {
+                        let o = Game.getObjectById(entry.id);
+                        if (o) {
+                            _.assign(o, entry);
+                            this._all.push(o);
+                        }
+                    };
+                    _.forEach(this.room.memory.links, add);
+                }
+                return this._all;
+            }
+        },
+        'controller': {
+            configurable: true,
+            get: function () {
+                if (_.isUndefined(this._controller)) {
+                    let byType = c => c.controller === true;
+                    this._controller = this.all.filter(byType);
+                }
+                return this._controller;
+            }
+        },
+        'storage': {
+            configurable: true,
+            get: function () {
+                if (_.isUndefined(this._storage)) {
+                    let byType = l => l.storage == true;
+                    this._storage = this.all.filter(byType);
+                }
+                return this._storage;
+            }
+        },
+        'in': {
+            configurable: true,
+            get: function () {
+                if (_.isUndefined(this._in)) {
+                    let byType = l => l.storage == false && l.controller == false;
+                    this._in = _.filter(this.all, byType);
+                }
+                return this._in;
+            }
+        },
+        'privateers': {
+            configurable: true,
+            get: function () {
+                if (_.isUndefined(this._privateers)) {
+                    let byType = l => l.storage == false && l.controller == false && l.source == false && l.energy < l.energyCapacity * 0.85;
+                    this._privateers = _.filter(this.all, byType);
+                }
+                return this._privateers;
+            }
+        }
+    });
+};
+

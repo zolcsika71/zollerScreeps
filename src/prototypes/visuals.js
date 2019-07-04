@@ -168,19 +168,19 @@ visuals.extend = function () {
                     stroke: false,
                     opacity: opts.opacity
                 }); {
-                let box = [
-                    [-0.45, 0.3],
-                    [-0.45, 0.55],
-                    [0.45, 0.55],
-                    [0.45, 0.3]
-                ];
-                box = relPoly(x, y, box);
-                this.poly(box, {
-                    stroke: colors.outline,
-                    strokeWidth: 0.05,
-                    opacity: opts.opacity
-                })
-            }
+                    let box = [
+                        [-0.45, 0.3],
+                        [-0.45, 0.55],
+                        [0.45, 0.55],
+                        [0.45, 0.3]
+                    ];
+                    box = relPoly(x, y, box);
+                    this.poly(box, {
+                        stroke: colors.outline,
+                        strokeWidth: 0.05,
+                        opacity: opts.opacity
+                    })
+                }
                 break;
             case STRUCTURE_TOWER:
                 this.circle(x, y, {
@@ -303,3 +303,4 @@ visuals.extend = function () {
     }
 
 };
+

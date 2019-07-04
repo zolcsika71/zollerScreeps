@@ -437,7 +437,7 @@ mod.extend = function () {
     };
 
     //room.container
-    Room.prototype.saveContainers = function(){
+    Room.prototype.saveContainers = function () {
         let containers = this.structures.all.filter(
             structure => structure.structureType == STRUCTURE_CONTAINER
         );
@@ -453,7 +453,7 @@ mod.extend = function () {
                     id: cont.id,
                     source: (source.length > 0),
                     controller: isControllerContainer,
-                    mineral: (mineral.length > 0),
+                    mineral: (mineral.length > 0)
                 });
                 let assignContainer = s => s.memory.container = cont.id;
                 source.forEach(assignContainer);
@@ -462,20 +462,22 @@ mod.extend = function () {
             containers.forEach(add);
         } else delete this.memory.container;
 
-        if( this.terminal ) {
+        if (this.terminal) {
             // terminal in range <= 2 is too simplistic for certain room placements near sources. See #681
             // This solution finds all walkable source fields in a room, then compares adjacency with the terminal
             // The first room position adjacent to the terminal is remapped back to it's adjacent source for mapping to terminal
             let minerSpots = [];
-            let findValidFields = s => { minerSpots = _(minerSpots).concat(Room.validFields(this.name, s.pos.x-1, s.pos.x+1, s.pos.y-1, s.pos.y+1, true)); };
+            let findValidFields = s => {
+                minerSpots = _(minerSpots).concat(Room.validFields(this.name, s.pos.x - 1, s.pos.x + 1, s.pos.y - 1, s.pos.y + 1, true));
+            };
             _.forEach(this.sources, findValidFields);
             let sourceField = this.terminal.pos.findClosestByRange(minerSpots, 1);
             let source = [];
-            if(sourceField){
-                if(this.sources.length == 1){
+            if (sourceField) {
+                if (this.sources.length == 1) {
                     source = this.sources;
                 } else {
-                    source.push( sourceField.isNearTo(this.sources[0]) ? this.sources[0] : this.sources[1] );
+                    source.push(sourceField.isNearTo(this.sources[0]) ? this.sources[0] : this.sources[1]);
                 }
             }
 
@@ -488,24 +490,24 @@ mod.extend = function () {
                 this.controller.memory.storage = this.terminal.id;
             }
         }
-        if( this.storage ) {
+        if (this.storage) {
             let source = this.storage.pos.findInRange(this.sources, 2);
             let mineral = this.storage.pos.findInRange(this.minerals, 2);
             let assignStorage = s => s.memory.storage = this.storage.id;
             source.forEach(assignStorage);
             mineral.forEach(assignStorage);
 
-            if( this.storage.pos.getRangeTo(this.controller) < 4 )
+            if (this.storage.pos.getRangeTo(this.controller) < 4)
                 this.controller.memory.storage = this.storage.id;
         }
     };
-    Room.prototype.findContainerWith = function(resourceType, amountMin) {
+    Room.prototype.findContainerWith = function (resourceType, amountMin) {
         if (!amountMin) amountMin = 1;
         //if (!RESOURCES_ALL.find((r)=>{r==resourceType;})) return null;
 
         let data = this.memory;
         if (data && data.container && data.container.length > 0) {
-            for (let i=0;i<data.container.length;i++) {
+            for (let i = 0; i < data.container.length; i++) {
                 let d = data.container[i];
                 let container = Game.getObjectById(d.id);
                 if (container) {
@@ -522,41 +524,40 @@ mod.extend = function () {
     };
 
     // from room.construction
-    Room.prototype.getBestConstructionSiteFor = function(pos, filter = null) {
+    Room.prototype.getBestConstructionSiteFor = function (pos, filter = null) {
         let sites;
-        if( filter ) sites = this.constructionSites.filter(filter);
+        if (filter) sites = this.constructionSites.filter(filter);
         else sites = this.constructionSites;
-        if( sites.length == 0 ) return null;
+        if (sites.length == 0) return null;
         let siteOrder = Util.fieldOrFunction(CONSTRUCTION_PRIORITY, this);
         let rangeOrder = site => {
             let order = siteOrder.indexOf(site.structureType);
-            return pos.getRangeTo(site) + ( order < 0 ? 100000 : (order * 100) );
+            return pos.getRangeTo(site) + (order < 0 ? 100000 : (order * 100));
             //if( order < 0 ) return 100000 + pos.getRangeTo(site);
             //return ((order - (site.progress / site.progressTotal)) * 100) + pos.getRangeTo(site);
         };
         return _.min(sites, rangeOrder);
     };
-
-    Room.prototype.roadConstruction = function( minDeviation = ROAD_CONSTRUCTION_MIN_DEVIATION ) {
-        const forced = ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] && ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name)!=-1;
-        if( (!ROAD_CONSTRUCTION_ENABLE && !forced) || Game.time % ROAD_CONSTRUCTION_INTERVAL != 0 ) return;
-        if( !forced && (_.isNumber(ROAD_CONSTRUCTION_ENABLE) && (!this.my || ROAD_CONSTRUCTION_ENABLE > this.controller.level))) return;
+    Room.prototype.roadConstruction = function (minDeviation = ROAD_CONSTRUCTION_MIN_DEVIATION) {
+        const forced = ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] && ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name) != -1;
+        if ((!ROAD_CONSTRUCTION_ENABLE && !forced) || Game.time % ROAD_CONSTRUCTION_INTERVAL != 0) return;
+        if (!forced && (_.isNumber(ROAD_CONSTRUCTION_ENABLE) && (!this.my || ROAD_CONSTRUCTION_ENABLE > this.controller.level))) return;
 
         let data = Object.keys(this.roadConstructionTrace)
-        .map( k => {
+        .map(k => {
             return { // convert to [{key,n,x,y}]
                 'n': this.roadConstructionTrace[k], // count of steps on x,y cordinates
-                'x': k.charCodeAt(0)-32, // extract x from key
-                'y': k.charCodeAt(1)-32 // extraxt y from key
+                'x': k.charCodeAt(0) - 32, // extract x from key
+                'y': k.charCodeAt(1) - 32 // extraxt y from key
             };
         });
 
-        let min = Math.max(ROAD_CONSTRUCTION_ABS_MIN, (data.reduce( (_sum, b) => _sum + b.n, 0 ) / data.length) * minDeviation);
-        data = data.filter( e => {
+        let min = Math.max(ROAD_CONSTRUCTION_ABS_MIN, (data.reduce((_sum, b) => _sum + b.n, 0) / data.length) * minDeviation);
+        data = data.filter(e => {
             if (e.n >= min) {
-                let structures = this.lookForAt(LOOK_STRUCTURES,e.x,e.y);
+                let structures = this.lookForAt(LOOK_STRUCTURES, e.x, e.y);
                 return (structures.length === 0 || structures[0].structureType === STRUCTURE_RAMPART)
-                    && this.lookForAt(LOOK_CONSTRUCTION_SITES,e.x,e.y).length === 0;
+                    && this.lookForAt(LOOK_CONSTRUCTION_SITES, e.x, e.y).length === 0;
             } else {
                 return false;
             }
@@ -564,7 +565,7 @@ mod.extend = function () {
 
         // build roads on all most frequent used fields
         let setSite = pos => {
-            if( global.DEBUG ) logSystem(this.name, `Constructing new road at ${pos.x}'${pos.y} (${pos.n} traces)`);
+            if (global.DEBUG) logSystem(this.name, `Constructing new road at ${pos.x}'${pos.y} (${pos.n} traces)`);
             this.createConstructionSite(pos.x, pos.y, STRUCTURE_ROAD);
         };
         _.forEach(data, setSite);
@@ -572,8 +573,7 @@ mod.extend = function () {
         // clear old data
         this.roadConstructionTrace = {};
     };
-
-    Room.prototype.processConstructionFlags = function() {
+    Room.prototype.processConstructionFlags = function () {
         if (!this.my || !Util.fieldOrFunction(SEMI_AUTOMATIC_CONSTRUCTION, this)) return;
         let sitesSize = _.size(Game.constructionSites);
         if (sitesSize >= 100) return;
@@ -680,6 +680,85 @@ mod.extend = function () {
             const extractor = mineral.pos.lookFor(LOOK_STRUCTURES);
             if (extractor.length && extractor[0] instanceof StructureExtractor) return;
             CONSTRUCT(mineral.pos, STRUCTURE_EXTRACTOR);
+        }
+    };
+
+    //from room.link
+    Room.prototype.saveLinks = function () {
+        let links = this.find(FIND_MY_STRUCTURES, {
+            filter: (structure) => (structure.structureType == STRUCTURE_LINK)
+        });
+        if (links.length > 0) {
+            this.memory.links = [];
+            let storageLinks = this.storage ? this.storage.pos.findInRange(links, 2).map(l => l.id) : [];
+
+            // for each memory entry, keep if existing
+            /*
+            let kept = [];
+            let keep = (entry) => {
+                if( links.find( (c) => c.id == entry.id )){
+                    entry.storage = storageLinks.includes(entry.id);
+                    kept.push(entry);
+                }
+            };
+            this.memory.links.forEach(keep);
+            this.memory.links = kept;
+            */
+            this.memory.links = [];
+
+            // for each link add to memory ( if not contained )
+            let add = (link) => {
+                // TODO consolidate managed container code
+                if (!this.memory.links.find((l) => l.id == link.id)) {
+                    let isControllerLink = (link.pos.getRangeTo(this.controller) <= 4);
+                    let isSource = false;
+                    if (!isControllerLink) {
+                        let source = link.pos.findInRange(this.sources, 2);
+                        let assign = s => s.memory.link = link.id;
+                        source.forEach(assign);
+                        isSource = source.length > 0;
+                    }
+                    this.memory.links.push({
+                        id: link.id,
+                        storage: storageLinks.includes(link.id),
+                        controller: isControllerLink,
+                        source: isSource
+                    });
+                }
+            };
+            links.forEach(add);
+        } else delete this.memory.links;
+    };
+    Room.prototype.linkDispatcher = function () {
+        let filled = l => l.cooldown == 0 && l.energy >= (l.energyCapacity * (l.source ? 0.85 : 0.5));
+        let empty = l =>  l.energy < l.energyCapacity * 0.15;
+        let filledIn = this.structures.links.in.filter(filled);
+        let emptyController = this.structures.links.controller.filter(empty);
+
+        if (filledIn.length > 0) {
+            let emptyStorage = this.structures.links.storage.filter(empty);
+
+            let handleFilledIn = f => { // first fill controller, then storage
+                if (emptyController.length > 0) {
+                    f.transferEnergy(emptyController[0]);
+                    emptyController.shift();
+                } else if (emptyStorage.length > 0) {
+                    f.transferEnergy(emptyStorage[0]);
+                    emptyStorage.shift();
+                }
+            };
+            filledIn.forEach(handleFilledIn);
+        }
+
+        if (emptyController.length > 0) { // controller still empty, send from storage
+            let filledStorage = this.structures.links.storage.filter(filled);
+            let handleFilledStorage = f => {
+                if (emptyController.length > 0) {
+                    f.transferEnergy(emptyController[0]);
+                    emptyController.shift();
+                }
+            };
+            filledStorage.forEach(handleFilledStorage);
         }
     };
 
