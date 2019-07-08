@@ -41,7 +41,8 @@ let //_ = require('lodash'),
         source: require('./properties.source'),
         structures: require('./properties.structures'),
         flag: require('./properties.flag'),
-        room: require('./properties.room')
+        room: require('./properties.room'),
+        lab: require('./properties.lab'),
     },
     PROTOTYPES = {
         structures: require('./prototypes.structures'),
@@ -222,7 +223,8 @@ _.assign(ROOM, {
     defense: require('./room.defense'),
     link: require('./room.link'),
     spawn: require('./room.spawn'),
-    extension: require('./room.extension')
+    extension: require('./room.extension'),
+    lab: require('./room.lab')
 
 
 });
@@ -233,7 +235,8 @@ _.assign(Room, {
         defense: ROOM.defense,
         links: ROOM.link,
         spawns: ROOM.spawn,
-        extension: ROOM.extension
+        extension: ROOM.extension,
+        lab: ROOM.lab
 
 
     }

@@ -40,6 +40,9 @@ let mod = {
     NOTIFICATE_INVADER: false, // Also log common 'Invader' hostiles
     NOTIFICATE_INTRUDER: false, // Log any hostiles in your rooms
     NOTIFICATE_HOSTILES: true, // Log any hostiles - Ignores NOTIFICATE_INTRUDER and NOTIFICATE_INVADER
+    COST_MATRIX_VALIDITY: 1000,
+
+
     TIME_ZONE: 2, // zone offset in hours (-12 through +12) from UTC
     USE_SUMMERTIME: true, // Please define isSummerTime in global.js to suit to your local summertime rules
 
