@@ -20,7 +20,6 @@ mod.extend = function () {
             this.memory.RCL = this.controller.level;
         }
     };
-
     Room.prototype.checkNuked = function () {
         if (!this.nuked)
             return false;
@@ -28,7 +27,6 @@ mod.extend = function () {
             Room.nuked.trigger(this);
         }
     };
-
     Room.prototype.countMySites = function () {
         const numSites = _.size(this.myConstructionSites);
         if (!_.isUndefined(this.memory.myTotalSites) && numSites !== this.memory.myTotalSites) {
@@ -37,13 +35,11 @@ mod.extend = function () {
         if (numSites > 0) this.memory.myTotalSites = numSites;
         else delete this.memory.myTotalSites;
     };
-
     Room.prototype.getBorder = function (roomName) {
         return _.findKey(Game.map.describeExits(this.name), function (name) {
             return this.name === name;
         }, {name: roomName});
     };
-
     Room.prototype.countMyStructures = function () {
         const numStructures = _.size(this.structures.my);
         if (!_.isUndefined(this.memory.myTotalStructures) && numStructures !== this.memory.myTotalStructures) {
@@ -53,13 +49,11 @@ mod.extend = function () {
             this.saveSpawns();
         } else delete this.memory.myTotalStructures;
     };
-
     Room.prototype.getBorder = function (roomName) {
         return _.findKey(Game.map.describeExits(this.name), function (name) {
             return this.name === name;
         }, {name: roomName});
     };
-
     Room.prototype.find = function (c, opt) {
         if (_.isArray(c)) {
             return _(c)
@@ -69,7 +63,6 @@ mod.extend = function () {
         } else
             return find.apply(this, arguments);
     };
-
     Room.prototype.findRoute = function (destination, checkOwner = true, preferHighway = true, allowSK = true) {
         if (this.name == destination) return [];
         const options = {checkOwner, preferHighway, allowSK};
@@ -77,7 +70,6 @@ mod.extend = function () {
             routeCallback: Room.routeCallback(this.name, destination, options)
         });
     };
-
     Room.prototype.recordMove = function (creep) {
         if (!global.ROAD_CONSTRUCTION_ENABLE &&
             (!global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] ||
@@ -94,7 +86,6 @@ mod.extend = function () {
             this.roadConstructionTrace[key] = 1;
         else this.roadConstructionTrace[key]++;
     };
-
     Room.prototype.isWalkable = function (x, y, look) {
         if (!look) look = this.lookAt(x, y);
         else look = look[y][x];
@@ -104,7 +95,6 @@ mod.extend = function () {
         };
         return look.filter(invalidObject).length == 0;
     };
-
     Room.prototype.exits = function (findExit, point) {
         if (point === true) point = 0.5;
         let positions;
@@ -145,7 +135,6 @@ mod.extend = function () {
         }
         return ret;
     }
-
     Room.prototype.showCostMatrix = function (matrix = this.structureMatrix, aroundPos) {
         const vis = new RoomVisual(this.name);
         let startY = 0;
@@ -196,12 +185,10 @@ mod.extend = function () {
     Room.prototype.invalidateCostMatrix = function () {
         Room.costMatrixInvalid.trigger(this.name);
     };
-
     Room.prototype.highwayHasWalls = function () {
         if (!Room.isHighwayRoom(this.name)) return false;
         return !!_.find(this.getPositionAt(25, 25).lookFor(LOOK_STRUCTURES), s => s instanceof StructureWall);
     };
-
     Room.prototype.isTargetAccessible = function (object, target) {
         if (!object || !target) return;
         // Checks. Accept RoomObject, RoomPosition, and mock position
@@ -289,7 +276,6 @@ mod.extend = function () {
         }
         return true;
     };
-
     Room.prototype.targetAccessible = function (target) {
         if (!target) return;
         if (target instanceof RoomObject) target = target.pos;
@@ -345,7 +331,6 @@ mod.extend = function () {
         }
         return true;
     };
-
     Room.prototype.getCreepMatrix = function (structureMatrix = this.structureMatrix) {
         if (_.isUndefined(this._creepMatrix)) {
             const costs = structureMatrix.clone();
