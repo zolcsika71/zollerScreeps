@@ -1,7 +1,6 @@
 "use strict";
 
 let action = new Creep.Action('recycling');
-
 module.exports = action;
 action.isValidAction = () => true;
 action.isAddableAction = () => true;

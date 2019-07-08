@@ -141,6 +141,10 @@ mod.execute = function () {
     let triggerRemoved = flagName => Flag.FlagRemoved.trigger(flagName);
     this.stale.forEach(triggerRemoved);
 };
+mod.cleanup = function(){
+    let clearMemory = flagName => delete Memory.flags[flagName];
+    this.stale.forEach(clearMemory);
+};
 mod.flagType = function (flag) {
     if (mod.isSpecialFlag(flag)) return '_OCS';
     for (let primary in global.FLAG_COLOR) {

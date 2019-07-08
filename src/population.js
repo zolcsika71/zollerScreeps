@@ -16,12 +16,10 @@ module.exports = mod;
 mod.getCreep = function (creepName) {
     return Memory.population[creepName];
 };
-
 mod.setCreep = function (val) {
     Memory.population[val.creepName] = val;
     return Memory.population[val.creepName];
 };
-
 mod.registerCreep = function (creepName, creepType, creepCost, room, spawnName, body, destiny = null) {
     let entry = this.setCreep({
         creepName: creepName,
@@ -39,7 +37,10 @@ mod.registerCreep = function (creepName, creepType, creepCost, room, spawnName, 
     });
     this.countCreep(room, entry);
 };
-
+mod.unregisterCreep = function(creepName){
+    delete Memory.population[creepName];
+    delete Memory.creeps[creepName];
+};
 mod.registerAction = function (creep, action, target, entry) {
     if (global.DEBUG && global.TRACE)
         GLOBAL.util.trace('Population', {creepName: this.name, registerAction: action.name, target: target.name || target.id, Population: 'registerAction'});
@@ -121,7 +122,6 @@ mod.registerAction = function (creep, action, target, entry) {
     creep.target = target;
     creep.data = entry;
 };
-
 mod.countCreep = function (room, entry) {
     entry.roomName = room.name;
     if (room.population === undefined) {
@@ -153,7 +153,6 @@ mod.countCreep = function (room, entry) {
     else
         this.typeWeight[entry.creepType] += entry.weight;
 };
-
 mod.flush = function () {
     this.typeCount = {};
     this.typeWeight = {};
@@ -167,7 +166,6 @@ mod.flush = function () {
         Memory.population = {};
 
 };
-
 mod.analyze = function () {
     let p = GLOBAL.util.startProfiling('Population.analyze', {enabled: global.PROFILING.CREEPS}),
         register = entry => {
@@ -264,7 +262,6 @@ mod.analyze = function () {
         p.checkCPU('Validate: ' + c.creepName, PROFILING.ANALYZE_LIMIT / 2);
     });
 };
-
 mod.execute = function () {
     const p = GLOBAL.util.startProfiling('Population.execute', {enabled: global.PROFILING.CREEPS});
     let triggerCompleted = name => Creep.spawningCompleted.trigger(Game.creeps[name]);
@@ -291,7 +288,13 @@ mod.execute = function () {
         p.checkCPU('probeSpawn', global.PROFILING.EXECUTE_LIMIT / 4);
     }
 };
-
+mod.cleanup = function(){
+    const p = GLOBAL.util.startProfiling('Population.cleanup', {enabled: PROFILING.CREEPS});
+    let unregister = name => mod.unregisterCreep(name);
+    this.died.forEach(unregister);
+    p.checkCPU('died', global.PROFILING.FLUSH_LIMIT);
+    // TODO consider clearing target here
+};
 mod.getCombatStats = function (body) {
     let i = 0;
 

@@ -1,5 +1,10 @@
-let mod = {
+global._ME = _(Game.rooms).map('controller').filter('my').map('owner.username').first();
 
+let mod = {
+    ME: _ME,
+    CHATTY: false, // creeps say their current action
+    HONK: true, // HONK when stored path is blocked by other creeps
+    OOPS: true, // Creeps say Oops when dropping energy during dropmining
     SAY_ASSIGNMENT: true, // say a symbol representing the assiged action
     SAY_PUBLIC: true, // creeps talk public
     CENSUS_ANNOUNCEMENTS: false, // log birth and death
@@ -31,11 +36,15 @@ let mod = {
     TRAVELER_STUCK_TICKS: 2, // Number of ticks not moving to be considered stuck by the Traveler API
     TRAVELER_THRESHOLD: 5, // Average creep CPU usage/tick before warning about pathing cost, starts after 25 ticks
     ROUTE_ROOM_COST: { 'shard0': {}}, // custom room routing cost: e.g. `{'shard0':{ 'W0N0':5, 'W4N4': 11 },'shard1':...}`. Affects bestSpawnRoomFor, Creep.Setup calculations, and travel cost predictions. Please call 'delete Memory.routeRange;' whenever you change this property.
+    TRAVELLING_BORDER_RANGE: 22, // room arrival distance for travelling and routes
     NOTIFICATE_INVADER: false, // Also log common 'Invader' hostiles
     NOTIFICATE_INTRUDER: false, // Log any hostiles in your rooms
     NOTIFICATE_HOSTILES: true, // Log any hostiles - Ignores NOTIFICATE_INTRUDER and NOTIFICATE_INVADER
     TIME_ZONE: 2, // zone offset in hours (-12 through +12) from UTC
     USE_SUMMERTIME: true, // Please define isSummerTime in global.js to suit to your local summertime rules
+
+    CONSTRUCTION_PRIORITY: [STRUCTURE_SPAWN,STRUCTURE_EXTENSION,STRUCTURE_LINK,STRUCTURE_TERMINAL,STRUCTURE_STORAGE,STRUCTURE_TOWER,STRUCTURE_POWER_SPAWN,STRUCTURE_NUKER,STRUCTURE_OBSERVER,STRUCTURE_ROAD,STRUCTURE_CONTAINER,STRUCTURE_EXTRACTOR,STRUCTURE_LAB,STRUCTURE_WALL,STRUCTURE_RAMPART],
+
 
 
     SPAWN_INTERVAL: 5, // loops between regular spawn probe
@@ -90,11 +99,52 @@ let mod = {
     ROAD_CONSTRUCTION_MIN_DEVIATION: 1.2,
     ROAD_CONSTRUCTION_ABS_MIN: 3,
 
+    MANAGED_CONTAINER_TRIGGER: 0.25, // managed containers get filled below this relative energy amount and emptied when above 1-this value
+
 
 
     MEMORY_RESYNC_INTERVAL: 500, // interval to reload spawns & towers present in a room
     SEND_STATISTIC_REPORTS: true, // Set to true to receive room statistics per mail, otherwise set to false.
     COMPRESS_COST_MATRICES: false, // enable to compress cached cost matrices (1/5 the size, but currently about 2x CPU usage)
+    COOLDOWN: {
+        TOWER_URGENT_REPAIR: 10,
+        TOWER_REPAIR: 10,
+        CREEP_IDLE: 5
+    },
+
+    MAX_REPAIR_LIMIT: { // Limits how high structures get repaired by towers, regarding RCL
+        1: 1000,
+        2: 1000,
+        3: 2000,
+        4: 4000,
+        5: 8000,
+        6: 15000,
+        7: 20000,
+        8: 40000
+    },
+    MIN_FORTIFY_LIMIT: { // Minimum fortification level
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+        6: 0,
+        7: 0,
+        8: 1000000,     // focus is usually RCL growth, so 0 until 8
+    },
+    MAX_FORTIFY_LIMIT: { // Limits how high structures get repaired by creeps, regarding RCL
+        1: 1000,
+        2: 1000,
+        3: 2000,
+        4: 50000,
+        5: 100000,
+        6: 300000,
+        7: 750000,
+        8: 300000000
+    },
+    MAX_FORTIFY_CONTAINER: 50000,
+    LIMIT_URGENT_REPAIRING: 750, // urgent repair when hits below
+    GAP_REPAIR_DECAYABLE: 800, // decayables (e.g. roads) only get repaired when that much hits are missing
 
     // constants
     ACTION_SAY: { // what gets said on creep.action.*.onAssignment
@@ -355,9 +405,17 @@ let mod = {
                 }
             }
         }
-    }
-
-
+    },
+    DECAY_AMOUNT: {
+        'rampart': RAMPART_DECAY_AMOUNT, // 300
+        'road': ROAD_DECAY_AMOUNT, // 100
+        'container': CONTAINER_DECAY // 5000
+    },
+    DECAYABLES: [
+        STRUCTURE_ROAD,
+        STRUCTURE_CONTAINER,
+        STRUCTURE_RAMPART
+        ]
 
 };
 

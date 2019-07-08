@@ -137,6 +137,36 @@ mod.execute = function () {
         }
     });
 };
+mod.cleanup = function () {
+    // run cleanup in each of our submodules
+    for (const key of Object.keys(Room._ext)) {
+        if (Room._ext[key].cleanup) Room._ext[key].cleanup();
+    }
+    // flush changes to the pathfinderCache but wait until load
+    if (!_.isUndefined(Memory.pathfinder)) {
+        OCSMemory.saveSegment(MEM_SEGMENTS.COSTMATRIX_CACHE, Memory.pathfinder);
+        delete Memory.pathfinder;
+    }
+    if (Room.pathfinderCacheDirty && Room.pathfinderCacheLoaded) {
+        // store our updated cache in the memory segment
+        let encodedCache = {};
+        for (let key in Room.pathfinderCache) {
+            let entry = Room.pathfinderCache[key];
+            if (entry.version === Room.COSTMATRIX_CACHE_VERSION) {
+                encodedCache[key] = {
+                    serializedMatrix: entry.serializedMatrix || (global.COMPRESS_COST_MATRICES ?
+                        CompressedMatrix.serialize(entry.costMatrix) : entry.costMatrix.serialize()),
+                    updated: entry.updated,
+                    version: entry.version
+                };
+                // only set memory when we need to
+                if (entry.stale) encodedCache[key].stale = true;
+            }
+        }
+        ROOT.ocsMemory.saveSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, encodedCache);
+        Room.pathfinderCacheDirty = false;
+    }
+};
 mod.routeCallback = function (origin, destination, options) {
     if (_.isUndefined(origin) || _.isUndefined(destination))
         GLOBAL.util.logError('Room.routeCallback', 'both origin and destination must be defined - origin:' + origin + ' destination:' + destination);
@@ -306,6 +336,21 @@ mod.getStructureMatrix = function (roomName, options) {
     }
 
     return matrix;
+};
+
+mod.shouldRepair = function (room, structure) {
+    return (
+        // is not at 100%
+        structure.hits < structure.hitsMax &&
+        // not owned room or hits below RCL repair limit
+        (!room.my || structure.hits < global.MAX_REPAIR_LIMIT[room.controller.level] || structure.hits < (global.LIMIT_URGENT_REPAIRING + (2 * global.DECAY_AMOUNT[structure.structureType] || 0))) &&
+        // not decayable or below threshold
+        (!DECAYABLES.includes(structure.structureType) || (structure.hitsMax - structure.hits) > global.GAP_REPAIR_DECAYABLE) &&
+        // not pavement art
+        (Memory.pavementArt[room.name] === undefined || Memory.pavementArt[room.name].indexOf('x' + structure.pos.x + 'y' + structure.pos.y + 'x') < 0) &&
+        // not flagged for removal
+        (!FlagDir.list.some(f => f.roomName == structure.pos.roomName && f.color == COLOR_ORANGE && f.x == structure.pos.x && f.y == structure.pos.y))
+    );
 };
 
 mod.fieldsInRange = function (args) {

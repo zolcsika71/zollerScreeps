@@ -3,6 +3,11 @@
 let mod = {};
 module.exports = mod;
 
+mod.NPC =  {
+    ["Source Keeper"]: true,
+    ["Invader"]: true,
+};
+
 mod.CONST = {
     MY_SCORE: 1000,
     WHITELIST_SCORE: 200,
@@ -11,6 +16,9 @@ mod.CONST = {
     NPC_SCORE: -200
 };
 
+mod.isAlly = username => mod.score(username) >= mod.CONST.ALLY;
+mod.notAlly = username => !mod.isAlly(username);
+mod.allyOwner = creep => creep.owner && mod.isAlly(creep.owner.username);
 mod.cache = table => Task.cache(mod.name, table);
 mod.score = username => {
     const reps = mod.cache('score');

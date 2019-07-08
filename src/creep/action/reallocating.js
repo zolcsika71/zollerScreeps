@@ -1,6 +1,5 @@
 "use strict";
 
-
 let action = new Creep.Action('reallocating');
 module.exports = action;
 action.maxPerTarget = 1;

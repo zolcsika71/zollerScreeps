@@ -33,7 +33,7 @@ mod.extend = function () {
                 return false;
 
             let returnValue = setup.isValidSetup(room) && that.createCreepBySetup(setup);
-            console.log(`probe: ${setup.type} returns: ${global.json(returnValue)}`);
+            console.log(`spawn.probe: ${setup.type} returns: ${global.json(returnValue)}`);
 
             return returnValue;
         };
@@ -55,7 +55,7 @@ mod.extend = function () {
                 }
             }
         }
-        console.log (`execute returns: ${busy}`);
+        console.log (`spawn.execute returns: ${busy}`);
         return busy;
     };
     Spawn.prototype.createCreepBySetup = function (setup) {

@@ -1,6 +1,5 @@
 "use strict";
 
-
 let action = new Creep.Action('uncharging'); // get from container/link
 module.exports = action;
 action.renewTarget = false;

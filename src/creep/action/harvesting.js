@@ -1,6 +1,5 @@
 "use strict";
 
-
 let action = new Creep.Action('harvesting');
 module.exports = action;
 action.renewTarget = false;

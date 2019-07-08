@@ -6,8 +6,9 @@ const
         parameter: require(`./global.parameter`),
         util: require(`./global.util`)
 
-    },
-    Behaviour = function (name) { // base class for behaviours
+    };
+
+let Behaviour = function (name) { // base class for behaviours
         this.name = name;
         this.actions = (creep) => []; // priority list of non resource based actions
         this.inflowActions = (creep) => []; // priority list of actions for getting resources
@@ -81,7 +82,9 @@ const
             let p = GLOBAL.util.startProfiling('selectAction' + creep.name, {enabled: global.PROFILING.BEHAVIOUR}),
                 actionChecked = {};
             for (let action of actions) {
-                if (!actionChecked[action.name]) {
+                // new line (action !== null && action !== undefined)
+                if (action !== null && action !== undefined && !actionChecked[action.name]) {
+                    console.log(`action: ${global.json(action.name)}`);
                     actionChecked[action.name] = true;
                     if (this.assignAction(creep, action)) {
                         p.checkCPU('assigned' + action.name, 1.5);
@@ -89,6 +92,7 @@ const
                     }
                 }
             }
+
             p.checkCPU('!assigned', 1.5);
             return Creep.action.idle.assign(creep);
         };

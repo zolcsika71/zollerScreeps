@@ -1,6 +1,5 @@
 "use strict";
 
-
 let action = new Creep.Action('feeding');
 module.exports = action;
 action.maxPerTarget = 1;

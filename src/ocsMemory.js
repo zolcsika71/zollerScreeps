@@ -2,11 +2,9 @@
 const
     //_ = require('lodash'),
     GLOBAL = {
-        global: require('./global.global'),
         parameter: require(`./global.parameter`),
         util: require(`./global.util`)
-
-    };
+};
 
 let mod = {};
 module.exports = mod;

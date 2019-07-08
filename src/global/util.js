@@ -3,6 +3,7 @@
 const
     _ = require('lodash');
 */
+
 let mod = {},
     profiler;
 module.exports = mod;
@@ -186,6 +187,31 @@ mod.resetProfiler = function () {
 };
 
 /**
+ * formats an integer into a readable value
+ * @param {Number} number
+ * @returns {string}
+ */
+mod.formatNumber = function (number) {
+    let ld = Math.log10(number) / 3;
+    if (!number)
+        return number;
+    let n = number.toString();
+    if (ld < 1) {
+        return n;
+    }
+    if (ld < 2) {
+        return n.substring(0, n.length - 3) + 'k';
+    }
+    if (ld < 3) {
+        return n.substring(0, n.length - 6) + 'M';
+    }
+    if (ld < 4) {
+        return n.substring(0, n.length - 9) + 'B';
+    }
+    return number.toString();
+};
+
+/**
  * Gets a property from an object and optionally sets the default
  * @param {Object} object - The object
  * @param {string} path - The path to the property within the object
@@ -315,4 +341,14 @@ mod.startProfiling = function (name, options = {enabled: false, startCPU: undefi
     returnValue = {checkCPU, totalCPU};
 
     return returnValue;
+};
+
+/**
+ * Get the distance between two points.
+ * @param {RoomPosition|Object} point1 - The first point
+ * @param {RoomPosition|Object} point2 - The second point
+ * @returns {Number}
+ */
+mod.getDistance = function (point1, point2) {
+    return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
 };

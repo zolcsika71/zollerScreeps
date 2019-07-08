@@ -3,8 +3,6 @@
 let visuals = {};
 module.exports = visuals;
 visuals.extend = function () {
-
-
     RoomVisual.prototype.structure = function (x, y, type, opts = {}) {
 
         opts = Object.assign({
@@ -301,6 +299,5 @@ visuals.extend = function () {
                 break;
         }
     }
-
 };
 

@@ -1,10 +1,17 @@
-const BLACK = '#000000';
-const WHITE = '#FFFFFF';
-const RED = '#FF0000';
-const GREEN = '#00FF00';
-const BLUE = '#0000FF';
-const YELLOW = '#FFFF00';
-const CYAN = '#00FFFF';
+"use strict";
+
+
+const
+    GLOBAL = {
+        util: require('./global.util')
+    },
+    BLACK = '#000000',
+    WHITE = '#FFFFFF',
+    RED = '#FF0000',
+    GREEN = '#00FF00',
+    BLUE = '#0000FF',
+    YELLOW = '#FFFF00',
+    CYAN = '#00FFFF';
 
 const getColourByPercentage = (percentage, reverse) => {
     const value = reverse ? percentage : 1 - percentage;
@@ -432,7 +439,7 @@ const Visuals = class {
             const delta_y = from.y - to.y;
             const theta_radians = Math.atan2(delta_y, delta_x);
             const base_angle = 0.610865;
-            const length = Math.log1p(Util.getDistance(from, to)) * 0.5;
+            const length = Math.log1p(GLOBAL.util.getDistance(from, to)) * 0.5;
             style = style instanceof Creep
                 ? this.creepPathStyle(style)
                 : (style || {});

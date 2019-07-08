@@ -1,12 +1,17 @@
 "use strict";
 
-const behaviour = new Creep.Behaviour('worker');
+const
+    GLOBAL = {
+        util: require(`./global.util`),
+    };
+
+let behaviour = new Creep.Behaviour('worker');
 module.exports = behaviour;
 behaviour.inflowActions = function (creep) {
     let priority = [
-        //Creep.action.bulldozing,
-        //Creep.action.picking,
-        //Creep.action.dismantling,
+        Creep.action.bulldozing,
+        Creep.action.picking,
+        Creep.action.dismantling,
         Creep.action.withdrawing,
         Creep.action.uncharging,
         Creep.action.harvesting,
@@ -28,7 +33,7 @@ behaviour.outflowActions = function (creep) {
         global.logSystem(creep.room.name, `workers know room is NUKED`);
         return [
             Creep.action.building,
-            //Creep.action.fortifying
+            Creep.action.fortifying
         ];
 
     } else {
@@ -37,13 +42,13 @@ behaviour.outflowActions = function (creep) {
             Creep.action.feeding,
             Creep.action.building,
             Creep.action.fueling,
-            //Creep.action.fortifying,
-            //Creep.action.charging,
-            //Creep.action.upgrading,
+            Creep.action.fortifying,
+            Creep.action.charging,
+            Creep.action.upgrading,
             Creep.action.storing
         ];
         const needMinersOrHaulers = (room) => {
-            const typeCount = room.population && room.population.typeCount;
+            let typeCount = room.population && room.population.typeCount;
             return !typeCount.hauler || typeCount.hauler < 1 || !typeCount.miner || typeCount.miner < 1;
         };
         if (creep.room.relativeEnergyAvailable < 1 && needMinersOrHaulers(creep.room)) {
@@ -60,8 +65,9 @@ behaviour.outflowActions = function (creep) {
     }
 };
 behaviour.nextAction = function (creep) {
-    if (creep.data.creepType == "worker" && creep.pos.roomName != creep.data.homeRoom && Game.rooms[creep.data.homeRoom] && Game.rooms[creep.data.homeRoom].controller) {
-        if (global.DEBUG && global.TRACE) trace('Behaviour', {actionName: 'travelling', behaviourName: this.name, creepName: creep.name, assigned: true, Behaviour: 'nextAction', Action: 'assign'});
+    if (creep.data.creepType === "worker" && creep.pos.roomName !== creep.data.homeRoom && Game.rooms[creep.data.homeRoom] && Game.rooms[creep.data.homeRoom].controller) {
+        if (global.DEBUG && global.TRACE)
+            GLOBAL.util.trace('Behaviour', {actionName: 'travelling', behaviourName: this.name, creepName: creep.name, assigned: true, Behaviour: 'nextAction', Action: 'assign'});
         Creep.action.travelling.assignRoom(creep, creep.data.homeRoom);
         return true;
     }
