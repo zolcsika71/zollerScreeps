@@ -399,7 +399,7 @@ let mod = {
         creep: {
             coreParts: {
                 [MOVE]: true,
-                [HEAL]: true,
+                [HEAL]: true
             },
             boost: {
                 hits: {
@@ -408,6 +408,18 @@ let mod = {
                     [RESOURCE_CATALYZED_GHODIUM_ALKALIDE]: 334
                 }
             }
+        },
+        defender: {
+            fixedBody: [RANGED_ATTACK, MOVE],
+            multiBody: {
+                [HEAL]: 1,
+                [MOVE]: 2,
+                [RANGED_ATTACK]: 2,
+                [TOUGH]: 1
+            },
+            name: "defender",
+            behaviour: "warrior",
+            queue: 'Low'
         }
     },
     DECAY_AMOUNT: {

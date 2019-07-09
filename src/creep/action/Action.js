@@ -3,6 +3,10 @@
 const
     GLOBAL = {
         util: require(`./global.util`)
+    },
+    ROOT = {
+        population: require('./population'),
+        visuals: require('./visuals')
     };
 
 // base class for every action

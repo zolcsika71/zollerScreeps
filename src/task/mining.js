@@ -1,25 +1,39 @@
-const mod = {};
+"use strict";
+
+const
+    GLOBAL = {
+        util: require(`./global.util`),
+        parameter: require(`./global.parameter`)
+    },
+    ROOT = {
+        flagDir: require('./flagDir')
+    };
+
+
+
+
+let mod = {};
 module.exports = mod;
 mod.minControllerLevel = 2;
 mod.name = 'mining';
 mod.register = () => {};
 mod.handleFlagRemoved = flagName => {
     // check flag
-    const flagMem = Memory.flags[flagName];
+    let flagMem = Memory.flags[flagName];
     if (flagMem && flagMem.task === mod.name && flagMem.roomName) {
         // if there is still a mining flag in that room ignore.
-        const flags = FlagDir.filter(FLAG_COLOR.claim.mining, new RoomPosition(25,25,flagMem.roomName), true);
+        const flags = ROOT.flagDir.filter(global.FLAG_COLOR.claim.mining, new RoomPosition(25,25,flagMem.roomName), true);
         if (flags && flags.length > 0)
             return;
         else {
             // no more mining in that room.
-            Task.cleanup(['remoteMiner', 'remoteWorker', 'remoteHauler'], mod.name, flagMem.roomName);
+            TASK.task.cleanup(['remoteMiner', 'remoteWorker', 'remoteHauler'], mod.name, flagMem.roomName);
         }
     }
 };
 mod.handleFlagFound = flag => {
     // Analyze Flag
-    if (flag.compareTo(FLAG_COLOR.claim.mining) && Task.nextCreepCheck(flag, mod.name)) {
+    if (flag.compareTo(global.FLAG_COLOR.claim.mining) && TASK.task.nextCreepCheck(flag, mod.name)) {
         Util.set(flag.memory, 'roomName', flag.pos.roomName);
         Util.set(flag.memory, 'task', mod.name);
         // check if a new creep has to be spawned

@@ -121,13 +121,15 @@ _.assign(global, {
 
 _.assign(TASK, {
     mining: require('./task.mining'),
-    reputation: require('./task.reputation')
+    reputation: require('./task.reputation'),
+    defense: require('./task.defense')
 });
 
 // TASK assign
 _.assign(TASK.task, {
     mining: TASK.mining,
-    reputation: TASK.reputation
+    reputation: TASK.reputation,
+    defense: TASK.defense
 });
 
 Creep.Action = require('./creep.action.Action');
