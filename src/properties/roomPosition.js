@@ -1,6 +1,7 @@
 "use strict";
 
 let mod = {};
+module.exports = mod;
 mod.extend = function () {
 
     // extensions.js
@@ -20,7 +21,6 @@ mod.extend = function () {
             return this._adjacent;
         }
     });
-
     Object.defineProperty(RoomPosition.prototype, 'radius', {
         configurable: true,
         value: function (radius = 1) {
@@ -40,4 +40,4 @@ mod.extend = function () {
     });
 
 };
-module.exports = mod;
+

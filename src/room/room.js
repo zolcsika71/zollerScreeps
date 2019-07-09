@@ -9,10 +9,13 @@ const
         mainInjection: require(`./mainInjection`)
     };
 
-
-// save original API functions
-let find = Room.prototype.find;
 let mod = {};
+module.exports = mod;
+
+mod.pathfinderCache = {};
+mod.pathfinderCacheDirty = false;
+mod.pathfinderCacheLoaded = false;
+mod.COSTMATRIX_CACHE_VERSION = global.COMPRESS_COST_MATRICES ? 4 : 5; // change this to invalidate previously cached costmatrices
 
 mod.register = function () {
     // run register in each of our submodules
@@ -24,12 +27,6 @@ mod.register = function () {
         if (!s.isActive()) _.set(room.memory, ['structures', s.id, 'active'], false);
     }));
 };
-module.exports = mod;
-mod.pathfinderCache = {};
-mod.pathfinderCacheDirty = false;
-mod.pathfinderCacheLoaded = false;
-mod.COSTMATRIX_CACHE_VERSION = global.COMPRESS_COST_MATRICES ? 4 : 5; // change this to invalidate previously cached costmatrices
-
 mod.flush = function () {
     // run flush in each of our submodules
     for (const key of Object.keys(Room._ext)) {
@@ -301,7 +298,8 @@ mod.getCachedStructureMatrix = function (roomName) {
         let mem = Room.pathfinderCache[roomName],
             ttl = Game.time - mem.updated;
         if (mem.version === Room.COSTMATRIX_CACHE_VERSION && (mem.serializedMatrix || mem.costMatrix) && !mem.stale && ttl < COST_MATRIX_VALIDITY) {
-            if (global.DEBUG && global.TRACE) trace('PathFinder', {roomName: roomName, ttl, PathFinder: 'CostMatrix'}, 'cached costmatrix');
+            if (global.DEBUG && global.TRACE)
+                GLOBAL.util.trace('PathFinder', {roomName: roomName, ttl, PathFinder: 'CostMatrix'}, 'cached costmatrix');
             return true;
         }
         return false;

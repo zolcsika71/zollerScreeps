@@ -25,7 +25,6 @@ mod.extend = function () {
             return;
         return action.assign(this, target);
     };
-
     Creep.prototype.assignBehaviour = function (behaviour) {
         if (typeof behaviour === 'string')
             behaviour = Creep.behaviour[behaviour];
@@ -50,7 +49,6 @@ mod.extend = function () {
         }
         return null;
     };
-
     Creep.prototype.findByType = function (creepType) {
 
         let creep;
@@ -62,7 +60,6 @@ mod.extend = function () {
 
         }
     };
-
     Creep.prototype.getBodyparts = function (type) {
         return _(this.body).filter({type}).value().length;
     };
@@ -87,7 +84,6 @@ mod.extend = function () {
         }
         return false;
     };
-
     Creep.prototype.run = function (behaviour) {
         if (!this.spawning) {
             if (!behaviour && this.data && this.data.creepType) {
@@ -122,7 +118,7 @@ mod.extend = function () {
                 let breeding = this.memory.breeding;
                 if (type && weight && home && spawn && breeding) {
                     //console.log( 'Fixing corrupt creep without population entry: ' + this.name );
-                    let entry = CREEP.population.setCreep({
+                    let entry = ROOT.population.setCreep({
                         creepName: this.name,
                         creepType: type,
                         weight: weight,
@@ -135,7 +131,7 @@ mod.extend = function () {
                         flagName: null,
                         body: _.countBy(this.body, 'type')
                     });
-                    CREEP.population.countCreep(this.room, entry);
+                    ROOT.population.countCreep(this.room, entry);
                 } else {
                     console.log(GLOBAL.util.dye(global.CRAYON.error, 'Corrupt creep without population entry!! : ' + this.name), GLOBAL.util.stack());
                     // trying to import creep
@@ -173,24 +169,7 @@ mod.extend = function () {
         }
         strategy.freeStrategy(this);
     };
-
-
     Creep.prototype.leaveBorder = function () {
-
-        RoomPosition.prototype.fromDirection = function (direction) {
-            const
-                DIRECTIONS = {
-                    1: [0, -1],
-                    2: [1, -1],
-                    3: [1, 0],
-                    4: [1, 1],
-                    5: [0, 1],
-                    6: [-1, 1],
-                    7: [-1, 0],
-                    8: [-1, -1]
-                };
-            return new RoomPosition(this.x + DIRECTIONS[direction][0], this.y + DIRECTIONS[direction][1], this.roomName)
-        };
 
         function getDirectionPriorities(lastDirection) {
 
@@ -265,11 +244,9 @@ mod.extend = function () {
     Creep.prototype.honk = function () {
         if (global.HONK) this.say('\u{26D4}\u{FE0E}', SAY_PUBLIC);
     };
-
     Creep.prototype.honkEvade = function () {
         if (HONK) this.say('\u{1F500}\u{FE0E}', SAY_PUBLIC);
     };
-
     Creep.prototype.fleeMove = function () {
         if (global.DEBUG && global.TRACE) GLOBAL.util.trace('Creep', {creepName: this.name, pos: this.pos, Action: 'fleeMove', Creep: 'run'});
         let drop = r => {
@@ -308,7 +285,6 @@ mod.extend = function () {
         if (path && path.length > 0)
             this.move(this.pos.getDirectionTo(new RoomPosition(path[0].x,path[0].y,path[0].roomName)));
     };
-
     Creep.prototype.idleMove = function () {
         if (this.fatigue > 0) return;
         // check if on road/structure
@@ -383,7 +359,6 @@ mod.extend = function () {
             }
         }
     };
-
     Creep.prototype.repairNearby = function () {
         // only repair in rooms that we own, have reserved, or belong to our allies, also SK rooms and highways.
         if (this.room.controller && this.room.controller.owner && !(this.room.my || this.room.reserved || this.room.ally)) return;
@@ -401,7 +376,6 @@ mod.extend = function () {
 
         }
     };
-
     Creep.prototype.buildNearby = function () {
         // enable remote haulers to build their own roads and containers
         if (!global.REMOTE_HAULER.DRIVE_BY_BUILDING || !this.data || this.data.creepType !== 'remoteHauler') return;
@@ -418,7 +392,6 @@ mod.extend = function () {
                 GLOBAL.util.trace('Creep', {creepName: this.name, Action: 'building', Creep: 'buildNearby'}, 'not building');
         }
     };
-
     Creep.prototype.controllerSign = function () {
         const signMessage = Util.fieldOrFunction(CONTROLLER_SIGN_MESSAGE, this.room);
         if (CONTROLLER_SIGN && (!this.room.controller.sign || this.room.controller.sign.username !== this.owner.username || (CONTROLLER_SIGN_UPDATE && this.room.controller.sign.text !== signMessage))) {

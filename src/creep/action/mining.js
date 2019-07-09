@@ -25,20 +25,27 @@ action.newTarget = function (creep) {
     return target;
 };
 action.determineSpot = function (creep, source) {
-    const invalid = [];
-    const findInvalid = entry => {
-        if (entry.name === creep.name) return;
-        const predictedRenewal = entry.predictedRenewal ? entry.predictedRenewal : entry.spawningTime;
-        if (entry.roomName === creep.pos.roomName && ['miner', 'upgrader'].includes(entry.creepType) && entry.determinatedSpot
-            && entry.ttl > predictedRenewal)
-            invalid.push(entry.determinatedSpot);
-    };
+    let invalid = [],
+        findInvalid = entry => {
+
+            if (entry.name === creep.name)
+                return;
+            let predictedRenewal = entry.predictedRenewal ? entry.predictedRenewal : entry.spawningTime;
+            if (entry.roomName === creep.pos.roomName
+                && ['miner', 'upgrader'].includes(entry.creepType)
+                && entry.determinatedSpot && entry.ttl > predictedRenewal)
+                    invalid.push(entry.determinatedSpot);
+
+        };
     _.forEach(Memory.population, findInvalid);
+
     const containerSpot = (source.container && source.container.structureType === STRUCTURE_CONTAINER && source.container.pos.isNearTo(source)
         && !_.some(invalid, {x: source.container.pos.x, y: source.container.pos.y})) ? source.container.pos : null;
-    let spots = [];
-    let args;
+
+    let spots = [],
+        args;
     if (!containerSpot) {
+
         args = {
             spots: [{
                 pos: source.pos,
@@ -65,13 +72,11 @@ action.determineSpot = function (creep, source) {
         let spot = containerSpot;
         if (!spot) {
             spot = creep.pos.findClosestByPath(spots, {filter: pos => {
-                    return !_.some(
-                        creep.room.lookForAt(LOOK_STRUCTURES, pos),
-                        {'structureType': STRUCTURE_ROAD }
-                    );
+                    return !_.some(creep.room.lookForAt(LOOK_STRUCTURES, pos), {'structureType': STRUCTURE_ROAD});
                 }});
         }
-        if (!spot) spot = creep.pos.findClosestByPath(spots) || spots[0];
+        if (!spot)
+            spot = creep.pos.findClosestByPath(spots) || spots[0];
         if (spot) {
             creep.data.determinatedSpot = {
                 x: spot.x,
@@ -84,7 +89,7 @@ action.determineSpot = function (creep, source) {
                     if (path) creep.data.predictedRenewal = creep.data.spawningTime + path.length; // road assumed
                 }
             }
-            if (MINERS_AUTO_BUILD && !source.container) {
+            if (global.MINERS_AUTO_BUILD && !source.container) {
                 const sites = _.filter(source.pos.findInRange(FIND_CONSTRUCTION_SITES, 2), s => s.structureType === STRUCTURE_CONTAINER);
                 if (!sites.length && source.room) {
                     source.room.createConstructionSite(spot, STRUCTURE_CONTAINER);
@@ -93,7 +98,7 @@ action.determineSpot = function (creep, source) {
         }
     }
     if (!creep.data.determinatedSpot) {
-        logError('Unable to determine working location for miner in room ' + creep.pos.roomName);
+        GLOBAL.util.logError('Unable to determine working location for miner in room ' + creep.pos.roomName);
     }
 };
 action.work = function (creep) {
@@ -116,7 +121,7 @@ action.work = function (creep) {
             } else {
                 if (global.CHATTY) creep.say('dropmining', global.SAY_PUBLIC);
                 if (global.OOPS) creep.say(String.fromCharCode(8681), global.SAY_PUBLIC);
-                const drop = r => {
+                let drop = r => {
                     if (creep.carry[r] > 0) creep.drop(r);
                 };
                 _.forEach(Object.keys(creep.carry), drop);
@@ -136,9 +141,10 @@ action.step = function (creep) {
     if (_.isUndefined(creep.data.determinatedSpot)) {
         this.determineSpot(creep, creep.target);
     } else {
-        const targetRoom = creep.data.destiny ? creep.data.destiny.room : creep.data.homeRoom;
-        const targetPos = new RoomPosition(creep.data.determinatedSpot.x, creep.data.determinatedSpot.y, targetRoom);
-        const range = creep.pos.getRangeTo(targetPos);
+        let targetRoom = creep.data.destiny ? creep.data.destiny.room : creep.data.homeRoom,
+            targetPos = new RoomPosition(creep.data.determinatedSpot.x, creep.data.determinatedSpot.y, targetRoom),
+            range = creep.pos.getRangeTo(targetPos);
+
         if (range > 1) {
             creep.travelTo(targetPos, {range: 1});
         } else if (range === 1) {
@@ -156,12 +162,13 @@ action.getEnergy = function (creep) {
         filter: r => r.resourceType === RESOURCE_ENERGY
     })[0];
     if (dropped) {
-        if (global.DEBUG && global.TRACE) trace('Action', {actionName: this.name, method: 'getEnergy', creepName: creep.name, pos: creep.pos, pickup: dropped.id});
+        if (global.DEBUG && global.TRACE)
+            GLOBAL.util.trace('Action', {actionName: this.name, method: 'getEnergy', creepName: creep.name, pos: creep.pos, pickup: dropped.id});
         creep.pickup(dropped);
         return true;
     }
 
-    const container = creep.pos.findInRange(FIND_STRUCTURES, 1, {
+    let container = creep.pos.findInRange(FIND_STRUCTURES, 1, {
         filter: s => s.structureType === STRUCTURE_CONTAINER
     })[0];
     if (container && container.sum > 0) {
@@ -170,7 +177,7 @@ action.getEnergy = function (creep) {
         return true;
     }
 
-    const link = creep.pos.findInRange(FIND_STRUCTURES, 1, {
+    let link = creep.pos.findInRange(FIND_STRUCTURES, 1, {
         filter: s => s.my && s.structureType === STRUCTURE_LINK
     })[0];
     if (link && link.energy > 0) {
@@ -184,14 +191,15 @@ action.getEnergy = function (creep) {
 };
 action.maintain = function (creep) {
     const minCarry = (creep.data.body && creep.data.body.work ? (creep.data.body.work * 5) : (creep.carryCapacity / 2));
-    if (global.DEBUG && global.TRACE) trace('Action', {actionName: this.name, method: 'maintain', creepName: creep.name, pos: creep.pos, energy: creep.carryenergy, minCarry});
+    if (global.DEBUG && global.TRACE)
+        GLOBAL.util.trace('Action', {actionName: this.name, method: 'maintain', creepName: creep.name, pos: creep.pos, energy: creep.carryenergy, minCarry});
     if (creep.carry.energy <= minCarry) {
-        if (!creep.data.energyChecked || Game.time - creep.data.energyChecked > MINER_WORK_THRESHOLD) {
+        if (!creep.data.energyChecked || Game.time - creep.data.energyChecked > global.MINER_WORK_THRESHOLD) {
             this.getEnergy(creep);
         }
     }
     if (creep.carry.energy > 0) {
-        if (!creep.data.repairChecked || Game.time - creep.data.repairChecked > MINER_WORK_THRESHOLD) {
+        if (!creep.data.repairChecked || Game.time - creep.data.repairChecked > global.MINER_WORK_THRESHOLD) {
             let repairTarget = Game.getObjectById(creep.data.repairTarget);
             if (!repairTarget || repairTarget.hits === repairTarget.hitsMax) {
                 repairTarget = creep.pos.findInRange(FIND_STRUCTURES, 3, {
@@ -200,7 +208,8 @@ action.maintain = function (creep) {
             }
             if (repairTarget) {
                 creep.data.repairTarget = repairTarget.id;
-                if (global.DEBUG && global.TRACE) trace('Action', {actionName: this.name, method: 'maintain', creepName: creep.name, pos: creep.pos, repairTarget: repairTarget.id, progress: repairTarget.hits / repairTarget.hitsMax});
+                if (global.DEBUG && global.TRACE)
+                    GLOBAL.util.trace('Action', {actionName: this.name, method: 'maintain', creepName: creep.name, pos: creep.pos, repairTarget: repairTarget.id, progress: repairTarget.hits / repairTarget.hitsMax});
                 return creep.repair(repairTarget);
             }  else {
                 delete creep.data.repairTarget;
@@ -216,7 +225,8 @@ action.maintain = function (creep) {
             }
             if (buildTarget) {
                 creep.data.buildTarget = buildTarget.id;
-                if (global.DEBUG && global.TRACE) trace('Action', {actionName: this.name, method: 'maintain', creepName: creep.name, pos: creep.pos, buildTarget: buildTarget.id, progress: buildTarget.progress / buildTarget.progressTotal});
+                if (global.DEBUG && global.TRACE)
+                    GLOBAL.util.trace('Action', {actionName: this.name, method: 'maintain', creepName: creep.name, pos: creep.pos, buildTarget: buildTarget.id, progress: buildTarget.progress / buildTarget.progressTotal});
                 return creep.build(buildTarget);
             } else {
                 delete creep.data.buildTarget;

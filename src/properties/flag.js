@@ -13,14 +13,12 @@ mod.extend = function () {
             this.memory.cloaking = value;
         }
     });
-
     Object.defineProperty(Flag, 'compare', {
         configurable: true,
         value: function (flagA, flagB) {
             return flagA.color === flagB.color && flagA.secondaryColor === flagB.secondaryColor;
         }
     });
-
     Object.defineProperty(Flag.prototype, 'compareTo', {
         configurable: true,
         // FLAG_COLOR flag
@@ -28,7 +26,6 @@ mod.extend = function () {
             return Flag.compare(this, flag);
         }
     });
-
     Object.defineProperty(RoomPosition.prototype, 'newFlag', {
         configurable: true,
         /**
@@ -43,7 +40,6 @@ mod.extend = function () {
             return this.createFlag(name, flagColour.color, flagColour.secondaryColor);
         }
     });
-
     Object.defineProperty(Room.prototype, 'newFlag', {
         configurable: true,
         /**

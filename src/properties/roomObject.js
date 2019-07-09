@@ -18,7 +18,6 @@ mod.extend = function(){
             }
         }
     });
-
     Object.defineProperty(RoomObject.prototype, 'cloak', {
         configurable: true,
         get: function() {

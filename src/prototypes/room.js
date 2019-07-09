@@ -35,11 +35,6 @@ mod.extend = function () {
         if (numSites > 0) this.memory.myTotalSites = numSites;
         else delete this.memory.myTotalSites;
     };
-    Room.prototype.getBorder = function (roomName) {
-        return _.findKey(Game.map.describeExits(this.name), function (name) {
-            return this.name === name;
-        }, {name: roomName});
-    };
     Room.prototype.countMyStructures = function () {
         const numStructures = _.size(this.structures.my);
         if (!_.isUndefined(this.memory.myTotalStructures) && numStructures !== this.memory.myTotalStructures) {
@@ -1477,11 +1472,11 @@ mod.extend = function () {
         data.reactions.seed_a = seed_a_id;
         data.reactions.seed_b = seed_b_id;
 
-        data_a = data.lab.find( l => l.id === seed_a_id );
+        let data_a = data.lab.find( l => l.id === seed_a_id );
         if ( data_a ) {
             data_a.reactionState = LAB_SEED;
         }
-        data_b = data.lab.find( l => l.id === seed_b_id );
+        let data_b = data.lab.find( l => l.id === seed_b_id );
         if ( data_b ) {
             data_b.reactionState = LAB_SEED;
         }

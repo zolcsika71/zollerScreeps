@@ -4,7 +4,6 @@ let mod = {};
 module.exports = mod;
 mod.extend = function () {
 
-
     Room.prototype.GCOrders = function () {
 
         let data = this.memory.resources,
@@ -94,7 +93,6 @@ mod.extend = function () {
 
 
     };
-
     Room.prototype.GCOffers = function () {
 
         let data = this.memory.resources,
@@ -217,7 +215,6 @@ mod.extend = function () {
             terminalOrderPlaced: terminalOrderPlaced
         };
     };
-
     Room.prototype.GCLabs = function () {
 
         if (global.DEBUG)
@@ -264,7 +261,6 @@ mod.extend = function () {
             }
         }
     };
-
     Room.prototype.checkOffers = function () {
 
 
@@ -352,7 +348,6 @@ mod.extend = function () {
 
 
     };
-
     Room.prototype.allOrdersWithOffers = function () {
         let orders = this.memory.resources.orders;
         if (orders.length === 0)
@@ -363,7 +358,6 @@ mod.extend = function () {
         });
         return ordersDone.length === orders.length;
     };
-
     Room.prototype.ordersWithOffers = function () {
         let orders = this.memory.resources.orders;
         if (orders.length === 0)
@@ -373,7 +367,6 @@ mod.extend = function () {
             return orderOffersAmount >= order.amount && order.amount > 0;
         });
     };
-
     Room.prototype.makeReaction = function () {
 
         if (this.nuked)
@@ -704,7 +697,6 @@ mod.extend = function () {
         return roomFound;
 
     };
-
     Room.prototype.storedMinerals = function (mineral) {
 
         let returnValue = (this.resourcesStorage[mineral] || 0) + (this.resourcesTerminal[mineral] || 0) - (this.resourcesOffers[mineral] || 0) - (this.resourcesReactions[mineral] || 0);
@@ -712,7 +704,6 @@ mod.extend = function () {
         //    returnValue = 0;
         return returnValue;
     };
-
     Room.prototype.countCheckRoomAt = function () {
         let data = this.memory.resources,
             boostTiming = data.boostTiming,
@@ -726,7 +717,6 @@ mod.extend = function () {
 
         boostTiming.checkRoomAt = boostTiming.reactionMaking + global.roundUpTo(amount / allLabsProducedAmountPerTick, reactionCoolDown);
     };
-
     Room.prototype.getSeedLabOrders = function () {
 
         let data = this.memory.resources;
@@ -758,7 +748,6 @@ mod.extend = function () {
         }
 
     };
-
     Room.prototype.allocateCompound = function (compounds, GUID, type, invadersRoom = false) {
 
         if (Object.keys(compounds).length === 0)

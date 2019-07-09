@@ -95,6 +95,7 @@ let mod = {
     },
 
     MINERS_AUTO_BUILD: true, // miners and remoteMiners will build their own containers if they are missing.
+    MINER_WORK_THRESHOLD: 50, // how long to wait before a miner checks for repairs/construction sites nearby again
 
     ROAD_CONSTRUCTION_ENABLE: false, // Set to False to disable automatic road construction, or to a number to enable for owned rooms reaching that RC Level. WARNING: HIGH MEMORY USAGE
     ROAD_CONSTRUCTION_FORCED_ROOMS: {'shard0': []}, //Add room names to force automatic road construction regardless of ROAD_CONSTRUCTION_ENABLE e.g. {'shard0':['W0N0','W1N0'],'shard1':['W0N0', 'W1N0']}. No dependency with ROAD_CONSTRUCTION_ENABLE
@@ -418,7 +419,18 @@ let mod = {
         STRUCTURE_ROAD,
         STRUCTURE_CONTAINER,
         STRUCTURE_RAMPART
-        ]
+        ],
+    PART_THREAT: {
+        'move': { common: 0, boosted: 0 },
+        'work': { common: 1, boosted: 3 },
+        'carry': { common: 0, boosted: 0 },
+        'attack': { common: 2, boosted: 5 },
+        'ranged_attack': { common: 2, boosted: 5 },
+        'heal': { common: 4, boosted: 10 },
+        'claim': { common: 1, boosted: 3 },
+        'tough': { common: 1, boosted: 3 },
+        tower: 25
+    },
 
 };
 

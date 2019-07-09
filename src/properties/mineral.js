@@ -26,7 +26,6 @@ mod.extend = function () {
             Memory.minerals[this.id] = value;
         }
     });
-
     Object.defineProperty(Mineral.prototype, 'container', {
         configurable: true,
         get: function () {

@@ -3,6 +3,7 @@
 let visuals = {};
 module.exports = visuals;
 visuals.extend = function () {
+
     RoomVisual.prototype.structure = function (x, y, type, opts = {}) {
 
         opts = Object.assign({
@@ -44,13 +45,6 @@ visuals.extend = function () {
                 });
                 break;
             case STRUCTURE_SPAWN:
-                //this.circle(x, y, {
-                //    radius: 0.65,
-                //    fill: colors.dark,
-                //    stroke: '#CCCCCC',
-                //    strokeWidth: 0.10,
-                //    opacity: opts.opacity
-                //});
                 this.circle(x, y, {
                     radius: 0.40,
                     fill: colors.energy,
@@ -72,8 +66,6 @@ visuals.extend = function () {
                 });
                 break;
             case STRUCTURE_LINK: {
-                let osize = 0.3;
-                let isize = 0.2;
                 let outer = [
                     [0.0, -0.5],
                     [0.4, 0.0],

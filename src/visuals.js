@@ -48,311 +48,11 @@ const storageObject = (vis, store, x, startY) => {
 
 
 const Visuals = class {
-/*
-    extend () {
 
-        RoomVisual.prototype.structure = function (x, y, type, opts = {}) {
-
-            opts = Object.assign({
-                opacity: 1
-            }, opts);
-
-            let colors = {
-                gray: '#555555',
-                light: '#AAAAAA',
-                road: '#666', // >:D
-                energy: '#FFE87B',
-                power: '#F53547',
-                dark: '#181818',
-                outline: '#8FBB93'
-            };
-
-            function relPoly(x, y, poly) {
-                return poly.map(p => {
-                    p[0] += x;
-                    p[1] += y;
-                    return p
-                })
-            }
-
-
-            switch (type) {
-                case STRUCTURE_EXTENSION:
-                    this.circle(x, y, {
-                        radius: 0.5,
-                        fill: colors.dark,
-                        stroke: colors.outline,
-                        strokeWidth: 0.05,
-                        opacity: opts.opacity
-                    });
-                    this.circle(x, y, {
-                        radius: 0.35,
-                        fill: colors.gray,
-                        opacity: opts.opacity
-                    });
-                    break;
-                case STRUCTURE_SPAWN:
-                    //this.circle(x, y, {
-                    //    radius: 0.65,
-                    //    fill: colors.dark,
-                    //    stroke: '#CCCCCC',
-                    //    strokeWidth: 0.10,
-                    //    opacity: opts.opacity
-                    //});
-                    this.circle(x, y, {
-                        radius: 0.40,
-                        fill: colors.energy,
-                        opacity: opts.opacity
-                    });
-                    break;
-                case STRUCTURE_POWER_SPAWN:
-                    this.circle(x, y, {
-                        radius: 0.65,
-                        fill: colors.dark,
-                        stroke: colors.power,
-                        strokeWidth: 0.10,
-                        opacity: opts.opacity
-                    });
-                    this.circle(x, y, {
-                        radius: 0.40,
-                        fill: colors.energy,
-                        opacity: opts.opacity
-                    });
-                    break;
-                case STRUCTURE_LINK: {
-                    let osize = 0.3;
-                    let isize = 0.2;
-                    let outer = [
-                        [0.0, -0.5],
-                        [0.4, 0.0],
-                        [0.0, 0.5],
-                        [-0.4, 0.0]
-                    ];
-                    let inner = [
-                        [0.0, -0.3],
-                        [0.25, 0.0],
-                        [0.0, 0.3],
-                        [-0.25, 0.0]
-                    ];
-                    outer = relPoly(x, y, outer);
-                    inner = relPoly(x, y, inner);
-                    outer.push(outer[0]);
-                    inner.push(inner[0]);
-                    this.poly(outer, {
-                        fill: colors.dark,
-                        stroke: colors.outline,
-                        strokeWidth: 0.05,
-                        opacity: opts.opacity
-                    });
-                    this.poly(inner, {
-                        fill: colors.gray,
-                        stroke: false,
-                        opacity: opts.opacity
-                    });
-                    break;
-                }
-                case STRUCTURE_TERMINAL: {
-                    let outer = [
-                        [0.0, -0.8],
-                        [0.55, -0.55],
-                        [0.8, 0.0],
-                        [0.55, 0.55],
-                        [0.0, 0.8],
-                        [-0.55, 0.55],
-                        [-0.8, 0.0],
-                        [-0.55, -0.55]
-                    ];
-                    let inner = [
-                        [0.0, -0.65],
-                        [0.45, -0.45],
-                        [0.65, 0.0],
-                        [0.45, 0.45],
-                        [0.0, 0.65],
-                        [-0.45, 0.45],
-                        [-0.65, 0.0],
-                        [-0.45, -0.45]
-                    ];
-                    outer = relPoly(x, y, outer);
-                    inner = relPoly(x, y, inner);
-                    outer.push(outer[0]);
-                    inner.push(inner[0]);
-                    this.poly(outer, {
-                        fill: colors.dark,
-                        stroke: colors.outline,
-                        strokeWidth: 0.05,
-                        opacity: opts.opacity
-                    });
-                    this.poly(inner, {
-                        fill: colors.light,
-                        stroke: false,
-                        opacity: opts.opacity
-                    });
-                    this.rect(x - 0.45, y - 0.45, 0.9, 0.9, {
-                        fill: colors.gray,
-                        stroke: colors.dark,
-                        strokeWidth: 0.1,
-                        opacity: opts.opacity
-                    });
-                    break;
-                }
-                case STRUCTURE_LAB:
-
-                    this.circle(x, y - 0.025, {
-                        radius: 0.55,
-                        fill: colors.dark,
-                        stroke: colors.outline,
-                        strokeWidth: 0.05,
-                        opacity: opts.opacity
-                    });
-                    this.circle(x, y - 0.025, {
-                        radius: 0.40,
-                        fill: colors.gray,
-                        opacity: opts.opacity
-                    });
-                    this.rect(x - 0.45, y + 0.3, 0.9, 0.25, {
-                        fill: colors.dark,
-                        stroke: false,
-                        opacity: opts.opacity
-                    }); {
-                        let box = [
-                            [-0.45, 0.3],
-                            [-0.45, 0.55],
-                            [0.45, 0.55],
-                            [0.45, 0.3]
-                        ];
-                        box = relPoly(x, y, box);
-                        this.poly(box, {
-                            stroke: colors.outline,
-                            strokeWidth: 0.05,
-                            opacity: opts.opacity
-                        })
-                    }
-                    break;
-                case STRUCTURE_TOWER:
-                    this.circle(x, y, {
-                        radius: 0.6,
-                        fill: colors.dark,
-                        stroke: colors.outline,
-                        strokeWidth: 0.05,
-                        opacity: opts.opacity
-                    });
-                    this.rect(x - 0.4, y - 0.3, 0.8, 0.6, {
-                        fill: colors.gray,
-                        opacity: opts.opacity
-                    });
-                    this.rect(x - 0.2, y - 0.9, 0.4, 0.5, {
-                        fill: colors.light,
-                        stroke: colors.dark,
-                        strokeWidth: 0.07,
-                        opacity: opts.opacity
-                    });
-                    break;
-                case STRUCTURE_ROAD:
-                    this.circle(x, y, {
-                        radius: 0.175,
-                        fill: colors.road,
-                        stroke: false,
-                        opacity: opts.opacity
-                    });
-                    if (!this.roads) this.roads = [];
-                    this.roads.push([x, y]);
-                    break;
-                case STRUCTURE_RAMPART:
-                    this.circle(x, y, {
-                        radius: 0.65,
-                        fill: '#434C43',
-                        stroke: '#5D735F',
-                        strokeWidth: 0.10,
-                        opacity: opts.opacity
-                    });
-                    break;
-                case STRUCTURE_WALL:
-                    this.circle(x, y, {
-                        radius: 0.40,
-                        fill: colors.dark,
-                        stroke: colors.light,
-                        strokeWidth: 0.05,
-                        opacity: opts.opacity
-                    });
-                    break;
-                case STRUCTURE_STORAGE:
-                    this.circle(x, y, {
-                        fill: colors.energy,
-                        radius: 0.35,
-                        stroke: colors.dark,
-                        strokeWidth: 0.20,
-                        opacity: opts.opacity
-                    });
-                    break;
-                case STRUCTURE_OBSERVER:
-                    this.circle(x, y, {
-                        fill: colors.dark,
-                        radius: 0.45,
-                        stroke: colors.outline,
-                        strokeWidth: 0.05,
-                        opacity: opts.opacity
-                    });
-                    this.circle(x + 0.225, y, {
-                        fill: colors.outline,
-                        radius: 0.20,
-                        opacity: opts.opacity
-                    });
-                    break;
-                case STRUCTURE_NUKER:
-                    let outline = [
-                        [0, -1],
-                        [-0.47, 0.2],
-                        [-0.5, 0.5],
-                        [0.5, 0.5],
-                        [0.47, 0.2],
-                        [0, -1]
-                    ];
-                    outline = relPoly(x, y, outline);
-                    this.poly(outline, {
-                        stroke: colors.outline,
-                        strokeWidth: 0.05,
-                        fill: colors.dark,
-                        opacity: opts.opacity
-                    });
-                    let inline = [
-                        [0, -.80],
-                        [-0.40, 0.2],
-                        [0.40, 0.2],
-                        [0, -.80]
-                    ];
-                    inline = relPoly(x, y, inline);
-                    this.poly(inline, {
-                        stroke: colors.outline,
-                        strokeWidth: 0.01,
-                        fill: colors.gray,
-                        opacity: opts.opacity
-                    });
-                    break;
-                case STRUCTURE_CONTAINER:
-                    this.rect(x - 0.225, y - 0.3, 0.45, 0.6, {
-                        fill: "yellow",
-                        opacity: opts.opacity,
-                        stroke: colors.dark,
-                        strokeWidth: 0.10
-                    });
-                    break;
-                default:
-                    this.circle(x, y, {
-                        fill: colors.light,
-                        radius: 0.35,
-                        stroke: colors.dark,
-                        strokeWidth: 0.20,
-                        opacity: opts.opacity
-                    });
-                    break;
-            }
-        }
-
-    };
-*/
     // VISUAL UTIL METHODS
     drawBar(vis, val, x, y, width, height, inner, fillStyle={}) {
-        if (!inner) inner = val;
+        if (!inner)
+            inner = val;
         const TEXT_Y = y + 0.75;
         vis.rect(x, y, width, height, this.barStyle);
         vis.rect(x, y, width * val, height, fillStyle);
@@ -360,22 +60,28 @@ const Visuals = class {
     }
 
     drawPie(vis, val, max, title, colour, center, inner) {
-        if (!inner) inner = val;
 
-        let p = 1;
-        if (max !== 0) p = val / max;
-        const r = 1; // radius
+        if (!inner)
+            inner = val;
+
+        let p = 1,
+            r = 1; // radius
+
+        if (max !== 0)
+            p = val / max;
+
         center = {x: center.x, y: center.y * r * 4.5};
         vis.circle(center, {
             radius: r + 0.1,
             fill: BLACK,
             stroke: 'rgba(255, 255, 255, 0.8)'
         });
-        const poly = [center];
-        const tau = 2 * Math.PI;
-        const surf = tau * (p + 0.1);
-        const offs = -Math.PI / 2;
-        const step = tau / 32;
+        let poly = [center],
+            tau = 2 * Math.PI,
+            surf = tau * (p + 0.1),
+            offs = -Math.PI / 2,
+            step = tau / 32;
+
         for (let i = 0; i <= surf; i += step) {
             poly.push({
                 x: center.x + Math.cos(i + offs),
@@ -389,22 +95,24 @@ const Visuals = class {
             stroke: colour,
             strokeWidth: 0.05
         });
-        vis.text(Number.isFinite(inner) ? Util.formatNumber(inner) : inner, center.x, center.y + 0.33, {
+        vis.text(Number.isFinite(inner) ? GLOBAL.util.formatNumber(inner) : inner, center.x, center.y + 0.33, {
             color: WHITE,
             font: '1 monospace',
             align: 'center',
             stroke: 'rgba(0, 0, 0, 0.8)',
             strokeWidth: 0.08
         });
-        let yoff = 0.7;
-        if (0.35 < p && p < 0.65) yoff += 0.3;
-        vis.text(title, center.x, center.y + r + yoff, {
+        let yOff = 0.7,
+            lastPol = poly[poly.length - 2];
+        if (0.35 < p && p < 0.65)
+            yOff += 0.3;
+        vis.text(title, center.x, center.y + r + yOff, {
             color: WHITE,
             font: '0.6 monospace',
             align: 'center'
         });
-        const lastpol = poly[poly.length - 2];
-        vis.text('' + Math.floor(p * 100) + '%', lastpol.x + (lastpol.x - center.x) * 0.7, lastpol.y + (lastpol.y - center.y) * 0.4 + 0.1, {
+
+        vis.text('' + Math.floor(p * 100) + '%', lastPol.x + (lastPol.x - center.x) * 0.7, lastPol.y + (lastPol.y - center.y) * 0.4 + 0.1, {
             color: WHITE,
             font: '0.4 monospace',
             align: 'center'
@@ -412,37 +120,43 @@ const Visuals = class {
     }
 
     drawLine(from, to, style) {
-        if (from instanceof RoomObject) from = from.pos;
-        if (to instanceof RoomObject) to = to.pos;
-        if (!(from instanceof RoomPosition || to instanceof RoomPosition)) throw new Error('Visuals: Point not a RoomPosition');
-        if (from.roomName !== to.roomName) return; // cannot draw lines to another room
-        const vis = new RoomVisual(from.roomName);
-        style = style instanceof Creep
-            ? this.creepPathStyle(style)
-            : (style || {});
+
+        if (from instanceof RoomObject)
+            from = from.pos;
+        if (to instanceof RoomObject)
+            to = to.pos;
+        if (!(from instanceof RoomPosition || to instanceof RoomPosition))
+            throw new Error('Visuals: Point not a RoomPosition');
+        if (from.roomName !== to.roomName)
+            return; // cannot draw lines to another room
+        let vis = new RoomVisual(from.roomName);
+        style = style instanceof Creep ? this.creepPathStyle(style) : (style || {});
         vis.line(from, to, style);
     }
 
     drawArrow (from, to, style) {
 
-        if (from instanceof RoomObject) from = from.pos;
-        if (to instanceof RoomObject) to = to.pos;
-        if (!(from instanceof RoomPosition || to instanceof RoomPosition)) throw new Error('Visuals: Point not a RoomPosition');
-        if (from.roomName !== to.roomName) return; // cannot draw lines to another room
-        const vis = new RoomVisual(from.roomName);
+        if (from instanceof RoomObject)
+            from = from.pos;
+        if (to instanceof RoomObject)
+            to = to.pos;
+        if (!(from instanceof RoomPosition || to instanceof RoomPosition))
+            throw new Error('Visuals: Point not a RoomPosition');
+        if (from.roomName !== to.roomName)
+            return; // cannot draw lines to another room
+        let vis = new RoomVisual(from.roomName);
 
-        if (VISUALS.DRAW_ARROW && ROOM_VISUALS) {
+        if (global.VISUALS.DRAW_ARROW && global.ROOM_VISUALS) {
 
             this.drawLine(from, to, style);
 
-            const delta_x = from.x - to.x;
-            const delta_y = from.y - to.y;
-            const theta_radians = Math.atan2(delta_y, delta_x);
-            const base_angle = 0.610865;
-            const length = Math.log1p(GLOBAL.util.getDistance(from, to)) * 0.5;
-            style = style instanceof Creep
-                ? this.creepPathStyle(style)
-                : (style || {});
+            let delta_x = from.x - to.x,
+                delta_y = from.y - to.y,
+                theta_radians = Math.atan2(delta_y, delta_x),
+                base_angle = 0.610865,
+                length = Math.log1p(GLOBAL.util.getDistance(from, to)) * 0.5;
+
+            style = style instanceof Creep ? this.creepPathStyle(style) : (style || {});
 
             vis.line(to.x, to.y, to.x + length * Math.cos(theta_radians + base_angle), to.y + length * Math.sin(theta_radians + base_angle), style);
             vis.line(to.x, to.y, to.x + length * Math.cos(theta_radians - base_angle), to.y + length * Math.sin(theta_radians - base_angle), style);
@@ -456,7 +170,7 @@ const Visuals = class {
                 return null;
         }
 
-        if (VISUALS.HIGHLIGHT_STRUCTURE && ROOM_VISUALS) {
+        if (global.VISUALS.HIGHLIGHT_STRUCTURE && global.ROOM_VISUALS) {
 
             let targetStructure = getStructure(to);
 
@@ -497,128 +211,129 @@ const Visuals = class {
     }
 
     run() {
-        const p = Util.startProfiling('Visuals', {enabled: PROFILING.VISUALS});
-        const visibleChecked = VISUALS.VISIBLE_ONLY;
-        const VISUAL_ROOMS = visibleChecked ? Util.getVisibleRooms() : Object.keys(Game.rooms);
+        let p = GLOBAL.util.startProfiling('Visuals', {enabled: global.PROFILING.VISUALS}),
+            visibleChecked = global.VISUALS.VISIBLE_ONLY,
+            VISUAL_ROOMS = visibleChecked ? GLOBAL.util.getVisibleRooms() : Object.keys(Game.rooms);
+
         _.forEach(VISUAL_ROOMS, roomName => {
 
             let room = Game.rooms[roomName],
-                p2 = Util.startProfiling('Visuals: ' + room.name, {enabled: PROFILING.VISUALS});
+                p2 = GLOBAL.util.startProfiling('Visuals: ' + room.name, {enabled: PROFILING.VISUALS});
 
             if (!room) return;
-            if (!ROOM_VISUALS_ALL && !room.my) return;
+            if (!global.ROOM_VISUALS_ALL && !room.my) return;
             if (!visibleChecked && !room.controller) return;
 
 
-            Util.set(Memory, 'heatmap', false);
+            GLOBAL.util.set(Memory, 'heatmap', false);
 
-            if (VISUALS.HEATMAP) {
-                if (Game.time % VISUALS.HEATMAP_INTERVAL === 0) {
+            if (global.VISUALS.HEATMAP) {
+                if (Game.time % global.VISUALS.HEATMAP_INTERVAL === 0) {
                     this.setHeatMapData(room);
-                    p2.checkCPU('Heatmap.set', PROFILING.VISUALS_LIMIT);
+                    p2.checkCPU('Heatmap.set', global.PROFILING.VISUALS_LIMIT);
                 }
 
                 if (Memory.heatmap) {
                     this.drawHeatMapData(room);
-                    p2.checkCPU('Heatmap.draw', PROFILING.VISUALS_LIMIT);
+                    p2.checkCPU('Heatmap.draw', global.PROFILING.VISUALS_LIMIT);
                     return;
                 }
             }
 
-            if (VISUALS.ROOM && !!room.controller) {
-                this.drawRoomInfo(room, VISUALS.ROOM_GLOBAL);
-                p2.checkCPU('Room Info', PROFILING.VISUALS_LIMIT);
+            if (global.VISUALS.ROOM && !!room.controller) {
+                this.drawRoomInfo(room, global.VISUALS.ROOM_GLOBAL);
+                p2.checkCPU('Room Info', global.PROFILING.VISUALS_LIMIT);
             }
-            if (VISUALS.ROOM_ORDERS) {
+            if (global.VISUALS.ROOM_ORDERS) {
                 this.drawRoomOrders(room);
-                p2.checkCPU('Room Orders', PROFILING.VISUALS_LIMIT);
+                p2.checkCPU('Room Orders', global.PROFILING.VISUALS_LIMIT);
             }
-            if (VISUALS.ROOM_OFFERS) {
+            if (global.VISUALS.ROOM_OFFERS) {
                 this.drawRoomOffers(room);
-                p2.checkCPU('Room Offers', PROFILING.VISUALS_LIMIT);
+                p2.checkCPU('Room Offers', global.PROFILING.VISUALS_LIMIT);
             }
-            if (VISUALS.CONTROLLER) {
+            if (global.VISUALS.CONTROLLER) {
                 this.drawControllerInfo(room.controller);
-                p2.checkCPU('Controller', PROFILING.VISUALS_LIMIT);
+                p2.checkCPU('Controller', global.PROFILING.VISUALS_LIMIT);
             }
-            if (VISUALS.SPAWN) {
+            if (global.VISUALS.SPAWN) {
                 room.structures.spawns.filter(s => s.spawning).forEach(spawn => this.drawSpawnInfo(spawn));
-                p2.checkCPU('Spawns', PROFILING.VISUALS_LIMIT);
+                p2.checkCPU('Spawns', global.PROFILING.VISUALS_LIMIT);
             }
-            if (VISUALS.MINERAL) {
+            if (global.VISUALS.MINERAL) {
                 let [mineral] = room.minerals;
                 if (mineral) {
                     this.drawMineralInfo(mineral);
-                    p2.checkCPU('Mineral', PROFILING.VISUALS_LIMIT);
+                    p2.checkCPU('Mineral', global.PROFILING.VISUALS_LIMIT);
                 }
             }
-            if (VISUALS.SOURCE) {
+            if (global.VISUALS.SOURCE) {
                 room.sources.forEach(source => this.drawSourceInfo(source));
-                p2.checkCPU('Sources', PROFILING.VISUALS_LIMIT);
+                p2.checkCPU('Sources', global.PROFILING.VISUALS_LIMIT);
             }
-            if (VISUALS.WALL) {
+            if (global.VISUALS.WALL) {
                 this.highlightWeakest(room, STRUCTURE_WALL);
-                p2.checkCPU('Walls', PROFILING.VISUALS_LIMIT);
+                p2.checkCPU('Walls', global.PROFILING.VISUALS_LIMIT);
             }
-            if (VISUALS.RAMPART) {
+            if (global.VISUALS.RAMPART) {
                 this.highlightWeakest(room, STRUCTURE_RAMPART);
-                p2.checkCPU('Ramparts', PROFILING.VISUALS_LIMIT);
+                p2.checkCPU('Ramparts', global.PROFILING.VISUALS_LIMIT);
             }
-            if (VISUALS.ROAD) {
+            if (global.VISUALS.ROAD) {
                 this.highlightWeakest(room, STRUCTURE_ROAD);
-                p2.checkCPU('Roads', PROFILING.VISUALS_LIMIT);
+                p2.checkCPU('Roads', global.PROFILING.VISUALS_LIMIT);
             }
-            if (VISUALS.STORAGE) {
+            if (global.VISUALS.STORAGE) {
                 this.drawStorageInfo(room.storage);
-                p2.checkCPU('Storage', PROFILING.VISUALS_LIMIT);
+                p2.checkCPU('Storage', global.PROFILING.VISUALS_LIMIT);
             }
-            if (VISUALS.TERMINAL) {
+            if (global.VISUALS.TERMINAL) {
                 this.drawTerminalInfo(room.terminal);
-                p2.checkCPU('Terminal', PROFILING.VISUALS_LIMIT);
+                p2.checkCPU('Terminal', global.PROFILING.VISUALS_LIMIT);
             }
-            if (VISUALS.TRANSACTIONS) {
+            if (global.VISUALS.TRANSACTIONS) {
                 this.drawTransactions(room);
-                p2.checkCPU('Transactions', PROFILING.VISUALS_LIMIT);
+                p2.checkCPU('Transactions', global.PROFILING.VISUALS_LIMIT);
             }
-            if (VISUALS.LABS) {
+            if (global.VISUALS.LABS) {
                 room.structures.labs.all.forEach(lab => this.drawLabInfo(lab));
-                p2.checkCPU('Labs', PROFILING.VISUALS_LIMIT);
+                p2.checkCPU('Labs', global.PROFILING.VISUALS_LIMIT);
             }
-            if (VISUALS.CREEP) {
+            if (global.VISUALS.CREEP) {
                 room.creeps.forEach(creep => this.drawCreepPath(creep));
-                p2.checkCPU('Creep Paths', PROFILING.VISUALS_LIMIT);
+                p2.checkCPU('Creep Paths', global.PROFILING.VISUALS_LIMIT);
             }
-            if (VISUALS.TOWER) {
+            if (global.VISUALS.TOWER) {
                 room.structures.towers.forEach(tower => this.drawTowerInfo(tower));
-                p2.checkCPU('Towers', PROFILING.VISUALS_LIMIT);
+                p2.checkCPU('Towers', global.PROFILING.VISUALS_LIMIT);
             }
-            if (VISUALS.CONTAINER) {
+            if (global.VISUALS.CONTAINER) {
                 room.structures.container.all.forEach(container => this.drawContainerInfo(container));
-                p2.checkCPU('Containers', PROFILING.VISUALS_LIMIT);
+                p2.checkCPU('Containers', global.PROFILING.VISUALS_LIMIT);
             }
         });
-        p.checkCPU('Total for all rooms', PROFILING.VISUALS_LIMIT);
-        if (VISUALS.ROOM_GLOBAL) {
-            if (VISUALS.CPU) {
+        p.checkCPU('Total for all rooms', global.PROFILING.VISUALS_LIMIT);
+        if (global.VISUALS.ROOM_GLOBAL) {
+            if (global.VISUALS.CPU) {
                 this.collectSparklineStats();
-                p.checkCPU('CPU Sparklines', PROFILING.VISUALS_LIMIT);
+                p.checkCPU('CPU Sparklines', global.PROFILING.VISUALS_LIMIT);
             }
             this.drawGlobal();
-            p.checkCPU('Global', PROFILING.VISUALS_LIMIT);
+            p.checkCPU('Global', global.PROFILING.VISUALS_LIMIT);
         }
     }
 
     drawGlobal() {
         const vis = this.vis;
         const bufferWidth = 1;
-        if (!VISUALS.INFO_PIE_CHART) {
+        if (!global.VISUALS.INFO_PIE_CHART) {
             const sectionWidth = 49 / 5;
             const BAR_STYLE = this.barStyle;
 
             let x = bufferWidth;
             let y = 2;
             const BAR_Y = y - 0.75;
-            if (VISUALS.ROOM) {
+            if (global.VISUALS.ROOM) {
                 // GCL
                 x = bufferWidth * 2 + sectionWidth;
                 const GCL_PERCENTAGE = Game.gcl.progress / Game.gcl.progressTotal;
@@ -694,13 +409,13 @@ const Visuals = class {
                 align: 'center'
             });
         }
-        if (VISUALS.CPU) {
+        if (global.VISUALS.CPU) {
             this.drawSparkline(undefined, 1.5, 46.5, 20, 2, _.map(Memory.visualStats.cpu, (v, i) => Memory.visualStats.cpu[i]), this.sparklineStyle);
         }
     }
 
     collectSparklineStats() {
-        Util.set(Memory, 'visualStats.cpu', []);
+        GLOBAL.util.set(Memory, 'visualStats.cpu', []);
         Memory.visualStats.cpu.push({
             limit: Game.cpu.limit,
             bucket: Game.cpu.bucket,
@@ -726,7 +441,7 @@ const Visuals = class {
         vis.text(`Room: ${vis.roomName}`, 24.5, ++y);
         // Displays bars: RCL, Room Energy
         const bufferWidth = 1;
-        if (!VISUALS.INFO_PIE_CHART) {
+        if (!global.VISUALS.INFO_PIE_CHART) {
             const sectionWidth = 49 / 5;
             const BAR_STYLE = this.barStyle;
 
@@ -753,7 +468,7 @@ const Visuals = class {
                 opacity: BAR_STYLE.opacity
             });
 
-            if (VISUALS.ROOM_GLOBAL) {
+            if (global.VISUALS.ROOM_GLOBAL) {
                 // New line
                 y += 1.5;
 
@@ -773,7 +488,7 @@ const Visuals = class {
         } else {
             let x = bufferWidth + 1;
             let y = 0.5;
-            if (VISUALS.ROOM_GLOBAL) {
+            if (global.VISUALS.ROOM_GLOBAL) {
                 x += 4;
             }
 
@@ -819,9 +534,9 @@ const Visuals = class {
         const x = mineral.pos.x + 1;
         const y = mineral.pos.y - 0.5;
         if (mineral.mineralAmount) {
-            vis.text(`Amount: ${Util.formatNumber(mineral.mineralAmount)}`, x, y, this.toolTipStyle);
+            vis.text(`Amount: ${GLOBAL.util.formatNumber(mineral.mineralAmount)}`, x, y, this.toolTipStyle);
         } else {
-            vis.text(`Regen: ${Util.formatNumber(mineral.ticksToRegeneration)}`, x, y, this.toolTipStyle);
+            vis.text(`Regen: ${GLOBAL.util.formatNumber(mineral.ticksToRegeneration)}`, x, y, this.toolTipStyle);
         }
     }
 
@@ -842,8 +557,8 @@ const Visuals = class {
         let y = controller.pos.y - 0.5;
         const style = this.toolTipStyle;
         let line0 = `L: ${controller.level}`;
-        let line1 = `P: ${Util.formatNumber(controller.progress)}/${Util.formatNumber(controller.progressTotal)} (${(controller.progress / controller.progressTotal * 100).toFixed(2)}%)`;
-        let line2 = `D: ${Util.formatNumber(controller.ticksToDowngrade)}`;
+        let line1 = `P: ${GLOBAL.util.formatNumber(controller.progress)}/${GLOBAL.util.formatNumber(controller.progressTotal)} (${(controller.progress / controller.progressTotal * 100).toFixed(2)}%)`;
+        let line2 = `D: ${GLOBAL.util.formatNumber(controller.ticksToDowngrade)}`;
         if (controller.level === 8) {
             line1 = undefined;
         } else if (controller.reservation) {
@@ -871,17 +586,17 @@ const Visuals = class {
             let y = weakest.pos.y - 0.5; // base y pos - consistent with spawns, labs, and controllers
             const look = weakest.pos.lookFor(LOOK_STRUCTURES);
             const towers = _.find(look, o => o instanceof StructureTower);
-            if (towers && VISUALS.TOWER) {
+            if (towers && global.VISUALS.TOWER) {
                 y += 0.4;
             } else {
                 const spawns = _.find(look, o => o instanceof StructureSpawn && o.spawning);
-                if (spawns && VISUALS.SPAWN) {
+                if (spawns && global.VISUALS.SPAWN) {
                     // if structure shares a position with a spawn (road, rampart), lower to next line
                     // spawn must be spawning, and spawn visuals must be enabled
                     y += 0.4;
                 } else {
                     const labs = _.find(look, o => o instanceof StructureLab);
-                    if (labs && VISUALS.LABS) {
+                    if (labs && global.VISUALS.LABS) {
                         // same as spawns, move the weakest structure text until it's on its own line
                         if (labs.energy) y += 0.4;
                         if (labs.mineralAmount) y += 0.4;
@@ -889,49 +604,49 @@ const Visuals = class {
                     }
                 }
             }
-            vis.text(`H: ${Util.formatNumber(weakest.hits)} (${(weakest.hits / weakest.hitsMax * 100).toFixed(2)}%)`, weakest.pos.x + 1, y, this.toolTipStyle);
+            vis.text(`H: ${GLOBAL.util.formatNumber(weakest.hits)} (${(weakest.hits / weakest.hitsMax * 100).toFixed(2)}%)`, weakest.pos.x + 1, y, this.toolTipStyle);
         }
     }
 
     drawRoomOrders(room) {
         const vis = new RoomVisual(room.name);
         const x = 43;
-        let y = VISUALS.INFO_PIE_CHART ? 0.5 : 4.5;
+        let y = global.VISUALS.INFO_PIE_CHART ? 0.5 : 4.5;
         if (!room.memory.resources || !room.memory.resources.orders || !_.size(room.memory.resources.orders)) {
             return;
         }
 
-        if (VISUALS.STORAGE && room.storage) {
+        if (global.VISUALS.STORAGE && room.storage) {
             y += 2 + _.size(room.storage.store) * 0.6;
         }
-        if (VISUALS.TERMINAL && room.terminal) {
+        if (global.VISUALS.TERMINAL && room.terminal) {
             y += 2 + _.size(room.terminal.store) * 0.6;
         }
         vis.text('Room Orders', x, ++y, {align: 'left'});
         for (let order of room.memory.resources.orders) {
-            vis.text(`${order.type}: ${Util.formatNumber(order.amount)}`, x, y += 0.6, Object.assign({color: getResourceColour(order.type)}, this.toolTipStyle));
+            vis.text(`${order.type}: ${GLOBAL.util.formatNumber(order.amount)}`, x, y += 0.6, Object.assign({color: getResourceColour(order.type)}, this.toolTipStyle));
         }
     }
 
     drawRoomOffers(room) {
         const vis = new RoomVisual(room.name);
         const x = 43;
-        let y = VISUALS.INFO_PIE_CHART ? 0.5 : 4.5;
+        let y = global.VISUALS.INFO_PIE_CHART ? 0.5 : 4.5;
         if (!room.memory.resources || !room.memory.resources.offers || !_.size(room.memory.resources.offers)) {
             return;
         }
-        if (VISUALS.STORAGE && room.storage) {
+        if (global.VISUALS.STORAGE && room.storage) {
             y += 2 + _.size(room.storage.store) * 0.6;
         }
-        if (VISUALS.TERMINAL && room.terminal) {
+        if (global.VISUALS.TERMINAL && room.terminal) {
             y += 2 + _.size(room.terminal.store) * 0.6;
         }
-        if (VISUALS.ROOM_ORDERS && room.memory.resources.orders) {
+        if (global.VISUALS.ROOM_ORDERS && room.memory.resources.orders) {
             y += 2 + _.size(room.memory.resources.orders) * 0.6;
         }
         vis.text('Room Offerings', x, ++y, {align: 'left'});
         for (let offer of room.memory.resources.offers) {
-            vis.text(`${offer.type}: ${Util.formatNumber(offer.amount)} (to ${offer.room})`, x, y += 0.6, Object.assign({color: getResourceColour(offer.type)}, this.toolTipStyle));
+            vis.text(`${offer.type}: ${GLOBAL.util.formatNumber(offer.amount)} (to ${offer.room})`, x, y += 0.6, Object.assign({color: getResourceColour(offer.type)}, this.toolTipStyle));
         }
     }
 
@@ -939,7 +654,7 @@ const Visuals = class {
         if (!storage || !_.size(storage.store)) return;
         const vis = new RoomVisual(storage.room.name);
         const x = 43;
-        let y = VISUALS.INFO_PIE_CHART ? 0.5 : 4.5;
+        let y = global.VISUALS.INFO_PIE_CHART ? 0.5 : 4.5;
         vis.text('Storage Contents', x, ++y, {align: 'left'});
         storageObject(vis, storage.store, x, y);
     }
@@ -948,8 +663,8 @@ const Visuals = class {
         if (!terminal || !_.size(terminal.store)) return;
         const vis = new RoomVisual(terminal.room.name);
         const x = 43;
-        let y = VISUALS.INFO_PIE_CHART ? 0.5 : 4.5;
-        if (VISUALS.STORAGE && terminal.room.storage) {
+        let y = global.VISUALS.INFO_PIE_CHART ? 0.5 : 4.5;
+        if (global.VISUALS.STORAGE && terminal.room.storage) {
             y += 2 + _.size(terminal.room.storage.store) * 0.6;
         }
         vis.text('Terminal Contents', x, ++y, {align: 'left'});
@@ -997,10 +712,10 @@ const Visuals = class {
         const x = lab.pos.x + 0.8;
         let y = lab.pos.y - 0.5;
         if (lab.energy) {
-            vis.text(`E: ${Util.formatNumber(lab.energy)}`, x, y, Object.assign({color: getResourceColour(RESOURCE_ENERGY)}, this.toolTipStyle));
+            vis.text(`E: ${GLOBAL.util.formatNumber(lab.energy)}`, x, y, Object.assign({color: getResourceColour(RESOURCE_ENERGY)}, this.toolTipStyle));
         }
         if (lab.mineralAmount) {
-            vis.text(`M: ${lab.mineralType} (${Util.formatNumber(lab.mineralAmount)})`, x, y += 0.4, Object.assign({color: getResourceColour(lab.mineralType)}, this.toolTipStyle));
+            vis.text(`M: ${lab.mineralType} (${GLOBAL.util.formatNumber(lab.mineralAmount)})`, x, y += 0.4, Object.assign({color: getResourceColour(lab.mineralType)}, this.toolTipStyle));
         }
         if (lab.cooldown) {
             vis.text(`C: ${lab.cooldown}`, x, y += 0.4, Object.assign({color: RED}, this.toolTipStyle));
@@ -1008,12 +723,13 @@ const Visuals = class {
     }
 
     setHeatMapData(room) {
-        Util.set(room.memory, 'heatmap', () => {
+        GLOBAL.util.set(room.memory, 'heatmap', () => {
             const r = {};
             for (let x = 0; x < 50; x++) {
                 for (let y = 0; y < 50; y++) {
-                    const pos = room.getPositionAt(x, y);
-                    if (Game.map.getTerrainAt(pos) === 'wall') continue;
+                    let terrain = Game.map.getRoomTerrain(room.name);
+                    if (terrain.get(x, y) === TERRAIN_MASK_WALL)
+                        continue;
                     const key = `${String.fromCharCode(32 + x)}${String.fromCharCode(32 + y)}_x${x}-y${y}`;
                     r[key] = 0;
                 }
@@ -1060,7 +776,7 @@ const Visuals = class {
             return c;
         }
 
-        Util.set(creep.data, 'pathColour', randomColour);
+        GLOBAL.util.set(creep.data, 'pathColour', randomColour);
 
         return {
             width: 0.15,

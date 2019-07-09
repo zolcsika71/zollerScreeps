@@ -27,8 +27,6 @@ function wrapLoop(fn) {
     };
 }
 
-
-
 let //_ = require('lodash'),
     cpuAtLoad = Game.cpu.getUsed(),
     CREEP = {},
@@ -42,7 +40,7 @@ let //_ = require('lodash'),
         structures: require('./properties.structures'),
         flag: require('./properties.flag'),
         room: require('./properties.room'),
-        lab: require('./properties.lab'),
+        lab: require('./properties.lab')
     },
     PROTOTYPES = {
         structures: require('./prototypes.structures'),
@@ -83,7 +81,6 @@ let inject = (base, alien, namespace) => {
 },
     cpuAtFirstLoop;
 
-
 _.assign(GLOBAL, {
     global: require('./global.global'),
     parameter: require(`./global.parameter`)
@@ -97,7 +94,6 @@ _.assign(ROOT, {
     mainInjection: require(`./mainInjection`),
     initMemory: require('./initMemory')
 });
-
 
 // Load modules
 GLOBAL.util = require(`./global.util`);
@@ -139,7 +135,6 @@ Creep.Behaviour = require('./creep.behaviour.Behaviour');
 Creep.Setup = require('./creep.setup.Setup');
 
 _.assign(CREEP, {
-
     action: {
         mining: require('./creep.action.mining'),
         recycling: require('./creep.action.recycling'),
@@ -163,8 +158,10 @@ _.assign(CREEP, {
     },
     behaviour: {
         miner: require('./creep.behaviour.miner'),
+        ranger: require('./creep.behaviour.ranger'),
         worker: require('./creep.behaviour.worker'),
         upgrader: require('./creep.behaviour.upgrader')
+
     },
     setup: {
         miner: require('./creep.setup.miner'),
@@ -173,7 +170,6 @@ _.assign(CREEP, {
     },
     creep: require('./creep.creep')
 });
-
 
 _.assign(Creep, {
     action: {
@@ -199,6 +195,7 @@ _.assign(Creep, {
     },
     behaviour: {
         miner: CREEP.behaviour.miner,
+        ranger: CREEP.behaviour.ranger,
         worker: CREEP.behaviour.worker,
         upgrader: CREEP.behaviour.upgrader
 
@@ -212,9 +209,15 @@ _.assign(Creep, {
 });
 
 inject(Creep, CREEP.creep);
+inject(Creep, PROTOTYPES.creep);
+inject(Creep, PROPERTIES.creep);
 
 ROOM.room = require('./room.room');
 inject(Room, ROOM.room);
+inject(Room, PROPERTIES.room);
+inject(Room, PROTOTYPES.room);
+inject(Room, PROTOTYPES.compounds);
+
 
 
 
@@ -225,7 +228,6 @@ _.assign(ROOM, {
     spawn: require('./room.spawn'),
     extension: require('./room.extension'),
     lab: require('./room.lab')
-
 
 });
 
@@ -238,12 +240,12 @@ _.assign(Room, {
         extension: ROOM.extension,
         lab: ROOM.lab
 
-
     }
 });
 
 ROOT.spawn = require('./spawn');
 inject(Spawn, ROOT.spawn);
+inject(Spawn, PROTOTYPES.spawn);
 
 // plus line!!
 ROOT.initMemory.init();
@@ -261,6 +263,7 @@ if (ROOT.mainInjection.extend)
     ROOT.mainInjection.extend();
 
 ROOT.ocsMemory.activateSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, true);
+
 //let Traveler = require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
 require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
 
@@ -319,8 +322,10 @@ module.exports.loop = wrapLoop(function () {
             return;
         }
         p.checkCPU('flagDir.analyze', global.PROFILING.ANALYZE_LIMIT);
+
         ROOM.room.analyze();
         p.checkCPU('Room.analyze', global.PROFILING.ANALYZE_LIMIT);
+
         ROOT.population.analyze();
         p.checkCPU('Population.analyze', global.PROFILING.ANALYZE_LIMIT);
 
@@ -392,7 +397,7 @@ module.exports.loop = wrapLoop(function () {
     }
     catch (e) {
         console.log(`ERROR ;)`);
-        console.log(e.message, e.stack);
+        GLOBAL.util.logError(e.stack || e.message);
     }
 
 });

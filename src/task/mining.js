@@ -467,3 +467,12 @@ mod.strategies = {
         }
     }
 };
+mod.creep = {
+    SKMiner: {
+        fixedBody: [MOVE, WORK, WORK, WORK, WORK, WORK],
+        multiBody: [MOVE, MOVE, WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, CARRY],
+        maxMulti: 1,
+        behaviour: 'remoteMiner',
+        queue: 'Medium' // not much point in hauling or working without a miner, and they're a cheap spawn.
+    }
+};

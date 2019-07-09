@@ -3,8 +3,7 @@ const
         global: require('./global.global'),
         parameter: require(`./global.parameter`),
         util: require(`./global.util`)
-    },
-    strategy = require('./strategy');
+    };
 
 let mod = {};
 module.exports = mod;
@@ -21,7 +20,6 @@ mod.execute = function () {
     };
     _.forEach(Game.creeps, run);
 };
-
 mod.bodyCosts = function (body) {
     let costs = 0;
     if (body) {
@@ -32,6 +30,8 @@ mod.bodyCosts = function (body) {
     return costs;
 };
 
+// params: {minThreat, minWeight, maxWeight, minMulti, maxMulti}
+// calculates the multi that is above the smallest minimum, and below the largest maximum based on parameters
 mod.multi = function (room, params = {}) {
     let minMulti = params.minMulti || 0,
         fixedCosts = Creep.bodyCosts(params.fixedBody),
@@ -69,14 +69,12 @@ mod.multi = function (room, params = {}) {
     // ensure this won't result in more than 50 parts
     return _.min([maxPartsMulti, min]);
 };
-
 mod.partsComparator = function (a, b) {
     let partsOrder = [TOUGH, CLAIM, WORK, CARRY, ATTACK, RANGED_ATTACK, HEAL, MOVE];
     let indexOfA = partsOrder.indexOf(a);
     let indexOfB = partsOrder.indexOf(b);
     return indexOfA - indexOfB;
 };
-
 mod.formatParts = function (parts) {
     if (parts && !Array.isArray(parts) && typeof parts === 'object') {
         let body = [];
@@ -89,13 +87,11 @@ mod.formatParts = function (parts) {
     }
     return parts;
 };
-
 mod.formatBody = function (fixedBody, multiBody) {
     fixedBody = mod.formatParts(fixedBody);
     multiBody = mod.formatParts(multiBody);
     return {fixedBody, multiBody};
 };
-
 mod.compileBody = function (room, params, sort = true) {
     const {fixedBody, multiBody} = Creep.formatBody(params.fixedBody || [], params.multiBody || []);
     _.assign(params, {fixedBody, multiBody});
@@ -119,28 +115,14 @@ mod.compileBody = function (room, params, sort = true) {
     }
     return parts;
 };
-
-mod.partThreat = {
-    'move': { common: 0, boosted: 0 },
-    'work': { common: 1, boosted: 3 },
-    'carry': { common: 0, boosted: 0 },
-    'attack': { common: 2, boosted: 5 },
-    'ranged_attack': { common: 2, boosted: 5 },
-    'heal': { common: 4, boosted: 10 },
-    'claim': { common: 1, boosted: 3 },
-    'tough': { common: 1, boosted: 3 },
-    tower: 25
-};
-
 mod.bodyThreat = function (body) {
     let threat = 0;
     let evaluatePart = part => {
-        threat += mod.partThreat[part.type ? part.type : part][part.boost ? 'boosted' : 'common'];
+        threat += global.PART_THREAT[part.type ? part.type : part][part.boost ? 'boosted' : 'common'];
     };
     if (body) body.forEach(evaluatePart);
     return threat;
 };
-
 mod.register = function () {
     for (const action in Creep.action) {
         if (Creep.action[action].register) Creep.action[action].register(this);

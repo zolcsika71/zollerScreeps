@@ -4,7 +4,6 @@ let mod = {};
 module.exports = mod;
 mod.extend = function () {
 
-
     RoomPosition.prototype.findClosestByPathFinder = function (goals, itr=_.identity) {
         let mapping = _.map(goals, itr);
         if (_.isEmpty(mapping))
@@ -29,9 +28,23 @@ mod.extend = function () {
             incomplete: result.incomplete
         }
     };
-
     RoomPosition.prototype.findClosestSpawn = function() {
         return this.findClosestByPathFinder(Game.spawns, (spawn) => ({pos: spawn.pos, range: 1})).goal;
+    };
+    // from room.leaveBorder
+    RoomPosition.prototype.fromDirection = function (direction) {
+        const
+            DIRECTIONS = {
+                1: [0, -1],
+                2: [1, -1],
+                3: [1, 0],
+                4: [1, 1],
+                5: [0, 1],
+                6: [-1, 1],
+                7: [-1, 0],
+                8: [-1, -1]
+            };
+        return new RoomPosition(this.x + DIRECTIONS[direction][0], this.y + DIRECTIONS[direction][1], this.roomName)
     };
 
 };
