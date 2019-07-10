@@ -126,7 +126,7 @@ _.assign(TASK, {
 });
 
 // TASK assign
-_.assign(TASK.task, {
+_.assign(Task, {
     mining: TASK.mining,
     reputation: TASK.reputation,
     defense: TASK.defense

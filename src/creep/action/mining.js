@@ -1,5 +1,10 @@
 "use strict";
 
+const
+    GLOBAL = {
+        util: require(`./global.util`)
+    };
+
 let action = new Creep.Action('mining');
 module.exports = action;
 action.renewTarget = true;
@@ -90,7 +95,7 @@ action.determineSpot = function (creep, source) {
                 }
             }
             if (global.MINERS_AUTO_BUILD && !source.container) {
-                const sites = _.filter(source.pos.findInRange(FIND_CONSTRUCTION_SITES, 2), s => s.structureType === STRUCTURE_CONTAINER);
+                let sites = _.filter(source.pos.findInRange(FIND_CONSTRUCTION_SITES, 2), s => s.structureType === STRUCTURE_CONTAINER);
                 if (!sites.length && source.room) {
                     source.room.createConstructionSite(spot, STRUCTURE_CONTAINER);
                 }

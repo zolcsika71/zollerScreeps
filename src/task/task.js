@@ -6,8 +6,8 @@ const
     },
     TASK = {
         //task: require('./task.task'),
-        mining: require('./task.mining'),
-        reputation: require('./task.reputation')
+        //mining: require('./task.mining'),
+        //reputation: require('./task.reputation')
     };
 
 let mod = {},
@@ -26,9 +26,9 @@ mod.populate = function () {
         //Task.defense,
         //Task.guard,
         //Task.labTech,
-        TASK.mining,
+        Task.mining,
         //Task.pioneer,
-        TASK.reputation
+        Task.reputation
         //Task.reserve,
         //Task.robbing,
         //Task.safeGen,
@@ -92,7 +92,7 @@ mod.execute = function () {
     });
 };
 mod.memory = (task, s) => { // task:  (string) name of the task, s: (string) any selector for that task, could be room name, flag name, enemy name
-    const memory = Util.get(Memory, ['tasks', task, s], {});
+    let memory = GLOBAL.util.get(Memory, ['tasks', task, s], {});
     // temporary migration, remove if in dev
     delete memory.queuedValid;
     delete memory.runningValid;
@@ -339,7 +339,7 @@ mod.validateRunning = function (memory, flag, task, options = {}) {
         running.forEach(_validateRunning);
         _.set(memory, subKey, validated);
         if (minRemaining) {
-            nextCheck = Game.time + Math.min(TASK_CREEP_CHECK_INTERVAL, minRemaining); // check running at least every 250 ticks
+            nextCheck = Game.time + Math.min(global.TASK_CREEP_CHECK_INTERVAL, minRemaining); // check running at least every 250 ticks
             GLOBAL.util.set(memory, checkPath, nextCheck, false);
         } else {
             if (options.subKey && memory.nextRunningCheck)
@@ -371,7 +371,7 @@ mod.nextCreepCheck = function (flag, task) {
         return false;
     } else {
         // set default, we will get a better nextCheck if it exists because we return true
-        _.set(flag.memory, ['nextCheck', task], Game.time + TASK_CREEP_CHECK_INTERVAL);
+        _.set(flag.memory, ['nextCheck', task], Game.time + global.TASK_CREEP_CHECK_INTERVAL);
         return true;
     }
 };
