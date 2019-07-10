@@ -224,6 +224,7 @@ inject(Room, PROTOTYPES.compounds);
 
 
 _.assign(ROOM, {
+    construction: require('./room.construction'),
     container: require('./room.container'),
     defense: require('./room.defense'),
     link: require('./room.link'),
@@ -235,6 +236,7 @@ _.assign(ROOM, {
 
 _.assign(Room, {
     _ext: {
+        construction: ROOM.construction,
         containers: ROOM.container,
         defense: ROOM.defense,
         links: ROOM.link,

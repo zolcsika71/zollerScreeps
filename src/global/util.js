@@ -372,3 +372,23 @@ mod.startProfiling = function (name, options = {enabled: false, startCPU: undefi
 mod.getDistance = function (point1, point2) {
     return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
 };
+
+/**
+ * Gets the distances between two rooms, respecting natural walls
+ * @param {string} fromRoom - Starting room
+ * @param {string} toRoom - Ending room
+ * @returns {Number}
+ */
+mod.routeRange = function (fromRoom, toRoom) {
+    if (fromRoom === toRoom) return 0;
+
+    return mod.get(Memory, `routeRange.${fromRoom}.${toRoom}`, function() {
+        const room = fromRoom instanceof Room ? fromRoom : Game.rooms[fromRoom];
+        if (!room) return Room.roomDistance(fromRoom, toRoom, false);
+
+        const route = room.findRoute(toRoom, false, false);
+        if (!route) return Room.roomDistance(fromRoom, toRoom, false);
+
+        return route === ERR_NO_PATH ? Infinity : route.length;
+    });
+};

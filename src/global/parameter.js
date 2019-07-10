@@ -81,6 +81,8 @@ let mod = {
         DRAW_ARROW: true, // draw arrow to the target
         HIGHLIGHT_STRUCTURE: true // highlight target structure
     },
+    SEMI_AUTOMATIC_CONSTRUCTION: true, // enables semi-automatic construction. Will construct based on flags.
+    REMOVE_CONSTRUCTION_FLAG: true, // if false, flag will remain. This is good if a structure decays, it can rebuild
 
     REMOTE_HAULER: {
         ALLOW_OVER_CAPACITY: 2450, // Hauler capacity rounds up by MIN_WEIGHT, or this number value.

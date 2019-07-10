@@ -20,7 +20,6 @@ mod.flagFilter = function (flagColour) {
     }
     return filter;
 };
-
 mod.findName = function (flagColor, pos, local=true, mod, modArgs) {
     let list = this.list;
     if (!flagColor || list.length === 0)
@@ -82,7 +81,92 @@ mod.find = function (flagColor, pos, local=true, mod, modArgs) {
         return null;
     return Game.flags[id];
 };
+mod.removeFromDir = function(name){
+    let index = this.list.indexOf(f => f.name === name );
+    if( index > -1 )
+        this.list = this.list.splice(index, 1);
+};
+mod.count = function(flagColor, pos, local=true) {
+    let list = this.list;
+    if (!flagColor || this.list.length === 0) return 0;
 
+    if (pos instanceof Room) pos = pos.getPositionAt(25, 25);
+    let filter = this.flagFilter(flagColor);
+    if (local && pos && pos.roomName) {
+        const room = Game.flags[pos.roomName];
+        if (room) {
+            list = room.flags;
+        } else {
+            _.assign(filter, {roomName: pos.roomName});
+        }
+    }
+    return _.countBy(list, filter).true || 0;
+};
+mod.filter = function(flagColor, pos, local=true){
+    if (!flagColor || this.list.length === 0) return [];
+    let list = this.list;
+    let filter;
+    if (pos instanceof Room) pos = pos.getPositionAt(25, 25);
+    if (Array.isArray(flagColor)) {
+        filter = entry => {
+            if (local && pos && pos.roomName && entry.roomName !== pos.roomName)
+                return false;
+            for (let i = 0; i < flagColor.length; i++) {
+                if (Flag.compare(flagColor[i], entry)) return true;
+            }
+            return false;
+        };
+    } else {
+        filter = this.flagFilter(flagColor);
+        if (local && pos && pos.roomName) {
+            const room = Game.rooms[pos.roomName];
+            if (room) {
+                list = room.flags;
+            } else {
+                _.assign(filter, {'roomName': pos.roomName});
+            }
+        }
+    }
+    return _.filter(list, filter);
+};
+mod.filterCustom = function(filter) {
+    if (!filter || this.list.length === 0)
+        return [];
+    return _.filter(this.list, filter);
+};
+mod.rangeMod = function(range, flagItem, args){
+    let rangeModPerCrowd = args && args.rangeModPerCrowd ? args.rangeModPerCrowd : 20;
+    let rangeModByType = args ? args.rangeModByType : null;
+    var flag = Game.flags[flagItem.name];
+    let crowd;
+    if( flag.targetOf ){ // flag is targetted
+        if( rangeModByType ) { // count defined creep type only
+            let count = _.countBy(flag.targetOf, 'creepType')[rangeModByType];
+            crowd = count || 0;
+        } else // count all creeps
+            crowd = flag.targetOf.length;
+    } else crowd = 0; // not targetted
+    return range + ( crowd * rangeModPerCrowd );
+};
+mod.exploitMod = function(range, flagItem, creepName){
+    if( range > 100 ) return Infinity;
+    var flag = Game.flags[flagItem.name];
+    if( flag.room ) {
+        if( flag.room.my ) {
+            return Infinity;
+        }
+        let assigned = flag.targetOf ? _.sum( flag.targetOf.map( t => t.creepType != 'privateer' || t.creepName == creepName ? 0 : t.carryCapacityLeft)) : 0;
+        if( flag.room.sourceEnergyAvailable <= assigned ) return Infinity;
+        return (range*range) / (flag.room.sourceEnergyAvailable - assigned);
+    }
+    return range;
+};
+mod.hasInvasionFlag = function(){
+    if( _.isUndefined(this._hasInvasionFlag) ) {
+        this._hasInvasionFlag = (this.findName(FLAG_COLOR.invade) != null) || (this.findName(FLAG_COLOR.destroy) != null);
+    }
+    return this._hasInvasionFlag;
+};
 mod.flush = function () {
     let clear = flag => delete flag.targetOf;
     _.forEach(Game.flags, clear);

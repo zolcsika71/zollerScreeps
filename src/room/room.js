@@ -67,7 +67,6 @@ mod.needMemoryResync = function (room) {
     }
     return Game.time % global.MEMORY_RESYNC_INTERVAL === 0 || room.name === 'sim';
 };
-
 mod.analyze = function () {
     const p = GLOBAL.util.startProfiling('Room.analyze', {enabled: global.PROFILING.ROOMS});
     // run analyze in each of our submodules
@@ -199,47 +198,19 @@ mod.routeCallback = function (origin, destination, options) {
         return Number.POSITIVE_INFINITY;
     };
 };
-mod.rebuildCostMatrix = function (roomName) {
-    if (global.DEBUG)
-        GLOBAL.util.logSystem(roomName, 'Invalidating costmatrix to force a rebuild when we have vision.');
-    _.set(Room, ['pathfinderCache', roomName, 'stale'], true);
-    _.set(Room, ['pathfinderCache', roomName, 'updated'], Game.time);
-    Room.pathfinderCacheDirty = true;
+mod.getCostMatrix = function (roomName) {
+    var room = Game.rooms[roomName];
+    if (!room) return;
+    return room.costMatrix;
 };
-mod.loadCostMatrixCache = function (cache) {
-    let count = 0;
-    for (const key in cache) {
-        if (!mod.pathfinderCache[key] || mod.pathfinderCache[key].updated < cache[key].updated) {
-            count++;
-            mod.pathfinderCache[key] = cache[key];
-        }
-    }
-    if (global.DEBUG && count > 0)
-        global.logSystem('RawMemory', 'loading pathfinder cache.. updated ' + count + ' stale entries.');
-    mod.pathfinderCacheLoaded = true;
+mod.isMine = function (roomName) {
+    let room = Game.rooms[roomName];
+    return (room && room.my);
 };
-
-mod.validFields = function (roomName, minX, maxX, minY, maxY, checkWalkable = false, where = null) {
-    const
-        room = Game.rooms[roomName],
-        look = checkWalkable ? room.lookAtArea(minY, minX, maxY, maxX) : null;
-
-    let fields = [];
-
-    for (let x = minX; x <= maxX; x++) {
-        for (let y = minY; y <= maxY; y++) {
-            if (x >= 1 && x <= 48 && y >= 1 && y <= 48) {
-                if (!checkWalkable || room.isWalkable(x, y, look)) {
-                    let p = new RoomPosition(x, y, roomName);
-                    if (!where || where(p))
-                        fields.push(p);
-                }
-            }
-        }
-    }
-    return fields;
+mod.calcCardinalDirection = function (roomName) {
+    const parsed = /^([WE])[0-9]+([NS])[0-9]+$/.exec(roomName);
+    return [parsed[1], parsed[2]];
 };
-
 mod.calcGlobalCoordinates = function (roomName, callBack) {
     if (!callBack) return null;
     const parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
@@ -284,7 +255,65 @@ mod.isHighwayRoom = function (roomName) {
         return x === 0 || y === 0;
     });
 };
-
+mod.adjacentRooms = function (roomName) {
+    let parts = roomName.split(/([NESW])/);
+    let dirs = ['N','E','S','W'];
+    let toggle = q => dirs[ (dirs.indexOf(q) + 2) % 4 ];
+    let names = [];
+    for (let x = parseInt(parts[2]) - 1; x < parseInt(parts[2]) + 2; x++) {
+        for (let y = parseInt(parts[4]) - 1; y < parseInt(parts[4]) + 2; y++) {
+            names.push((x < 0 ? toggle(parts[1]) + '0' : parts[1] + x) + (y < 0 ? toggle(parts[3]) + '0' : parts[3] + y));
+        }
+    }
+    return names;
+};
+mod.adjacentAccessibleRooms = function (roomName, diagonal = true) {
+    let validRooms = [];
+    let exits = Game.map.describeExits(roomName);
+    let addValidRooms = (roomName, direction) => {
+        if (diagonal) {
+            let roomExits = Game.map.describeExits(roomName);
+            let dirA = (direction + 1) % 8 + 1;
+            let dirB = (direction + 5) % 8 + 1;
+            if (roomExits && roomExits[dirA] && !validRooms.includes(roomExits[dirA]))
+                validRooms.push(roomExits[dirA]);
+            if (roomExits && roomExits[dirB] && !validRooms.includes(roomExits[dirB]))
+                validRooms.push(roomExits[dirB]);
+        }
+        validRooms.push(roomName);
+    };
+    _.forEach(exits, addValidRooms);
+    return validRooms;
+};
+mod.roomDistance = function (roomName1, roomName2, diagonal, continuous) {
+    if (diagonal) return Game.map.getRoomLinearDistance(roomName1, roomName2, continuous);
+    if (roomName1 == roomName2) return 0;
+    let posA = roomName1.split(/([NESW])/);
+    let posB = roomName2.split(/([NESW])/);
+    let xDif = posA[1] == posB[1] ? Math.abs(posA[2] - posB[2]) : posA[2] + posB[2] + 1;
+    let yDif = posA[3] == posB[3] ? Math.abs(posA[4] - posB[4]) : posA[4] + posB[4] + 1;
+    //if( diagonal ) return Math.max(xDif, yDif); // count diagonal as 1
+    return xDif + yDif; // count diagonal as 2
+};
+mod.rebuildCostMatrix = function (roomName) {
+    if (global.DEBUG)
+        GLOBAL.util.logSystem(roomName, 'Invalidating costmatrix to force a rebuild when we have vision.');
+    _.set(Room, ['pathfinderCache', roomName, 'stale'], true);
+    _.set(Room, ['pathfinderCache', roomName, 'updated'], Game.time);
+    Room.pathfinderCacheDirty = true;
+};
+mod.loadCostMatrixCache = function (cache) {
+    let count = 0;
+    for (const key in cache) {
+        if (!mod.pathfinderCache[key] || mod.pathfinderCache[key].updated < cache[key].updated) {
+            count++;
+            mod.pathfinderCache[key] = cache[key];
+        }
+    }
+    if (global.DEBUG && count > 0)
+        global.logSystem('RawMemory', 'loading pathfinder cache.. updated ' + count + ' stale entries.');
+    mod.pathfinderCacheLoaded = true;
+};
 mod.getCachedStructureMatrix = function (roomName) {
     const cacheValid = (roomName) => {
         if (_.isUndefined(Room.pathfinderCache)) {
@@ -335,7 +364,37 @@ mod.getStructureMatrix = function (roomName, options) {
 
     return matrix;
 };
+mod.validFields = function (roomName, minX, maxX, minY, maxY, checkWalkable = false, where = null) {
+    const
+        room = Game.rooms[roomName],
+        look = checkWalkable ? room.lookAtArea(minY, minX, maxY, maxX) : null;
 
+    let fields = [];
+
+    for (let x = minX; x <= maxX; x++) {
+        for (let y = minY; y <= maxY; y++) {
+            if (x >= 1 && x <= 48 && y >= 1 && y <= 48) {
+                if (!checkWalkable || room.isWalkable(x, y, look)) {
+                    let p = new RoomPosition(x, y, roomName);
+                    if (!where || where(p))
+                        fields.push(p);
+                }
+            }
+        }
+    }
+    return fields;
+};
+mod.fieldsInRange = function (args) {
+    let plusRangeX = args.spots.map(spot => spot.pos.x + spot.range);
+    let plusRangeY = args.spots.map(spot => spot.pos.y + spot.range);
+    let minusRangeX = args.spots.map(spot => spot.pos.x - spot.range);
+    let minusRangeY = args.spots.map(spot => spot.pos.y - spot.range);
+    let minX = Math.max(...minusRangeX);
+    let maxX = Math.min(...plusRangeX);
+    let minY = Math.max(...minusRangeY);
+    let maxY = Math.min(...plusRangeY);
+    return Room.validFields(args.roomName, minX, maxX, minY, maxY, args.checkWalkable, args.where);
+};
 mod.shouldRepair = function (room, structure) {
     return (
         // is not at 100%
@@ -351,25 +410,12 @@ mod.shouldRepair = function (room, structure) {
     );
 };
 
-mod.fieldsInRange = function (args) {
-    let plusRangeX = args.spots.map(spot => spot.pos.x + spot.range);
-    let plusRangeY = args.spots.map(spot => spot.pos.y + spot.range);
-    let minusRangeX = args.spots.map(spot => spot.pos.x - spot.range);
-    let minusRangeY = args.spots.map(spot => spot.pos.y - spot.range);
-    let minX = Math.max(...minusRangeX);
-    let maxX = Math.min(...plusRangeX);
-    let minY = Math.max(...minusRangeY);
-    let maxY = Math.min(...plusRangeY);
-    return Room.validFields(args.roomName, minX, maxX, minY, maxY, args.checkWalkable, args.where);
-};
-
-
 // from room.spawn
+
 mod.bestSpawnRoomFor = function (targetRoomName) {
     var range = room => room.my ? routeRange(room.name, targetRoomName) : Infinity;
     return _.min(Game.rooms, range);
 };
-
 // find a room to spawn
 // params: { targetRoom, minRCL = 0, maxRange = Infinity, minEnergyAvailable = 0, minEnergyCapacity = 0, callBack = null, allowTargetRoom = false, rangeRclRatio = 3, rangeQueueRatio = 51 }
 // requiredParams: targetRoom
@@ -399,96 +445,13 @@ mod.findSpawnRoom = function (params) {
     return _.min(validRooms, evaluation);
 };
 
-mod.Containers = function (room) {
-    this.room = room;
-    Object.defineProperties(this, {
-        'all': {
-            configurable: true,
-            get: function () {
-                if (_.isUndefined(this._container)) {
-                    this._container = [];
-                    let add = entry => {
-                        let cont = Game.getObjectById(entry.id);
-                        if (cont) {
-                            _.assign(cont, entry);
-                            this._container.push(cont);
-                        }
-                    };
-                    _.forEach(this.room.memory.container, add);
-                }
-                return this._container;
-            }
-        },
-        'controller': {
-            configurable: true,
-            get: function () {
-                if (_.isUndefined(this._controller)) {
-                    if (this.room.my && this.room.controller.memory.storage) {
-                        this._controller = [Game.getObjectById(this.room.controller.memory.storage)];
-                        if (!this._controller[0]) delete this.room.controller.memory.storage;
-                    } else {
-                        let byType = c => c.controller == true;
-                        this._controller = _.filter(this.all, byType);
-                    }
-                }
-                return this._controller;
-            }
-        },
-        'in': {
-            configurable: true,
-            get: function () {
-                if (_.isUndefined(this._in)) {
-                    let byType = c => c.controller == false;
-                    this._in = _.filter(this.all, byType);
-                    // add managed
-                    let isFull = c => c.sum >= (c.storeCapacity * (1 - MANAGED_CONTAINER_TRIGGER));
-                    this._in = this._in.concat(this.managed.filter(isFull));
-                }
-                return this._in;
-            }
-        },
-        'out': {
-            configurable: true,
-            get: function () {
-                if (_.isUndefined(this._out)) {
-                    let byType = c => c.controller == true;
-                    this._out = _.filter(this.all, byType);
-                    // add managed
-                    let isEmpty = c => c.sum <= (c.storeCapacity * MANAGED_CONTAINER_TRIGGER);
-                    this._out = this._out.concat(this.managed.filter(isEmpty));
-                }
-                return this._out;
-            }
-        },
-        'privateers': {
-            configurable: true,
-            get: function () {
-                if (_.isUndefined(this._privateers)) {
-                    let byType = c => (c.source === false && !c.mineral && c.sum < c.storeCapacity);
-                    this._privateers = _.filter(this.all, byType);
-                }
-                return this._privateers;
-            }
-        },
-        'managed': {
-            configurable: true,
-            get: function () {
-                if (_.isUndefined(this._managed)) {
-                    let byType = c => c.source === true && c.controller == true;
-                    this._managed = _.filter(this.all, byType);
-                }
-                return this._managed;
-            }
-        }
-    });
-};
 
-// Container related Room variables go here
 
-// Construction related Room variables go here
+
+
 
 // from room.construction
-Room.roomLayoutArray =
+mod.roomLayoutArray =
     [[,,,,,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],
     [,,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],
     [,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_SPAWN,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],
@@ -503,11 +466,7 @@ Room.roomLayoutArray =
     [,,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],
     [,,,,,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION]];
 
-
-// New Room methods go here
-
-// from room.construction
-Room.roomLayout = function (flag) {
+mod.roomLayout = function (flag) {
     if (!Flag.compare(flag, global.FLAG_COLOR.command.roomLayout)) return;
     flag = Game.flags[flag.name];
     const room = flag.room;
@@ -567,76 +526,13 @@ Room.roomLayout = function (flag) {
         f.pos.newFlag(f.flagColour);
     });
     _.forEach(sites, p => {
-        if (_.size(Game.constructionSites) >= 100) return false;
+        if (_.size(Game.constructionSites) >= 100)
+            return false;
         p.createConstructionSite(STRUCTURE_ROAD);
     });
 
     flag.remove();
 };
 
-// from room.link
-// Links constructor
-Room.Links = function (room) {
-    this.room = room;
 
-    Object.defineProperties(this, {
-        'all': {
-            configurable: true,
-            get: function () {
-                if (_.isUndefined(this._all)) {
-                    this._all = [];
-                    let add = entry => {
-                        let o = Game.getObjectById(entry.id);
-                        if (o) {
-                            _.assign(o, entry);
-                            this._all.push(o);
-                        }
-                    };
-                    _.forEach(this.room.memory.links, add);
-                }
-                return this._all;
-            }
-        },
-        'controller': {
-            configurable: true,
-            get: function () {
-                if (_.isUndefined(this._controller)) {
-                    let byType = c => c.controller === true;
-                    this._controller = this.all.filter(byType);
-                }
-                return this._controller;
-            }
-        },
-        'storage': {
-            configurable: true,
-            get: function () {
-                if (_.isUndefined(this._storage)) {
-                    let byType = l => l.storage == true;
-                    this._storage = this.all.filter(byType);
-                }
-                return this._storage;
-            }
-        },
-        'in': {
-            configurable: true,
-            get: function () {
-                if (_.isUndefined(this._in)) {
-                    let byType = l => l.storage == false && l.controller == false;
-                    this._in = _.filter(this.all, byType);
-                }
-                return this._in;
-            }
-        },
-        'privateers': {
-            configurable: true,
-            get: function () {
-                if (_.isUndefined(this._privateers)) {
-                    let byType = l => l.storage == false && l.controller == false && l.source == false && l.energy < l.energyCapacity * 0.85;
-                    this._privateers = _.filter(this.all, byType);
-                }
-                return this._privateers;
-            }
-        }
-    });
-};
 

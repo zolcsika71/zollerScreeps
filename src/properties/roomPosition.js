@@ -4,7 +4,7 @@ let mod = {};
 module.exports = mod;
 mod.extend = function () {
 
-    // extensions.js
+    // from extensions
     Object.defineProperty(RoomPosition.prototype, 'adjacent', {
         configurable: true,
         get: function () {
@@ -36,6 +36,22 @@ mod.extend = function () {
                 }
             }
             return positions;
+        }
+    });
+
+    // from flagDir
+    Object.defineProperty(RoomPosition.prototype, 'newFlag', {
+        configurable: true,
+        /**
+         * Create a new flag at this position
+         * @param {Object|string} flagColour - An object with color and secondaryColor properties, or a string path for a FLAG_COLOR
+         * @param {string} [name] - Optional name for the flag
+         * @returns {string|Number} The name of the flag or an error code.
+         */
+        value: function (flagColour, name) {
+            if (!flagColour) flagColour = _.get(FLAG_COLOR, flagColour); // allows you to pass through a string (e.g. 'invade.robbing')
+            if (!flagColour) return;
+            return this.createFlag(name, flagColour.color, flagColour.secondaryColor);
         }
     });
 
