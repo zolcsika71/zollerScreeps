@@ -8,8 +8,8 @@ let mod = {
     SAY_PUBLIC: true, // creeps talk public
     DEBUG: true, // gimme some more details, use false not undefined to unset
     DEBUG_STACKS: false, // add stack frame to EVERY console.log message (spammy!)
-    TRACE: false, // use Memory.debugTrace for low-level information
-    PROFILE: false, // enable CPU profiling
+    TRACE: true, // use Memory.debugTrace for low-level information
+    PROFILE: true, // enable CPU profiling
     PROFILING: {
         ANALYZE_LIMIT: 2, // profile warning levels
         AVERAGE_USAGE: true, // display average creep & flag usage
@@ -32,39 +32,37 @@ let mod = {
     USE_UNBUILT_ROADS: true, // enabling this will set the pathing cost of road construction sites to that of roads
     GRAFANA: true, // track for Grafana data
     GRAFANA_INTERVAL: 15, // loops between Grafana tracking - No lower than 3.
-    CENSUS_ANNOUNCEMENTS: false, // log birth and death
-    OFFSPRING_ANNOUNCEMENTS: false,
+    CENSUS_ANNOUNCEMENTS: true, // log birth and death
     SELL_NOTIFICATION: true, // send mail when selling minerals
     SPAWN_INTERVAL: 5, // loops between regular spawn probe
-    ROOM_VISUALS: false, // display basic room statistics with RoomVisuals
-    ROOM_VISUALS_ALL: false, // displays visuals in all rooms you have vision in. Only your rooms when false.
+    ROOM_VISUALS: true, // display basic room statistics with RoomVisuals
+    ROOM_VISUALS_ALL: true, // displays visuals in all rooms you have vision in. Only your rooms when false.
     VISUALS: { // if ROOM_VISUALS is enabled, you can select what you want to display - All is a bit much for some people.
-        VISIBLE_ONLY: false, // depends on userscript: https://github.com/Esryok/screeps-browser-ext/blob/master/visible-room-tracker.user.js
-        ROOM: false, // displays basic info relative to the room
-        ROOM_GLOBAL: false, // displays basic info relative to your account - requires ROOM: true
-        INFO_PIE_CHART: false, // replaces the info bars with pie charts
-        CPU: false, // display a graph containing CPU used, CPU limit, and bucket
+        ROOM: true, // displays basic info relative to the room
+        ROOM_GLOBAL: true, // displays basic info relative to your account - requires ROOM: true
+        INFO_PIE_CHART: true, // replaces the info bars with pie charts
+        CPU: true, // display a graph containing CPU used, CPU limit, and bucket
         ROOM_ORDERS: true, // display orders the room creates
         ROOM_OFFERS: true, // display what a room will offer another
         SPAWN: true, // displays creep name and spawn progress percentage when spawning
-        CONTROLLER: false, // displays level, progress, and ticks to downgrade if active
+        CONTROLLER: true, // displays level, progress, and ticks to downgrade if active
         STORAGE: true, // displays storage contents
         TERMINAL: true, // displays terminal contents
-        TOWER: false, // displays tower contents
-        TRANSACTIONS: false, // displays 2 most recent transactions over room terminal
-        LABS: false, // displays lab energy, mineral, or cooldown
-        MINERAL: false, // displays mineral amount, or ticks to regen
-        SOURCE: false, // displays energy amount, or ticks to regen
-        CREEP: false, // draws creep paths
-        WALL: false, // highlight weakest wall and display hits
-        RAMPART: false, // highlight weakest rampart and display hits
-        ROAD: false, // highlight weakest road and display hits
-        HEATMAP: false, // collects creep positioning to display a heatmap. WARNING: HIGH MEMORY USAGE
+        TOWER: true, // displays tower contents
+        TRANSACTIONS: true, // displays 2 most recent transactions over room terminal
+        LABS: true, // displays lab energy, mineral, or cooldown
+        MINERAL: true, // displays mineral amount, or ticks to regen
+        SOURCE: true, // displays energy amount, or ticks to regen
+        CREEP: true, // draws creep paths
+        WALL: true, // highlight weakest wall and display hits
+        RAMPART: true, // highlight weakest rampart and display hits
+        ROAD: true, // highlight weakest road and display hits
+        HEATMAP: true, // collects creep positioning to display a heatmap. WARNING: HIGH MEMORY USAGE
         HEATMAP_INTERVAL: 2, // intervals between collections
-        ACTION_ASSIGNMENT: false, // draws a line from a creep and it's new assignment
-        CONTAINER: false, // displays container amount of resources in x/2000 format
-        DRAW_ARROW: false, // draw arrow to the target
-        HIGHLIGHT_STRUCTURE: false // highlight target structure
+        ACTION_ASSIGNMENT: true, // draws a line from a creep and it's new assignment
+        CONTAINER: true, // displays container amount of resources in x/2000 format
+        DRAW_ARROW: true, // draw arrow to the target
+        HIGHLIGHT_STRUCTURE: true // highlight target structure
     },
     // function parameters: room. expected result: boolean
     SEMI_AUTOMATIC_CONSTRUCTION: true, // enables semi-automatic construction. Will construct based on flags.
@@ -559,7 +557,7 @@ let mod = {
 
 
 
-// constants
+    // constants
 
     CRAYON: { // predefined log colors
         death: {color: 'black', 'font-weight': 'bold'},

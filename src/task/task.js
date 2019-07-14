@@ -3,11 +3,6 @@
 const
     GLOBAL = {
         util: require(`./global.util`)
-    },
-    TASK = {
-        //task: require('./task.task'),
-        //mining: require('./task.mining'),
-        //reputation: require('./task.reputation')
     };
 
 let mod = {},
@@ -23,7 +18,7 @@ mod.populate = function () {
     mod.addTasks(...[
         //Task.attackController,
         //Task.claim,
-        //Task.defense,
+        Task.defense,
         //Task.guard,
         //Task.labTech,
         Task.mining,

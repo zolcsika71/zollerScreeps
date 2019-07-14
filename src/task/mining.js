@@ -161,7 +161,7 @@ mod.checkForRequiredCreeps = (flag) => {
     }
 
     // only spawn haulers for sources a miner has been spawned for
-    let maxHaulers = Math.ceil(memory.running.remoteMiner.length * REMOTE_HAULER.MULTIPLIER);
+    let maxHaulers = Math.ceil(memory.running.remoteMiner.length * global.REMOTE_HAULER.MULTIPLIER);
     if (haulerCount < maxHaulers && (!memory.capacityLastChecked || Game.time - memory.capacityLastChecked > global.TASK_CREEP_CHECK_INTERVAL)) {
         for (let i = haulerCount; i < maxHaulers; i++) {
             let minWeight = i >= 1 && global.REMOTE_HAULER.MIN_WEIGHT,
@@ -264,7 +264,7 @@ mod.findRunning = (roomName, type) => {
     return running;
 };
 mod.memory = key => {
-    let memory = Task.memory(mod.name, key);
+    let memory = TASK.task.memory(mod.name, key);
     if (!memory.hasOwnProperty('queued')) {
         memory.queued = {
             remoteMiner: [],
@@ -397,7 +397,7 @@ mod.carry = function (roomName, partChange) {
     memory.carryParts = (memory.carryParts || 0) + (partChange || 0);
     const population = Math.round(mod.carryPopulation(roomName) * 100);
     if (partChange) {
-        Task.forceCreepCheck(Task.mining.getFlag(roomName), mod.name);
+        TASK.task.forceCreepCheck(TASK.task.mining.getFlag(roomName), mod.name);
         delete memory.capacityLastChecked;
     }
     return `Task.${mod.name}: hauler carry capacity for ${roomName} ${memory.carryParts >= 0 ? 'increased' : 'decreased'} by ${Math.abs(memory.carryParts)}. Currently at ${population}% of desired capacity`;
@@ -438,7 +438,7 @@ mod.checkCapacity = function (roomName) {
 };
 mod.storage = function (miningRoom, storageRoom) {
     let room = Game.rooms[miningRoom],
-        memory = Task.mining.memory(miningRoom);
+        memory = mod.memory(miningRoom);
     if (storageRoom) {
         let was = memory.storageRoom;
         memory.storageRoom = storageRoom;

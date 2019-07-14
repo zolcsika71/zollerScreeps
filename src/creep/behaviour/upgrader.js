@@ -105,7 +105,7 @@ behaviour.run = function (creep) {
                             range: 1
                         }],
                     checkWalkable: true,
-                    where: pos => !_.some(pos.lookFor(LOOK_CREEPS), viralCreepBehaviourUpgrader.invalidCreep) && (ignoreSources || pos.findInRange(creep.room.sources, 1).length === 0),
+                    where: pos => !_.some(pos.lookFor(LOOK_CREEPS), behaviour.invalidCreep) && (ignoreSources || pos.findInRange(creep.room.sources, 1).length === 0),
                     roomName: creep.pos.roomName
                 };
                 return Room.fieldsInRange(args);

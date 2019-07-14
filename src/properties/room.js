@@ -6,11 +6,8 @@ const
         util: require(`./global.util`)
     };
 
-
-
 let mod = {};
 module.exports = mod;
-
 mod.extend = function () {
 
     let Structures = function (room) {
@@ -1016,7 +1013,7 @@ mod.extend = function () {
                 if (!pos) pos = this.getPositionAt(25, 25);
                 return pos.newFlag(flagColour, name);
             }
-        }
+        },
 
     });
 
@@ -1167,17 +1164,17 @@ mod.extend = function () {
             }
         });
     };
-    Room.Labs = function(room){
+    Room.Labs = function (room) {
         this.room = room;
         Object.defineProperties(this, {
             'all': {
                 configurable: true,
-                get: function() {
-                    if( _.isUndefined(this._all) ){
+                get: function () {
+                    if (_.isUndefined(this._all)) {
                         this._all = [];
                         let add = entry => {
                             let o = Game.getObjectById(entry.id);
-                            if( o ) {
+                            if (o) {
                                 _.assign(o, entry);
                                 this._all.push(o);
                             }
@@ -1189,8 +1186,8 @@ mod.extend = function () {
             },
             'storage': {
                 configurable: true,
-                get: function() {
-                    if(_.isUndefined(this._storage)) {
+                get: function () {
+                    if (_.isUndefined(this._storage)) {
                         this._storage = _.filter(room.memory.resources.lab.reactionState, reactionState => {
                             return reactionState === 'Storage';
                         });
@@ -1200,17 +1197,17 @@ mod.extend = function () {
             }
         });
     };
-    Room.Nuker = function(room){
+    Room.Nuker = function (room) {
         this.room = room;
         Object.defineProperties(this, {
             'all': {
                 configurable: true,
-                get: function() {
-                    if( _.isUndefined(this._all) ){
+                get: function () {
+                    if (_.isUndefined(this._all)) {
                         this._all = [];
                         let add = entry => {
                             let o = Game.getObjectById(entry.id);
-                            if( o ) {
+                            if (o) {
                                 _.assign(o, entry);
                                 this._all.push(o);
                             }
@@ -1219,20 +1216,20 @@ mod.extend = function () {
                     }
                     return this._all;
                 }
-            },
+            }
         });
     };
-    Room.PowerSpawn = function(room){
+    Room.PowerSpawn = function (room) {
         this.room = room;
         Object.defineProperties(this, {
             'all': {
                 configurable: true,
-                get: function() {
-                    if( _.isUndefined(this._all) ){
+                get: function () {
+                    if (_.isUndefined(this._all)) {
                         this._all = [];
                         let add = entry => {
                             let o = Game.getObjectById(entry.id);
-                            if( o ) {
+                            if (o) {
                                 _.assign(o, entry);
                                 this._all.push(o);
                             }
@@ -1241,7 +1238,7 @@ mod.extend = function () {
                     }
                     return this._all;
                 }
-            },
+            }
         });
     };
 

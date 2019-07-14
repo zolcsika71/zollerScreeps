@@ -186,25 +186,7 @@ mod.resetProfiler = function () {
     mod.loadProfiler(true);
 };
 
-/**
- * Gets currently visible rooms.
- * Dependant on userscript: {@link https://github.com/Esryok/screeps-browser-ext/blob/master/visible-room-tracker.user.js Visible Room Tracker}
- * @param {Number} [age]
- * @returns {Array}
- */
-mod.getVisibleRooms = function (age) {
-    let since = Game.time - (age || 5),
-        visibleRooms = [];
-    //return _(Memory.rooms).filter(r => r.lastViewed && r.lastViewed > since).keys().value();
-    for (let roomName in Memory.rooms) {
-        let room = Memory.rooms[roomName];
-        if (room.lastViewed && room.lastViewed > since) {
-            visibleRooms.push(roomName);
-        }
-    }
 
-    return visibleRooms;
-};
 
 /**
  * formats an integer into a readable value

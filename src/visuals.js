@@ -13,13 +13,13 @@ const
     YELLOW = '#FFFF00',
     CYAN = '#00FFFF';
 
-const getColourByPercentage = (percentage, reverse) => {
+let getColourByPercentage = (percentage, reverse) => {
     const value = reverse ? percentage : 1 - percentage;
     const hue = (value * 120).toString(10);
     return `hsl(${hue}, 100%, 50%)`;
 };
 
-const getResourceColour = (resourceType) => {
+let getResourceColour = (resourceType) => {
     const BASE = {
         [RESOURCE_ENERGY]: '#FFE56D',
         [RESOURCE_POWER]: RED,
@@ -41,13 +41,13 @@ const getResourceColour = (resourceType) => {
     return BASE[compoundType];
 };
 
-const storageObject = (vis, store, x, startY) => {
+let storageObject = (vis, store, x, startY) => {
     Object.keys(store).forEach(resource => vis.text(`${resource}: ${Util.formatNumber(store[resource])}`, x, startY += 0.6, Object.assign({color: getResourceColour(resource)}, {align: 'left', font: 0.5})));
 };
 
 
 
-const Visuals = class {
+let Visuals = class {
 
     // VISUAL UTIL METHODS
     drawBar(vis, val, x, y, width, height, inner, fillStyle={}) {
@@ -211,19 +211,17 @@ const Visuals = class {
     }
 
     run() {
-        let p = GLOBAL.util.startProfiling('Visuals', {enabled: global.PROFILING.VISUALS}),
-            visibleChecked = global.VISUALS.VISIBLE_ONLY,
-            VISUAL_ROOMS = visibleChecked ? GLOBAL.util.getVisibleRooms() : Object.keys(Game.rooms);
+        let p = GLOBAL.util.startProfiling('Visuals', {enabled: global.PROFILING.VISUALS});
 
-        _.forEach(VISUAL_ROOMS, roomName => {
+        _.forEach(Object.keys(Game.rooms), roomName => {
 
             let room = Game.rooms[roomName],
-                p2 = GLOBAL.util.startProfiling('Visuals: ' + room.name, {enabled: PROFILING.VISUALS});
+                p2 = GLOBAL.util.startProfiling('Visuals: ' + room.name, {enabled: global.PROFILING.VISUALS});
 
-            if (!room) return;
-            if (!global.ROOM_VISUALS_ALL && !room.my) return;
-            if (!visibleChecked && !room.controller) return;
-
+            if (!room)
+                return;
+            if (!global.ROOM_VISUALS_ALL && !room.my)
+                return;
 
             GLOBAL.util.set(Memory, 'heatmap', false);
 
@@ -300,6 +298,7 @@ const Visuals = class {
                 p2.checkCPU('Labs', global.PROFILING.VISUALS_LIMIT);
             }
             if (global.VISUALS.CREEP) {
+                //console.log(`Hello creep Path`);
                 room.creeps.forEach(creep => this.drawCreepPath(creep));
                 p2.checkCPU('Creep Paths', global.PROFILING.VISUALS_LIMIT);
             }
@@ -324,6 +323,9 @@ const Visuals = class {
     }
 
     drawGlobal() {
+
+        //console.log(`Hello GLOBAL VIS`);
+
         const vis = this.vis;
         const bufferWidth = 1;
         if (!global.VISUALS.INFO_PIE_CHART) {
@@ -786,16 +788,19 @@ const Visuals = class {
     }
 
     drawCreepPath(creep) {
-        const vis = new RoomVisual(creep.room.name);
-        if (creep.action && creep.action.name === 'idle') return; // don't draw idle path
-        if (_(creep.pos).pick(['x', 'y']).eq(creep.data.determinatedSpot)) return;
-        if (!creep.memory || !creep.memory._travel || !creep.memory._travel.path) return;
+        let vis = new RoomVisual(creep.room.name);
+        if (creep.action && creep.action.name === 'idle')
+            return; // don't draw idle path
+        if (_(creep.pos).pick(['x', 'y']).eq(creep.data.determinatedSpot))
+            return;
+        if (!creep.memory || !creep.memory._travel || !creep.memory._travel.path)
+            return;
 
-        const path = creep.memory._travel.path.substr(1);
-        const style = this.creepPathStyle(creep);
-        let x = creep.pos.x;
-        let y = creep.pos.y;
-        const maths = {
+        let path = creep.memory._travel.path.substr(1),
+            style = this.creepPathStyle(creep),
+            x = creep.pos.x,
+            y = creep.pos.y,
+            maths = {
             [TOP]: {x: 0, y: -1},
             [TOP_RIGHT]: {x: 1, y: -1},
             [RIGHT]: {x: 1, y: 0},
@@ -806,7 +811,7 @@ const Visuals = class {
             [TOP_LEFT]: {x: -1, y: -1}
         };
         if (creep.fatigue === 0) {
-            const initDir = +creep.memory._travel.path[0]; // get initial so we know where to set the start (x, y)
+            let initDir = +creep.memory._travel.path[0]; // get initial so we know where to set the start (x, y)
             x += maths[initDir].x;
             y += maths[initDir].y;
         }
