@@ -191,8 +191,10 @@ mod.addToQueue = (creepDef, roomParams, target) => {
     return mod.spawn(creepDef, destiny, roomParams);
 };
 mod.forceSpawn = (creepDef, roomParams, target) => {
-    if (roomParams.link) roomParams = {targetRoom: roomParams};
-    if (!roomParams.targetRoom) return;
+    if (roomParams.link)
+        roomParams = {targetRoom: roomParams};
+    if (!roomParams.targetRoom)
+        return;
     const room = roomParams.explicit ? Game.rooms[roomParams.explicit] : Room.findSpawnRoom(roomParams);
 
     if (!room)
