@@ -310,7 +310,7 @@ module.exports.loop = wrapLoop(function () {
         ROOT.flagDir.flush();
         ROOT.population.flush();
         ROOM.room.flush();
-        TASK.task.flush();
+        Task.flush();
 
         if (ROOT.mainInjection.flush)
             ROOT.mainInjection.flush();

@@ -1,5 +1,13 @@
 "use strict";
 
+const
+    ROOT = {
+        flagDir: require('./flagDir')
+    },
+    GLOBAL = {
+        util: require(`./global.util`)
+    };
+
 // Defense task handles spotted invaders. Spawns defenders and gives them special behaviour.
 let mod = {};
 module.exports = mod;
@@ -9,38 +17,39 @@ mod.register = () => {};
 // When a new invader has been spotted
 mod.handleNewInvader = invaderCreep => {
     // ignore if on blacklist
-    if (!SPAWN_DEFENSE_ON_ATTACK || DEFENSE_BLACKLIST.includes(invaderCreep.pos.roomName)) return;
+    if (!global.SPAWN_DEFENSE_ON_ATTACK || global.DEFENSE_BLACKLIST.includes(invaderCreep.pos.roomName))
+        return;
     // if not our room and not our reservation
 
-    global.logSystem(invaderCreep.pos.roomName, `Hostile Invaders detected`);
+    GLOBAL.util.logSystem(invaderCreep.pos.roomName, `Hostile Invaders detected`);
 
     if (!invaderCreep.room.my && !invaderCreep.room.reserved) {
         // if it is not our exploiting target
         let validColor = flagEntry => (
-            (Flag.compare(flagEntry, FLAG_COLOR.invade.exploit)) ||
-            (flagEntry.color == FLAG_COLOR.claim.color)
+            (Flag.compare(flagEntry, global.FLAG_COLOR.invade.exploit)) ||
+            (flagEntry.color === global.FLAG_COLOR.claim.color)
         );
-        let flag = FlagDir.find(validColor, invaderCreep.pos, true);
+        let flag = ROOT.flagDir.find(validColor, invaderCreep.pos, true);
 
         if (!flag) {
-            global.logSystem(invaderCreep.pos.roomName, `Hostile Invaders not in range`);
+            GLOBAL.util.logSystem(invaderCreep.pos.roomName, `Hostile Invaders not in range`);
             return; // ignore invader
         }
     }
     // check room threat balance
 
-    global.logSystem(invaderCreep.pos.roomName, `THREAT: ${invaderCreep.room.hostileThreatLevel} DEFENSE: ${invaderCreep.room.defenseLevel.sum}`);
+    GLOBAL.util.logSystem(invaderCreep.pos.roomName, `THREAT: ${invaderCreep.room.hostileThreatLevel} DEFENSE: ${invaderCreep.room.defenseLevel.sum}`);
 
     if (invaderCreep.room.defenseLevel.sum > invaderCreep.room.hostileThreatLevel) {
-        global.logSystem(invaderCreep.pos.roomName, `Defense HIGHER than Threat`);
+        GLOBAL.util.logSystem(invaderCreep.pos.roomName, `Defense HIGHER than Threat`);
         // room can handle that
         return;
     } else {
         // order a defender for each invader (if not happened yet)
-        global.logSystem(invaderCreep.pos.roomName, `Defense LOWER than Threat`);
+        GLOBAL.util.logSystem(invaderCreep.pos.roomName, `Defense LOWER than Threat`);
         let lastAllocatedGUID = global.guid();
         invaderCreep.room.hostiles.forEach(hostile => {
-            Task.defense.orderDefenses(hostile, lastAllocatedGUID);
+            mod.orderDefenses(hostile, lastAllocatedGUID);
         });
     }
 };
@@ -51,9 +60,8 @@ mod.handleGoneInvader = invaderId => {
     if (!invader) {
         // Invader not found anymore
         // remove queued creeps
-        let taskMemory = Task.defense.memory(invaderId);
+        let taskMemory = mod.memory(invaderId);
         if (taskMemory && taskMemory.defender) {
-            let defender = [];
             let removeQueued = entry => {
                 let roomMemory = Memory.rooms[entry.spawnRoom];
                 if (roomMemory && roomMemory.spawnQueueHigh) {
@@ -79,7 +87,7 @@ mod.handleGoneInvader = invaderId => {
 mod.handleCreepDied = creepName => {
     // check if its our creep
     let creepMemory = Memory.population[creepName];
-    if (!creepMemory || !creepMemory.destiny || !creepMemory.destiny.task || creepMemory.destiny.task != 'defense' || !creepMemory.destiny.invaderId)
+    if (!creepMemory || !creepMemory.destiny || !creepMemory.destiny.task || creepMemory.destiny.task !== 'defense' || !creepMemory.destiny.invaderId)
         return;
     // check if the invader is still there
     let invader = Game.getObjectById(creepMemory.destiny.invaderId);
@@ -87,14 +95,14 @@ mod.handleCreepDied = creepName => {
         return;
 
     // remove died creep from mem
-    let taskMemory = Task.defense.memory(creepMemory.destiny.invaderId);
+    let taskMemory = mod.memory(creepMemory.destiny.invaderId);
     if (taskMemory.defender) {
         let thisEntry = e => e.order === creepMemory.destiny.order;
         let index = taskMemory.defender.findIndex(thisEntry);
         if (index > -1) taskMemory.defender.splice(index, 1);
     }
     // order reinforements
-    Task.defense.orderDefenses(invader);
+    mod.orderDefenses(invader);
 };
 // get task memory
 mod.memory = invaderId => {
@@ -124,7 +132,7 @@ mod.orderDefenses = function (invaderCreep, GUID) {
 
     let invaderId = invaderCreep.id,
         remainingThreat = invaderCreep.threat,
-        taskMemory = Task.defense.memory(invaderId);
+        taskMemory = mod.memory(invaderId);
 
     // check if an order has been made already
     if (taskMemory.defender) {
@@ -140,8 +148,8 @@ mod.orderDefenses = function (invaderCreep, GUID) {
 
     while (remainingThreat > 0) {
 
-        Task.defense.creep.defender.queue = invaderCreep.room.my ? 'High' : 'Medium';
-        Task.defense.creep.defender.minThreat = (remainingThreat * 1.1);
+        mod.defense.creep.defender.queue = invaderCreep.room.my ? 'High' : 'Medium';
+        mod.defense.creep.defender.minThreat = (remainingThreat * 1.1);
 
         let collectCompounds = function (fixedBody, multiBody) {
 
@@ -245,12 +253,12 @@ mod.orderDefenses = function (invaderCreep, GUID) {
                 allowTargetRoom: true
             },
             creepSetup => { // callback onQueued
-                let memory = Task.defense.memory(invaderId);
+                let memory = mod.memory(invaderId);
                 memory.defender.push({
                     spawnRoom: creepSetup.queueRoom,
                     order: creepSetup.destiny.order
                 });
-                if (DEBUG)
+                if (global.DEBUG)
                     global.logSystem(creepSetup.queueRoom, `Defender queued for hostile creep ${creepSetup.destiny.order} in ${creepSetup.destiny.spottedIn}`);
 
                 console.log(`DEFENDER will spawn at: ${creepSetup.queueRoom}`);
@@ -267,7 +275,8 @@ mod.orderDefenses = function (invaderCreep, GUID) {
             remainingThreat -= bodyThreat;
         } else {
             // Can't spawn. Invader will not get handled!
-            if (TRACE || DEBUG) trace('Task', {task: 'defense', invaderId: invaderId, targetRoom: invadersRoom}, 'Unable to spawn. Invader will not get handled!');
+            if (global.TRACE || global.DEBUG)
+                GLOBAL.util.trace('Task', {task: 'defense', invaderId: invaderId, targetRoom: invadersRoom}, 'Unable to spawn. Invader will not get handled!');
             return;
         }
     }

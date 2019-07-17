@@ -31,6 +31,7 @@ mod.toLocalDate = function (date) {
     if (global.USE_SUMMERTIME && mod.isSummerTime(date)) offset++;
     return new Date(date.getTime() + (3600000 * offset));
 };
+
 // for notify mails: format dateTime (as date & time)
 mod.toDateTimeString = function (date) {
     return (mod.len(date.getDate()) + "." + mod.len(date.getMonth() + 1) + "." + mod.len(date.getFullYear()) + " " + mod.len(date.getHours()) + ":" + mod.len(date.getMinutes()) + ":" + mod.len(date.getSeconds()));
@@ -99,5 +100,12 @@ mod.addById = function (array, id) {
     if (obj)
         array.push(obj);
     return array;
+};
+
+mod.guid = function () {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
 };
 

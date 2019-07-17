@@ -213,9 +213,9 @@ mod.forceSpawn = (creepDef, roomParams, target) => {
         return;
     let name = `${creepDef.name || creepDef.behaviour}-${destiny.targetName}`,
         creepSetup = {
-        parts, destiny, name,
-        behaviour: creepDef.behaviour,
-        queueRoom: room.name
+            parts, destiny, name,
+            behaviour: creepDef.behaviour,
+            queueRoom: room.name
         },
         queue = room.spawnQueueHigh;
 
