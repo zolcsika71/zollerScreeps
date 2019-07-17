@@ -6,10 +6,10 @@ let mod = {
     OOPS: true, // Creeps say Oops when dropping energy during dropmining
     SAY_ASSIGNMENT: true, // say a symbol representing the assiged action
     SAY_PUBLIC: true, // creeps talk public
-    DEBUG: true, // gimme some more details, use false not undefined to unset
+    DEBUG: false, // gimme some more details, use false not undefined to unset
     DEBUG_STACKS: false, // add stack frame to EVERY console.log message (spammy!)
-    TRACE: true, // use Memory.debugTrace for low-level information
-    PROFILE: true, // enable CPU profiling
+    TRACE: false, // use Memory.debugTrace for low-level information
+    PROFILE: false, // enable CPU profiling
     PROFILING: {
         ANALYZE_LIMIT: 2, // profile warning levels
         AVERAGE_USAGE: true, // display average creep & flag usage

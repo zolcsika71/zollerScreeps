@@ -9,9 +9,11 @@ behaviour.actions = function (creep) {
         Creep.action.recycling
     ];
 };
-behaviour.run = function(creep) {
+
+behaviour.run = function (creep) {
     Creep.behaviour.ranger.heal.call(this, creep);
     // original -> return this.baseOf.internalViral.run.call(this, creep);
     // own -> return this.baseOf.run.call(this, creep);
 };
+
 

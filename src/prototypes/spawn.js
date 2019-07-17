@@ -29,11 +29,17 @@ mod.extend = function () {
 
         let probe = (setup) => {
             // plus line
-            if (_.isUndefined(setup))
+            /*
+            if (_.isUndefined(setup)) {
+                GLOBAL.util.logSystem('setup', `undefined`);
                 return false;
+            }
+            */
+
 
             let returnValue = setup.isValidSetup(room) && that.createCreepBySetup(setup);
-            console.log(`spawn.probe: ${setup.type} returns: ${global.json(returnValue)}`);
+            if (returnValue !== null)
+                console.log(`spawn.probe: ${setup.type} returns: ${global.json(returnValue)}`);
 
             return returnValue;
         };
@@ -55,7 +61,8 @@ mod.extend = function () {
                 }
             }
         }
-        console.log (`spawn.execute returns: ${busy}`);
+        if (busy !== null)
+            console.log (`spawn.execute returns: ${busy}`);
         return busy;
     };
     Spawn.prototype.createCreepBySetup = function (setup) {

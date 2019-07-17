@@ -166,7 +166,11 @@ _.assign(CREEP, {
 
     },
     setup: {
+        hauler: require('./creep.setup.hauler'),
+        healer: require('./creep.setup.healer'),
         miner: require('./creep.setup.miner'),
+        mineralMiner: require('./creep.setup.mineralMiner'),
+        privateer: require('./creep.setup.privateer'),
         worker: require('./creep.setup.worker'),
         upgrader: require('./creep.setup.upgrader')
     },
@@ -203,7 +207,11 @@ _.assign(Creep, {
 
     },
     setup: {
+        hauler: CREEP.setup.hauler,
+        healer: CREEP.setup.healer,
         miner: CREEP.setup.miner,
+        mineralMiner: CREEP.setup.mineralMiner,
+        privateer: CREEP.setup.privateer,
         worker: CREEP.setup.worker,
         upgrader: CREEP.setup.upgrader
 
