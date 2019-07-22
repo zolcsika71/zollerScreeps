@@ -3,7 +3,6 @@
 const
     //setup = require(`./creep.setup.Setup`),
     GLOBAL = {
-        parameter: require(`./global.parameter`),
         util: require(`./global.util`)
     },
     ROOT = {
@@ -28,17 +27,9 @@ mod.extend = function () {
         let that = this;
 
         let probe = (setup) => {
-            // plus line
-            /*
-            if (_.isUndefined(setup)) {
-                GLOBAL.util.logSystem('setup', `undefined`);
-                return false;
-            }
-            */
-
 
             let returnValue = setup.isValidSetup(room) && that.createCreepBySetup(setup);
-            if (returnValue !== null)
+            if (returnValue)
                 console.log(`spawn.probe: ${setup.type} returns: ${global.json(returnValue)}`);
 
             return returnValue;
@@ -71,6 +62,9 @@ mod.extend = function () {
         let params = setup.buildParams(this);
         //console.log(`by setup: ${global.json(params)}`);
         // plus lines
+
+
+
         let cost = 0;
         params.parts.forEach(function (part) {
             cost += BODYPART_COST[part];
@@ -84,6 +78,12 @@ mod.extend = function () {
 
         if (cost <= this.room.remainingEnergyAvailable && this.create(params.parts, params.name, params.setup))
             return params;
+
+        // old lines
+/*
+        if (this.create(params.parts, params.name, params.setup))
+            return params;
+*/
         return null;
     };
     Spawn.prototype.createCreepByQueue = function (queue, level) {

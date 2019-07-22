@@ -6,7 +6,7 @@ let mod = {
     OOPS: true, // Creeps say Oops when dropping energy during dropmining
     SAY_ASSIGNMENT: true, // say a symbol representing the assiged action
     SAY_PUBLIC: true, // creeps talk public
-    DEBUG: false, // gimme some more details, use false not undefined to unset
+    DEBUG: true, // gimme some more details, use false not undefined to unset
     DEBUG_STACKS: false, // add stack frame to EVERY console.log message (spammy!)
     TRACE: false, // use Memory.debugTrace for low-level information
     PROFILE: false, // enable CPU profiling
@@ -53,7 +53,7 @@ let mod = {
         LABS: true, // displays lab energy, mineral, or cooldown
         MINERAL: true, // displays mineral amount, or ticks to regen
         SOURCE: true, // displays energy amount, or ticks to regen
-        CREEP: true, // draws creep paths
+        CREEP: false, // draws creep paths
         WALL: true, // highlight weakest wall and display hits
         RAMPART: true, // highlight weakest rampart and display hits
         ROAD: true, // highlight weakest road and display hits
@@ -61,7 +61,7 @@ let mod = {
         HEATMAP_INTERVAL: 2, // intervals between collections
         ACTION_ASSIGNMENT: true, // draws a line from a creep and it's new assignment
         CONTAINER: true, // displays container amount of resources in x/2000 format
-        DRAW_ARROW: true, // draw arrow to the target
+        DRAW_ARROW: false, // draw arrow to the target
         HIGHLIGHT_STRUCTURE: true // highlight target structure
     },
     // function parameters: room. expected result: boolean
@@ -267,7 +267,7 @@ let mod = {
     CONTROLLER_SIGN_MESSAGE: `[YP] claimed by Zolcsika`,
     CONTROLLER_SIGN_UPDATE: true, // Update sign message if user changes CONTROLLER_SIGN_MESSAGE
     MINERS_AUTO_BUILD: true, // miners and remoteMiners will build their own containers if they are missing.
-    MINER_WORK_THRESHOLD: 50, // how long to wait before a miner checks for repairs/construction sites nearby again
+    MINER_WORK_THRESHOLD: 10, // how long to wait before a miner checks for repairs/construction sites nearby again
     REMOTE_HAULER: {
         ALLOW_OVER_CAPACITY: 2450, // Hauler capacity rounds up by MIN_WEIGHT, or this number value.
         DRIVE_BY_BUILD_ALL: false, // If REMOTE_HAULER.DRIVE_BY_BUILDING is enabled then this option will allow remote haulers will drive-by-build any of your structures.

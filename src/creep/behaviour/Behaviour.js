@@ -84,7 +84,7 @@ let Behaviour = function (name) { // base class for behaviours
             for (let action of actions) {
                 // new line (action !== null && action !== undefined)
                 if (action !== null && action !== undefined && !actionChecked[action.name]) {
-                    GLOBAL.util.logSystem(creep.name, `action: ${global.json(action.name)}`);
+                    //GLOBAL.util.logSystem(creep.name, `action: ${global.json(action.name)}`);
                     actionChecked[action.name] = true;
                     if (this.assignAction(creep, action)) {
                         p.checkCPU('assigned' + action.name, 1.5);

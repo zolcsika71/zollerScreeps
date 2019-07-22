@@ -68,7 +68,7 @@ let Action = function (actionName) {
         if (global.CHATTY) creep.say(this.name, global.SAY_PUBLIC);
         let range = creep.pos.getRangeTo(creep.target);
         if (range <= this.targetRange) {
-            var workResult = this.work(creep);
+            let workResult = this.work(creep);
             if (workResult !== OK) {
                 creep.handleError({errorCode: workResult, action: this, target: creep.target, range, creep});
                 return this.unassign(creep);
@@ -76,7 +76,11 @@ let Action = function (actionName) {
             range = creep.pos.getRangeTo(creep.target); // target may have changed (eg. hauler feed+move/tick)
         }
         if (creep.target && creep.hasActiveBodyparts(MOVE)) {
-            if (range > this.targetRange) creep.travelTo(creep.target, {range: this.targetRange});
+
+            if (range > this.targetRange) {
+                //console.log(`target: ${global.json(creep.target)} range: ${this.targetRange}`);
+                creep.travelTo(creep.target, {range: this.targetRange});
+            }
             // low CPU pathfinding for last few steps.
             else if (range > this.reachedRange) {
                 const direction = creep.pos.getDirectionTo(creep.target);
@@ -84,7 +88,9 @@ let Action = function (actionName) {
                 if (creep.room.isWalkable(targetPos.x, targetPos.y)) { // low cost last steps if possible
                     creep.move(direction);
                 } else if (!creep.pos.isNearTo(creep.target)) { // travel there if we're not already adjacent
-                    creep.travelTo(creep.target, {range: this.reachedRange});
+                    let travelData = {};
+                    creep.travelTo(creep.target, {range: this.reachedRange, returnData: travelData});
+                    console.log(`travelData: ${global.json(travelData)}`);
                 }
             }
         }

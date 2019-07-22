@@ -276,8 +276,8 @@ if (ROOT.mainInjection.extend)
 
 ROOT.ocsMemory.activateSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, true);
 
-//let Traveler = require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
-require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
+let Traveler = require('./traveler');
+//require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
 
 if (global.DEBUG)
     GLOBAL.util.logSystem('Global.install', 'Code reloaded.');
@@ -318,7 +318,7 @@ module.exports.loop = wrapLoop(function () {
         ROOT.flagDir.flush();
         ROOT.population.flush();
         ROOM.room.flush();
-        Task.flush();
+        TASK.task.flush();
 
         if (ROOT.mainInjection.flush)
             ROOT.mainInjection.flush();
