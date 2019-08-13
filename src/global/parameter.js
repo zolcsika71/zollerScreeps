@@ -61,7 +61,7 @@ let mod = {
         HEATMAP_INTERVAL: 2, // intervals between collections
         ACTION_ASSIGNMENT: true, // draws a line from a creep and it's new assignment
         CONTAINER: true, // displays container amount of resources in x/2000 format
-        DRAW_ARROW: false, // draw arrow to the target
+        DRAW_ARROW: true, // draw arrow to the target
         HIGHLIGHT_STRUCTURE: true // highlight target structure
     },
     // function parameters: room. expected result: boolean

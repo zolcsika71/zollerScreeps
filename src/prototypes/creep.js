@@ -94,7 +94,7 @@ mod.extend = function () {
                     return;
             }
             const
-                total = GLOBAL.util.startProfiling('Creep.run', {enabled: global.PROFILING.CREEPS}),
+                total = global.Util.startProfiling('Creep.run', {enabled: global.PROFILING.CREEPS}),
                 p = GLOBAL.util.startProfiling(this.name + '.run', {enabled: this.data && this.data.creepType && global.PROFILING.CREEP_TYPE === this.data.creepType});
 
             if (this.data && !_.contains(['remoteMiner', 'miner', 'upgrader'], this.data.creepType)) {

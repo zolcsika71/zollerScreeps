@@ -29,8 +29,6 @@ function wrapLoop(fn) {
 
 let //_ = require('lodash'),
     cpuAtLoad = Game.cpu.getUsed(),
-    CREEP = {},
-    GLOBAL = {},
     PROPERTIES = {
         creep: require('./properties.creep'),
         mineral: require('./properties.mineral'),
@@ -50,10 +48,7 @@ let //_ = require('lodash'),
         roomPosition: require('./prototypes.roomPosition'),
         compounds: require('./prototypes.compounds'),
         visuals: require('./prototypes.visuals')
-    },
-    ROOM = {},
-    TASK = {},
-    ROOT = {};
+    };
 
 
 let inject = (base, alien, namespace) => {
@@ -81,63 +76,40 @@ let inject = (base, alien, namespace) => {
 },
     cpuAtFirstLoop;
 
-_.assign(GLOBAL, {
-    global: require('./global.global'),
-    parameter: require(`./global.parameter`)
-});
 
-inject(global, GLOBAL.global);
-// make parameter accessible from command line
-_.assign(global, GLOBAL.parameter);
 
-_.assign(ROOT, {
-    mainInjection: require(`./mainInjection`),
-    initMemory: require('./initMemory')
-});
+inject(global, require('./global.global'));
+_.assign(global, require(`./global.parameter`));
+global.mainInjection = require(`./mainInjection`);
+global.initMemory = require('./initMemory');
+
+
 
 // Load modules
-GLOBAL.util = require(`./global.util`);
 
-TASK.task = require('./task.task');
-
-_.assign(ROOT, {
-    ocsMemory: require('./ocsMemory'),
-    events: require('./events'),
-    flagDir: require('./flagDir'),
-    population: require('./population'),
-    visuals: require('./visuals')
-});
-
-// global assign
 _.assign(global, {
-    Util: GLOBAL.util,
-    Task: TASK.task,
-    OCSMemory: ROOT.ocsMemory,
-    Events: ROOT.events,
-    FlagDir: ROOT.flagDir,
-    Population: ROOT.population,
-    Visuals: ROOT.visuals
-});
-
-_.assign(TASK, {
-    mining: require('./task.mining'),
-    reputation: require('./task.reputation'),
-    defense: require('./task.defense')
+    Task: require('./task.task'),
+    OcsMemory: require('./ocsMemory'),
+    Events: require('./events'),
+    FlagDir: require('./flagDir'),
+    Population: require('./population'),
+    Util: require(`./global.util`),
+    Visuals: require('./visuals')
 });
 
 // TASK assign
-// Task = {};
+
 _.assign(global.Task, {
-    mining: TASK.mining,
-    reputation: TASK.reputation,
-    defense: TASK.defense
+    mining: require('./task.mining'),
+    reputation: require('./task.reputation'),
+    defense: require('./task.defense')
 });
 
 Creep.Action = require('./creep.action.Action');
 Creep.Behaviour = require('./creep.behaviour.Behaviour');
 Creep.Setup = require('./creep.setup.Setup');
 
-_.assign(CREEP, {
+_.assign(Creep, {
     action: {
         mining: require('./creep.action.mining'),
         recycling: require('./creep.action.recycling'),
@@ -175,92 +147,37 @@ _.assign(CREEP, {
         privateer: require('./creep.setup.privateer'),
         worker: require('./creep.setup.worker'),
         upgrader: require('./creep.setup.upgrader')
-    },
-    creep: require('./creep.creep')
-});
-
-_.assign(Creep, {
-    action: {
-        mining: CREEP.action.mining,
-        recycling: CREEP.action.recycling,
-        building: CREEP.action.building,
-        harvesting: CREEP.action.harvesting,
-        reallocating: CREEP.action.reallocating,
-        storing: CREEP.action.storing,
-        uncharging: CREEP.action.uncharging,
-        withdrawing: CREEP.action.withdrawing,
-        fueling: CREEP.action.fueling,
-        feeding: CREEP.action.feeding,
-        repairing: CREEP.action.repairing,
-        idle: CREEP.action.idle,
-        travelling: CREEP.action.travelling,
-        fortifying: CREEP.action.fortifying,
-        charging: CREEP.action.charging,
-        upgrading: CREEP.action.upgrading,
-        bulldozing: CREEP.action.bulldozing,
-        picking: CREEP.action.picking,
-        dismantling: CREEP.action.dismantling
-    },
-    behaviour: {
-        hauler: CREEP.behaviour.hauler,
-        miner: CREEP.behaviour.miner,
-        ranger: CREEP.behaviour.ranger,
-        worker: CREEP.behaviour.worker,
-        upgrader: CREEP.behaviour.upgrader
-
-    },
-    setup: {
-        hauler: CREEP.setup.hauler,
-        healer: CREEP.setup.healer,
-        miner: CREEP.setup.miner,
-        mineralMiner: CREEP.setup.mineralMiner,
-        privateer: CREEP.setup.privateer,
-        worker: CREEP.setup.worker,
-        upgrader: CREEP.setup.upgrader
-
     }
 });
 
-inject(Creep, CREEP.creep);
+inject(Creep, require('./creep.creep'));
 inject(Creep, PROTOTYPES.creep);
 inject(Creep, PROPERTIES.creep);
 
-ROOM.room = require('./room.room');
-inject(Room, ROOM.room);
+
+inject(Room, require('./room.room'));
 inject(Room, PROPERTIES.room);
 inject(Room, PROTOTYPES.room);
 inject(Room, PROTOTYPES.compounds);
 
-_.assign(ROOM, {
-    construction: require('./room.construction'),
-    container: require('./room.container'),
-    defense: require('./room.defense'),
-    link: require('./room.link'),
-    spawn: require('./room.spawn'),
-    extension: require('./room.extension'),
-    lab: require('./room.lab')
-
-});
-
 _.assign(Room, {
     _ext: {
-        construction: ROOM.construction,
-        containers: ROOM.container,
-        defense: ROOM.defense,
-        links: ROOM.link,
-        spawns: ROOM.spawn,
-        extension: ROOM.extension,
-        lab: ROOM.lab
+        construction: require('./room.construction'),
+        containers: require('./room.container'),
+        defense: require('./room.defense'),
+        links: require('./room.link'),
+        spawns: require('./room.spawn'),
+        extension: require('./room.extension'),
+        lab: require('./room.lab')
 
     }
 });
 
-ROOT.spawn = require('./spawn');
-inject(Spawn, ROOT.spawn);
+inject(Spawn, require('./spawn'));
 inject(Spawn, PROTOTYPES.spawn);
 
 // plus line!!
-ROOT.initMemory.init();
+global.initMemory.init();
 
 Object.keys(PROPERTIES).forEach(property => {
     PROPERTIES[property].extend();
@@ -269,18 +186,18 @@ Object.keys(PROTOTYPES).forEach(prototype => {
     PROTOTYPES[prototype].extend();
 });
 
-TASK.task.populate();
+global.Task.populate();
 
-if (ROOT.mainInjection.extend)
-    ROOT.mainInjection.extend();
+if (global.mainInjection.extend)
+    global.mainInjection.extend();
 
-ROOT.ocsMemory.activateSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, true);
+global.OcsMemory.activateSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, true);
 
 let Traveler = require('./traveler');
 //require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
 
 if (global.DEBUG)
-    GLOBAL.util.logSystem('Global.install', 'Code reloaded.');
+    global.Util.logSystem('Global.install', 'Code reloaded.');
 
 module.exports.loop = wrapLoop(function () {
 
@@ -291,8 +208,8 @@ module.exports.loop = wrapLoop(function () {
 
     try {
 
-        let totalUsage = GLOBAL.util.startProfiling('main', {startCPU: cpuAtLoop}),
-            p = GLOBAL.util.startProfiling('main', {enabled: global.PROFILING.MAIN, startCPU: cpuAtLoop});
+        let totalUsage = global.Util.startProfiling('main', {startCPU: cpuAtLoop}),
+            p = global.Util.startProfiling('main', {enabled: global.PROFILING.MAIN, startCPU: cpuAtLoop});
 
         p.checkCPU('deserialize memory', 5);
 
@@ -303,99 +220,99 @@ module.exports.loop = wrapLoop(function () {
             cpuAtFirstLoop = cpuAtLoop;
 
 
-        GLOBAL.util.set(Memory, 'parameters', {});
+        global.Util.set(Memory, 'parameters', {});
         _.assign(global, {parameters: Memory.parameters}); // allow for shorthand access in console
         // ensure up to date parameters, override in memory
-        _.assign(global, GLOBAL.parameter);
-        _.merge(global, parameters);
+        _.assign(global, require(`./global.parameter`));
+        _.merge(global, Memory.parameters);
 
-        ROOT.ocsMemory.processSegments();
+        global.OcsMemory.processSegments();
         p.checkCPU('processSegments', global.PROFILING.ANALYZE_LIMIT);
 
         // Flush cache
 
-        ROOT.events.flush();
-        ROOT.flagDir.flush();
-        ROOT.population.flush();
-        ROOM.room.flush();
-        TASK.task.flush();
+        global.Events.flush();
+        global.FlagDir.flush();
+        global.Population.flush();
+        Room.flush();
+        global.Task.flush();
 
-        if (ROOT.mainInjection.flush)
-            ROOT.mainInjection.flush();
+        if (global.mainInjection.flush)
+            global.mainInjection.flush();
 
         p.checkCPU('flush', global.PROFILING.ANALYZE_LIMIT);
 
         // Room event hooks must be registered before analyze for costMatrixInvalid
-        ROOM.room.register();
+        Room.register();
 
         // analyze environment, wait a tick if critical failure
-        if (!ROOT.flagDir.analyze()) {
-            GLOBAL.util.logError('flagDir.analyze failed, waiting one tick to sync flags');
+        if (!global.FlagDir.analyze()) {
+            global.Util.logError('flagDir.analyze failed, waiting one tick to sync flags');
             return;
         }
         p.checkCPU('flagDir.analyze', global.PROFILING.ANALYZE_LIMIT);
 
-        ROOM.room.analyze();
+        Room.analyze();
         p.checkCPU('Room.analyze', global.PROFILING.ANALYZE_LIMIT);
 
-        ROOT.population.analyze();
+        global.Population.analyze();
         p.checkCPU('Population.analyze', global.PROFILING.ANALYZE_LIMIT);
 
-        if (ROOT.mainInjection.analyze)
-            ROOT.mainInjection.analyze();
+        if (global.mainInjection.analyze)
+            global.mainInjection.analyze();
 
         // Register event hooks
-        CREEP.creep.register();
-        ROOT.spawn.register();
-        TASK.task.register();
+        Creep.register();
+        Spawn.register();
+        global.Task.register();
 
-        if (ROOT.mainInjection.register)
-            ROOT.mainInjection.register();
+        if (global.mainInjection.register)
+            global.mainInjection.register();
 
         p.checkCPU('register', global.PROFILING.REGISTER_LIMIT);
 
         // Execution
-        ROOT.population.execute();
+        global.Population.execute();
         p.checkCPU('population.execute', global.PROFILING.EXECUTE_LIMIT);
 
-        ROOT.flagDir.execute();
+        global.FlagDir.execute();
         p.checkCPU('flagDir.execute', global.PROFILING.EXECUTE_LIMIT);
 
-        ROOM.room.execute();
+        Room.execute();
         p.checkCPU('room.execute', global.PROFILING.EXECUTE_LIMIT);
 
-        CREEP.creep.execute();
+        Creep.execute();
         p.checkCPU('creep.execute', global.PROFILING.EXECUTE_LIMIT);
 
-        ROOT.spawn.execute();
+        Spawn.execute();
         p.checkCPU('spawn.execute', global.PROFILING.EXECUTE_LIMIT);
 
-        TASK.task.execute();
+        global.Task.execute();
         p.checkCPU('task.execute', global.PROFILING.EXECUTE_LIMIT);
 
-        if (ROOT.mainInjection.execute)
-            ROOT.mainInjection.execute();
+        if (global.mainInjection.execute)
+            global.mainInjection.execute();
 
         // post-processing
         // SEND statistic reports (not yet)
 
-        ROOT.flagDir.cleanup();
+        global.FlagDir.cleanup();
         p.checkCPU('FlagDir.cleanup', global.PROFILING.FLUSH_LIMIT);
 
-        ROOT.population.cleanup();
+        global.Population.cleanup();
         p.checkCPU('Population.cleanup', global.PROFILING.FLUSH_LIMIT);
 
-        ROOM.room.cleanup();
+        Room.cleanup();
         p.checkCPU('Room.cleanup', global.PROFILING.FLUSH_LIMIT);
 
         // custom cleanup
-        if (ROOT.mainInjection.cleanup)
-            ROOT.mainInjection.cleanup();
+        if (global.mainInjection.cleanup)
+            global.mainInjection.cleanup();
 
-        ROOT.ocsMemory.cleanup(); // must come last
+        global.OcsMemory.cleanup(); // must come last
         p.checkCPU('OCSMemory.cleanup', global.PROFILING.ANALYZE_LIMIT);
         if (global.ROOM_VISUALS && !Memory.CPU_CRITICAL)
-            ROOT.visuals.run(); // At end to correctly display used CPU.
+            global.Visuals.run(); // At end to correctly display used CPU.
         p.checkCPU('visuals', global.PROFILING.EXECUTE_LIMIT);
 
         // GRAFANA (not yet)
@@ -403,12 +320,12 @@ module.exports.loop = wrapLoop(function () {
         Game.cacheTime = Game.time;
 
         if (global.DEBUG && global.TRACE)
-            GLOBAL.util.trace('main', {cpuAtLoad, cpuAtFirstLoop, cpuAtLoop, cpuTick: Game.cpu.getUsed(), isNewServer: global.isNewServer, lastServerSwitch: Game.lastServerSwitch, main: 'cpu'});
+            global.Util.trace('main', {cpuAtLoad, cpuAtFirstLoop, cpuAtLoop, cpuTick: Game.cpu.getUsed(), isNewServer: global.isNewServer, lastServerSwitch: Game.lastServerSwitch, main: 'cpu'});
         totalUsage.totalCPU();
     }
     catch (e) {
         console.log(`ERROR ;)`);
-        GLOBAL.util.logError(e.stack || e.message);
+        global.Util.logError(e.stack || e.message);
     }
 
 });
