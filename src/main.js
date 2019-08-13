@@ -160,6 +160,7 @@ _.assign(CREEP, {
         dismantling: require('./creep.action.dismantling')
     },
     behaviour: {
+        hauler: require('./creep.behaviour.hauler'),
         miner: require('./creep.behaviour.miner'),
         ranger: require('./creep.behaviour.ranger'),
         worker: require('./creep.behaviour.worker'),
@@ -201,6 +202,7 @@ _.assign(Creep, {
         dismantling: CREEP.action.dismantling
     },
     behaviour: {
+        hauler: CREEP.behaviour.hauler,
         miner: CREEP.behaviour.miner,
         ranger: CREEP.behaviour.ranger,
         worker: CREEP.behaviour.worker,
