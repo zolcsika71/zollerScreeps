@@ -126,7 +126,7 @@ _.assign(TASK, {
 });
 
 // TASK assign
-_.assign(Task, {
+_.assign(global.Task, {
     mining: TASK.mining,
     reputation: TASK.reputation,
     defense: TASK.defense
@@ -159,6 +159,7 @@ _.assign(CREEP, {
         dismantling: require('./creep.action.dismantling')
     },
     behaviour: {
+        hauler: require('./creep.behaviour.hauler'),
         miner: require('./creep.behaviour.miner'),
         ranger: require('./creep.behaviour.ranger'),
         worker: require('./creep.behaviour.worker'),
@@ -200,6 +201,7 @@ _.assign(Creep, {
         dismantling: CREEP.action.dismantling
     },
     behaviour: {
+        hauler: CREEP.behaviour.hauler,
         miner: CREEP.behaviour.miner,
         ranger: CREEP.behaviour.ranger,
         worker: CREEP.behaviour.worker,

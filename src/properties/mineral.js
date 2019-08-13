@@ -32,7 +32,7 @@ mod.extend = function () {
             let that = this;
             if (_.isUndefined(this.memory.container)) {
                 this.room.saveContainers();
-            };
+            }
 
             if (_.isUndefined(this._container)) {
                 if (this.memory.terminal) {

@@ -806,6 +806,16 @@ let mod = {
         STRUCTURE_CONTAINER,
         STRUCTURE_RAMPART
         ],
+    LAB_IDLE: 'idle',
+    LAB_BOOST: 'boost',
+    LAB_SEED: 'seed',
+    LAB_MASTER: 'master',
+    LAB_SLAVE_1: 'slave_1',
+    LAB_SLAVE_2: 'slave_2',
+    LAB_SLAVE_3: 'slave_3',
+    REACTOR_TYPE_FLOWER: 'flower',
+    REACTOR_MODE_IDLE: 'idle',
+    REACTOR_MODE_BURST: 'burst',
     PART_THREAT: {
         'move': { common: 0, boosted: 0 },
         'work': { common: 1, boosted: 3 },

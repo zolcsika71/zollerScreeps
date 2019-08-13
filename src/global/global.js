@@ -109,3 +109,11 @@ mod.guid = function () {
     });
 };
 
+mod.LAB_REACTIONS = {};
+for (let a in REACTIONS) {
+    for (let b in REACTIONS[a]) {
+        mod.LAB_REACTIONS[REACTIONS[a][b]] = [a, b];
+    }
+}
+mod = _.bindAll(mod);
+
