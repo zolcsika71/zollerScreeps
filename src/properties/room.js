@@ -2,10 +2,8 @@
 
 const
     GLOBAL = {
+        global: require('./global.global'),
         util: require(`./global.util`)
-    },
-    ROOT = {
-        flagDir: require('./flagDir'),
     };
 
 let mod = {};
@@ -38,8 +36,8 @@ mod.extend = function () {
                 get: function () {
                     if (_.isUndefined(this._towers)) {
                         this._towers = [];
-                        let add = id => {
-                            global.addById(this._towers, id);
+                        var add = id => {
+                            addById(this._towers, id);
                         };
                         _.forEach(this.room.memory.towers, add);
                     }
@@ -65,7 +63,7 @@ mod.extend = function () {
                 configurable: true,
                 get: function () {
                     if (_.isUndefined(this._urgentRepairableSites)) {
-                        let isUrgent = site => (site.hits < (global.LIMIT_URGENT_REPAIRING + (global.DECAY_AMOUNT[site.structureType] || 0)));
+                        var isUrgent = site => (site.hits < (LIMIT_URGENT_REPAIRING + (DECAY_AMOUNT[site.structureType] || 0)));
                         this._urgentRepairableSites = _.filter(this.repairable, isUrgent);
                     }
                     return this._urgentRepairableSites;
@@ -90,11 +88,11 @@ mod.extend = function () {
                                 structure => (
                                     that.room.my &&
                                     structure.hits < structure.hitsMax &&
-                                    structure.hits < global.MAX_FORTIFY_LIMIT[that.room.controller.level] &&
-                                    (structure.structureType !== STRUCTURE_CONTAINER || structure.hits < global.MAX_FORTIFY_CONTAINER) &&
-                                    (!global.DECAYABLES.includes(structure.structureType) || (structure.hitsMax - structure.hits) > global.GAP_REPAIR_DECAYABLE * 3) &&
+                                    structure.hits < MAX_FORTIFY_LIMIT[that.room.controller.level] &&
+                                    (structure.structureType != STRUCTURE_CONTAINER || structure.hits < MAX_FORTIFY_CONTAINER) &&
+                                    (!DECAYABLES.includes(structure.structureType) || (structure.hitsMax - structure.hits) > GAP_REPAIR_DECAYABLE * 3) &&
                                     (Memory.pavementArt[that.room.name] === undefined || Memory.pavementArt[that.room.name].indexOf('x' + structure.pos.x + 'y' + structure.pos.y + 'x') < 0) &&
-                                    (!ROOT.FlagDir.list.some(f => f.roomName === structure.pos.roomName && f.color === COLOR_ORANGE && f.x === structure.pos.x && f.y === structure.pos.y))
+                                    (!FlagDir.list.some(f => f.roomName == structure.pos.roomName && f.color == COLOR_ORANGE && f.x == structure.pos.x && f.y == structure.pos.y))
                                 )
                             ),
                             'hits'
@@ -107,9 +105,9 @@ mod.extend = function () {
                 configurable: true,
                 get: function () {
                     if (_.isUndefined(this._fuelables)) {
-                        let that = this,
-                            factor = that.room.situation.invasion ? 1 : 0.82,
-                            fuelable = target => (target.energy < (target.energyCapacity * factor));
+                        var that = this;
+                        var factor = that.room.situation.invasion ? 1 : 0.82;
+                        var fuelable = target => (target.energy < (target.energyCapacity * factor));
                         this._fuelables = _.sortBy(_.filter(this.towers, fuelable), 'energy') ; // TODO: Add Nuker
                     }
                     return this._fuelables;
@@ -155,8 +153,8 @@ mod.extend = function () {
                 configurable: true,
                 get: function () {
                     if (_.isUndefined(this._piles)) {
-                        let room = this.room;
-                        this._piles = ROOT.FlagDir.filter(global.FLAG_COLOR.command.drop, room.getPositionAt(25, 25), true)
+                        const room = this.room;
+                        this._piles = FlagDir.filter(FLAG_COLOR.command.drop, room.getPositionAt(25, 25), true)
                             .map(function (flagInformation) {
                                 const flag = Game.flags[flagInformation.name];
                                 const piles = room.lookForAt(LOOK_ENERGY, flag.pos.x, flag.pos.y);
@@ -232,8 +230,8 @@ mod.extend = function () {
                 get: function () {
                     if (_.isUndefined(this._spawns)) {
                         this._spawns = [];
-                        let addSpawn = id => {
-                            global.addById(this._spawns, id);
+                        var addSpawn = id => {
+                            addById(this._spawns, id);
                         };
                         _.forEach(this.room.memory.spawns, addSpawn);
                     }
@@ -247,7 +245,7 @@ mod.extend = function () {
         'flags': {
             configurable: true,
             get() {
-                return GLOBAL.util.get(this, '_flags', _.filter(ROOT.FlagDir.list, {roomName: this.name}));
+                return global.Util.get(this, '_flags', _.filter(global.FlagDir.list, {roomName: this.name}));
             }
         },
         'structures': {
@@ -368,16 +366,13 @@ mod.extend = function () {
                         let that = this;
                         let adjacent, ownNeighbor, room, mult;
 
-                        let flagEntries = ROOT.FlagDir.filter(global.FLAG_COLOR.invade.exploit);
+                        let flagEntries = FlagDir.filter(FLAG_COLOR.invade.exploit);
                         let countOwn = roomName => {
-                            if (roomName === that.name)
-                                return;
-                            if (Room.isMine(roomName))
-                                ownNeighbor++;
+                            if (roomName == that.name) return;
+                            if (Room.isMine(roomName)) ownNeighbor++;
                         };
                         let calcWeight = flagEntry => {
-                            if (!this.adjacentAccessibleRooms.includes(flagEntry.roomName))
-                                return;
+                            if (!this.adjacentAccessibleRooms.includes(flagEntry.roomName)) return;
                             room = Game.rooms[flagEntry.roomName];
                             if (room) {
                                 adjacent = room.adjacentAccessibleRooms;
@@ -392,7 +387,7 @@ mod.extend = function () {
                         };
                         flagEntries.forEach(calcWeight);
                     }
-                }
+                };
                 return this._privateerMaxWeight;
             }
         },
@@ -407,10 +402,10 @@ mod.extend = function () {
                     let distance, reserved, flag;
                     let rcl = this.controller.level;
 
-                    let flagEntries = ROOT.FlagDir.filter([global.FLAG_COLOR.claim, global.FLAG_COLOR.claim.reserve, global.FLAG_COLOR.invade.exploit]);
+                    let flagEntries = FlagDir.filter([FLAG_COLOR.claim, FLAG_COLOR.claim.reserve, FLAG_COLOR.invade.exploit]);
                     let calcWeight = flagEntry => {
                         // don't spawn claimer for reservation at RCL < 4 (claimer not big enough)
-                        if (rcl > 3 || (flagEntry.color === global.FLAG_COLOR.claim.color && flagEntry.secondaryColor === global.FLAG_COLOR.claim.secondaryColor)) {
+                        if (rcl > 3 || (flagEntry.color == FLAG_COLOR.claim.color && flagEntry.secondaryColor == FLAG_COLOR.claim.secondaryColor)) {
                             distance = Room.roomDistance(that.name, flagEntry.roomName);
                             if (distance > maxRange)
                                 return;
@@ -418,12 +413,12 @@ mod.extend = function () {
                             if (flag.room && flag.room.controller && flag.room.controller.reservation && flag.room.controller.reservation.ticksToEnd > 2500)
                                 return;
 
-                            reserved = flag.targetOf && flag.targetOf ? _.sum(flag.targetOf.map(t => t.creepType === 'claimer' ? t.weight : 0)) : 0;
+                            reserved = flag.targetOf && flag.targetOf ? _.sum(flag.targetOf.map(t => t.creepType == 'claimer' ? t.weight : 0)) : 0;
                             that._claimerMaxWeight += (base - reserved);
-                        }
+                        };
                     };
                     flagEntries.forEach(calcWeight);
-                }
+                };
                 return this._claimerMaxWeight;
             }
         },
@@ -443,15 +438,15 @@ mod.extend = function () {
                             // don't walk on allied construction sites.
                             if (site && !structure.my && Task.reputation.allyOwner(structure)) return costMatrix.set(structure.pos.x, structure.pos.y, 0xFF);
                             if (structure.structureType === STRUCTURE_ROAD) {
-                                if (!site || global.USE_UNBUILT_ROADS)
+                                if (!site || USE_UNBUILT_ROADS)
                                     return costMatrix.set(structure.pos.x, structure.pos.y, 1);
                             } else if (structure.structureType === STRUCTURE_PORTAL) {
                                 return costMatrix.set(structure.pos.x, structure.pos.y, 0xFF); // only take final step onto portals
                             } else if (OBSTACLE_OBJECT_TYPES.includes(structure.structureType)) {
-                                if (!site || global.Task.reputation.allyOwner(structure)) // don't set for hostile construction sites
+                                if (!site || Task.reputation.allyOwner(structure)) // don't set for hostile construction sites
                                     return costMatrix.set(structure.pos.x, structure.pos.y, 0xFF);
                             } else if (structure.structureType === STRUCTURE_RAMPART && !structure.my && !structure.isPublic) {
-                                if (!site || global.Task.reputation.allyOwner(structure)) // don't set for hostile construction sites
+                                if (!site || Task.reputation.allyOwner(structure)) // don't set for hostile construction sites
                                     return costMatrix.set(structure.pos.x, structure.pos.y, 0xFF);
                             }
                         };
@@ -821,7 +816,7 @@ mod.extend = function () {
                 if (_.isUndefined(this._minerals)) {
                     this._minerals = [];
                     let add = id => {
-                        global.addById(this._minerals, id);
+                        addById(this._minerals, id);
                     };
                     _.forEach(this.memory.minerals, add);
                 }
@@ -843,7 +838,7 @@ mod.extend = function () {
         'sources': {
             configurable: true,
             get: function () {
-                if (_.isUndefined(this.memory.sources) || this.name === 'sim') {
+                if (_.isUndefined(this.memory.sources) || this.name == 'sim') {
                     this._sources = this.find(FIND_SOURCES);
                     if (this._sources.length > 0) {
                         this.memory.sources = this._sources.map(s => s.id);
@@ -852,7 +847,7 @@ mod.extend = function () {
                 if (_.isUndefined(this._sources)) {
                     this._sources = [];
                     let addSource = id => {
-                        global.addById(this._sources, id);
+                        GLOBAL.global.addById(this._sources, id);
                     };
                     this.memory.sources.forEach(addSource);
                 }
@@ -907,7 +902,7 @@ mod.extend = function () {
             get: function () {
                 if (_.isUndefined(this._casualties)) {
                     var isInjured = creep => creep.hits < creep.hitsMax &&
-                        (creep.towers === undefined || creep.towers.length === 0);
+                        (creep.towers === undefined || creep.towers.length == 0);
                     this._casualties = _.sortBy(_.filter(this.creeps, isInjured), 'hits');
                 }
                 return this._casualties;
@@ -948,7 +943,7 @@ mod.extend = function () {
             configurable: true,
             get: function () {
                 if (_.isUndefined(this._hostiles)) {
-                    this._hostiles = this.find(FIND_HOSTILE_CREEPS, { filter : global.Task.reputation.hostileOwner });
+                    this._hostiles = this.find(FIND_HOSTILE_CREEPS, { filter : Task.reputation.hostileOwner });
                 }
                 return this._hostiles;
             }

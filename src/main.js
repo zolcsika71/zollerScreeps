@@ -126,8 +126,8 @@ _.assign(TASK, {
 });
 
 // TASK assign
-Task = {};
-_.assign(Task, {
+// Task = {};
+_.assign(global.Task, {
     mining: TASK.mining,
     reputation: TASK.reputation,
     defense: TASK.defense
