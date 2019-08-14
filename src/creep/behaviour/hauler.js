@@ -19,9 +19,7 @@ behaviour.outflowActions = (creep) => {
         Creep.action.fueling,
         Creep.action.storing
     ];
-    if (creep.sum > creep.carry.energy ||
-        (!creep.room.situation.invasion &&
-            global.SPAWN_DEFENSE_ON_ATTACK && creep.room.conserveForDefense && creep.room.relativeEnergyAvailable > 0.8)) {
+    if (creep.sum > creep.carry.energy || !creep.room.situation.invasion && global.SPAWN_DEFENSE_ON_ATTACK && creep.room.conserveForDefense && creep.room.relativeEnergyAvailable > 0.8) {
         priority.unshift(Creep.action.storing);
     }
     if (creep.room.structures.urgentRepairable.length > 0) {

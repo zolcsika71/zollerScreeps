@@ -2,7 +2,7 @@
 
 let mod = {};
 module.exports = mod;
-mod.extend = function () {
+mod.extend = () => {
 
     // extensions.js
     Object.defineProperty(Structure.prototype, 'towers', {
