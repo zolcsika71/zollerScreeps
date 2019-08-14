@@ -1,11 +1,5 @@
 "use strict";
 
-const
-    ROOT = {
-        population: require('./population'),
-        visuals: require('./visuals')
-    };
-
 // base class for every action
 let Action = function (actionName) {
     // action name
@@ -30,16 +24,16 @@ let Action = function (actionName) {
     this.isValidAction = creep => true;
     // determines, if a target is (still) valid. Gets validated each tick.
     // check possible override in derived action
-    this.isValidTarget = (target, creep) => (target != null);
+    this.isValidTarget = (target, creep) => target != null;
     // determines, if an action is valid. Gets validated only once upon assignment.
     // check possible override in derived action
     this.isAddableAction = function (creep) {
-        return (this.maxPerAction === Infinity || !creep.room.population || !creep.room.population.actionCount[this.name] || creep.room.population.actionCount[this.name] < this.maxPerAction);
+        return this.maxPerAction === Infinity || !creep.room.population || !creep.room.population.actionCount[this.name] || creep.room.population.actionCount[this.name] < this.maxPerAction;
     };
     // determines, if a target is valid. Gets validated only once upon assignment.
     // check possible override in derived action
     this.isAddableTarget = function (target, creep) { // target is valid to be given to an additional creep
-        return (!target.targetOf || this.maxPerTarget === Infinity || _.filter(target.targetOf, {'actionName': this.name}).length < this.maxPerTarget);
+        return !target.targetOf || this.maxPerTarget === Infinity || _.filter(target.targetOf, {'actionName': this.name}).length < this.maxPerTarget;
     };
     // find a new target for that action
     // needs implementation in derived action
@@ -105,9 +99,9 @@ let Action = function (actionName) {
         if (target === undefined) target = this.newTarget(creep);
         if (target && this.isAddableTarget(target, creep)) {
             if (global.DEBUG && global.TRACE)
-                global.Util.trace('Action', {creepName: creep.name, assign: this.name, target: !target || target.name || target.id, Action: 'assign'});
+                global.trace('Action', {creepName: creep.name, assign: this.name, target: !target || target.name || target.id, Action: 'assign'});
             if (!creep.action || creep.action.name !== this.name || !creep.target || creep.target.id !== target.id || creep.target.name !== target.name) {
-                ROOT.population.registerAction(creep, this, target);
+                global.Population.registerAction(creep, this, target);
                 this.onAssignment(creep, target);
             }
             return true;
@@ -117,7 +111,7 @@ let Action = function (actionName) {
     this.showAssignment = function (creep, target) {
         if (global.SAY_ASSIGNMENT && global.ACTION_SAY[this.name.toUpperCase()]) creep.say(global.ACTION_SAY[this.name.toUpperCase()], global.SAY_PUBLIC);
         if (target instanceof RoomObject || target instanceof RoomPosition && global.VISUALS.ACTION_ASSIGNMENT) {
-            ROOT.visuals.drawArrow(creep, target);
+            global.Visuals.drawArrow(creep, target);
         }
     };
     // assignment postprocessing

@@ -32,7 +32,7 @@ action.newTarget = creep => {
                 };
                 flag = ROOT.flagDir.find(global.FLAG_COLOR.destroy.dismantle, creep.pos, true, otherFlagMod, oldName);
                 if (oldName === flag.name)
-                    global.Util.logError('Removed flag found again in dismantling.newTarget!');
+                    global.logError('Removed flag found again in dismantling.newTarget!');
                 if (flag) {
                     if (flag.room !== undefined) { // room is visible
                         let targets = flag.room.lookForAt(LOOK_STRUCTURES, flag.pos.x, flag.pos.y);

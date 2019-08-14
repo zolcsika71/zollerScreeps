@@ -197,7 +197,7 @@ let Traveler = require('./traveler');
 //require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
 
 if (global.DEBUG)
-    global.Util.logSystem('Global.install', 'Code reloaded.');
+    global.logSystem('Global.install', 'Code reloaded.');
 
 module.exports.loop = wrapLoop(function () {
 
@@ -247,7 +247,7 @@ module.exports.loop = wrapLoop(function () {
 
         // analyze environment, wait a tick if critical failure
         if (!global.FlagDir.analyze()) {
-            global.Util.logError('flagDir.analyze failed, waiting one tick to sync flags');
+            global.logError('flagDir.analyze failed, waiting one tick to sync flags');
             return;
         }
         p.checkCPU('flagDir.analyze', global.PROFILING.ANALYZE_LIMIT);
@@ -320,12 +320,12 @@ module.exports.loop = wrapLoop(function () {
         Game.cacheTime = Game.time;
 
         if (global.DEBUG && global.TRACE)
-            global.Util.trace('main', {cpuAtLoad, cpuAtFirstLoop, cpuAtLoop, cpuTick: Game.cpu.getUsed(), isNewServer: global.isNewServer, lastServerSwitch: Game.lastServerSwitch, main: 'cpu'});
+            global.trace('main', {cpuAtLoad, cpuAtFirstLoop, cpuAtLoop, cpuTick: Game.cpu.getUsed(), isNewServer: global.isNewServer, lastServerSwitch: Game.lastServerSwitch, main: 'cpu'});
         totalUsage.totalCPU();
     }
     catch (e) {
         console.log(`ERROR ;)`);
-        global.Util.logError(e.stack || e.message);
+        global.logError(e.stack || e.message);
     }
 
 });

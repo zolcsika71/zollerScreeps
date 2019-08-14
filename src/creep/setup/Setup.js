@@ -1,12 +1,4 @@
-//"use strict";
-
-const
-    GLOBAL = {
-        util: require(`./global.util`)
-    },
-    ROOT = {
-        population: require('./population')
-    };
+"use strict";
 
 let Setup = function (typeName) {
     this.none = {
@@ -75,7 +67,7 @@ let Setup = function (typeName) {
     this.isValidSetup = function (room) {
         if (room.controller.level < this.minControllerLevel) {
             if (global.DEBUG && global.TRACE)
-                global.Util.trace('Setup', {setupType: this.type, room: room.name, rcl: room.controller.level, Setup: 'isValidSetup'}, 'low RCL');
+                global.trace('Setup', {setupType: this.type, room: room.name, rcl: room.controller.level, Setup: 'isValidSetup'}, 'low RCL');
             return false;
         }
 
@@ -87,7 +79,7 @@ let Setup = function (typeName) {
         if (absEnergy < minAbsEnergyAvailable ||
             energy < minEnergyAvailable) {
             if (global.DEBUG && global.TRACE)
-                global.Util.trace('Setup', {setupType: this.type, room: room.name, absEnergy, energy, Setup: 'isValidSetup'}, 'not enough energy');
+                global.trace('Setup', {setupType: this.type, room: room.name, absEnergy, energy, Setup: 'isValidSetup'}, 'not enough energy');
             return false;
         }
 
@@ -95,7 +87,7 @@ let Setup = function (typeName) {
             maxWeight = this.SelfOrCall(this._maxWeight, room);
         if (maxCount === 0 || maxWeight === 0) {
             if (global.DEBUG && global.TRACE)
-                global.Util.trace('Setup', {setupType: this.type, room: room.name, maxCount, maxWeight, Setup: 'isValidSetup'}, 'too many creeps');
+                global.trace('Setup', {setupType: this.type, room: room.name, maxCount, maxWeight, Setup: 'isValidSetup'}, 'too many creeps');
             return false;
         }
         if (maxCount == null)
@@ -115,7 +107,7 @@ let Setup = function (typeName) {
             };
             _.forEach(Memory.population, count);
         } else {
-            let population = this.globalMeasurement ? ROOT.population : room.population;
+            let population = this.globalMeasurement ? global.Population : room.population;
             if (!population || !population.typeCount[this.type])
                 return true;
             existingCount = population.typeCount[this.type] || 0;
@@ -123,7 +115,7 @@ let Setup = function (typeName) {
         }
         const returnVal = existingCount < maxCount && existingWeight < maxWeight;
         if (global.DEBUG && global.TRACE)
-            Util.trace('Setup', {setupType: this.type, room: room.name, returnVal, Setup: 'isValidSetup'}, 'count:', existingCount, '<', maxCount, 'weight:', existingWeight, '<', maxWeight);
+            global.trace('Setup', {setupType: this.type, room: room.name, returnVal, Setup: 'isValidSetup'}, 'count:', existingCount, '<', maxCount, 'weight:', existingWeight, '<', maxWeight);
         return returnVal;
     };
     this.existingWeight = function (room) {
@@ -137,7 +129,7 @@ let Setup = function (typeName) {
             };
             _.forEach(Memory.population, count);
         } else {
-            let population = this.globalMeasurement ? ROOT.population : room.population;
+            let population = this.globalMeasurement ? global.Population : room.population;
             existingWeight = population ? (population.typeWeight[this.type] || 0) : 0;
         }
         return existingWeight;
@@ -154,7 +146,7 @@ let Setup = function (typeName) {
             maxCreepWeight = maxWeight - existingWeight;
         }
         if (global.DEBUG && global.TRACE)
-            Util.trace('Setup', {setupType: this.type, room: room.name, Setup: 'parts',
+            global.trace('Setup', {setupType: this.type, room: room.name, Setup: 'parts',
             maxWeight, minMulti, maxMulti});
         return Creep.compileBody(room, {
             fixedBody, multiBody, minMulti, maxMulti,

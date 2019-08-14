@@ -161,7 +161,7 @@ mod.spawn = (creepDefinition, destiny, roomParams, onQueued) => {
     };
     if (creepSetup.parts.length === 0) {
         // creep has no body.
-        global.Util.logSystem(flag.pos.roomName, global.Util.dye(global.CRAYON.error, `${destiny.task} task tried to queue a zero parts body ${creepDefinition.behaviour} creep. Aborted.`));
+        global.logSystem(flag.pos.roomName, global.dye(global.CRAYON.error, `${destiny.task} task tried to queue a zero parts body ${creepDefinition.behaviour} creep. Aborted.`));
         return null;
     }
     // queue creep for spawning
@@ -349,7 +349,7 @@ mod.validateRunning = function (memory, flag, task, options = {}) {
 };
 mod.validateAll = function (memory, flag, task, options = {}) {
     if (_.isUndefined(options.roomName))
-        return global.Util.logError('Task.validateAll', 'roomName undefined' + flag + options.subKey);
+        return global.logError('Task.validateAll', 'roomName undefined' + flag + options.subKey);
     mod.validateQueued(memory, flag, task, options);
     mod.validateSpawning(memory, flag, task, options);
     mod.validateRunning(memory, flag, task, options);

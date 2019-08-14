@@ -425,7 +425,7 @@ mod.extend = function () {
                         this._structureMatrix = cachedMatrix;
                     } else {
                         if (global.DEBUG)
-                            global.Util.logSystem(this.name, 'Calculating cost matrix');
+                            global.logSystem(this.name, 'Calculating cost matrix');
                         const costMatrix = new PathFinder.CostMatrix;
                         let setCosts = structure => {
                             const site = structure instanceof ConstructionSite;
@@ -455,7 +455,7 @@ mod.extend = function () {
                         };
                         Room.pathfinderCacheDirty = true;
                         if (global.DEBUG && global.TRACE)
-                            global.Util.trace('PathFinder', {roomName: this.name, prevTime, structures: this.structures.all.length, PathFinder: 'CostMatrix'}, 'updated costmatrix');
+                            global.trace('PathFinder', {roomName: this.name, prevTime, structures: this.structures.all.length, PathFinder: 'CostMatrix'}, 'updated costmatrix');
                         this._structureMatrix = costMatrix;
                     }
                 }

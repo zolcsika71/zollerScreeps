@@ -39,7 +39,7 @@ mod.unregisterCreep = function(creepName){
 };
 mod.registerAction = function (creep, action, target, entry) {
     if (global.DEBUG && global.TRACE)
-        global.Util.trace('Population', {creepName: this.name, registerAction: action.name, target: target.name || target.id, Population: 'registerAction'});
+        global.trace('Population', {creepName: this.name, registerAction: action.name, target: target.name || target.id, Population: 'registerAction'});
 
     if (creep === target)
         throw new Error('attempt to register self target');
@@ -168,7 +168,7 @@ mod.analyze = function () {
         let creep = Game.creeps[entry.creepName];
         if (!creep) {
             if (global.CENSUS_ANNOUNCEMENTS)
-                global.Util.logSystem(entry.homeRoom, global.Util.dye(CRAYON.death, 'Good night ' + entry.creepName + '!'));
+                global.logSystem(entry.homeRoom, global.dye(CRAYON.death, 'Good night ' + entry.creepName + '!'));
             this.died.push(entry.creepName);
         } else {
             creep.data = entry;
@@ -187,7 +187,7 @@ mod.analyze = function () {
                 creep.data.nearDeath = true;
 
                 if (global.CENSUS_ANNOUNCEMENTS)
-                    console.log(global.Util.dye(global.CRAYON.system, entry.creepName + ' &gt; ') + global.Util.dye(global.CRAYON.death, 'Farewell!'), global.Util.stack());
+                    console.log(global.dye(global.CRAYON.system, entry.creepName + ' &gt; ') + global.dye(global.CRAYON.death, 'Farewell!'), global.stack());
 
                 this.predictedRenewal.push(creep.name);
 

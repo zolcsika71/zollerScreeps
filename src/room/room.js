@@ -86,7 +86,7 @@ mod.analyze = function () {
         }
         catch (err) {
             Game.notify('Error in room.js (Room.prototype.loop) for "' + room.name + '" : ' + err.stack ? err + '<br/>' + err.stack : err);
-            console.log(global.Util.dye(global.CRAYON.error, 'Error in room.js (Room.prototype.loop) for "' + room.name + '": <br/>' + (err.stack || err.toString()) + '<br/>' + err.stack));
+            console.log(global.dye(global.CRAYON.error, 'Error in room.js (Room.prototype.loop) for "' + room.name + '": <br/>' + (err.stack || err.toString()) + '<br/>' + err.stack));
         }
     };
     _.forEach(Game.rooms, r => {
@@ -117,7 +117,7 @@ mod.execute = function () {
                 }
             }
         } catch (e) {
-            global.Util.logError(e.stack || e.message);
+            global.logError(e.stack || e.message);
         }
     };
     _.forEach(Memory.rooms, (memory, roomName) => {
@@ -161,7 +161,7 @@ mod.cleanup = function () {
 };
 mod.routeCallback = function (origin, destination, options) {
     if (_.isUndefined(origin) || _.isUndefined(destination))
-        global.Util.logError('Room.routeCallback', 'both origin and destination must be defined - origin:' + origin + ' destination:' + destination);
+        global.logError('Room.routeCallback', 'both origin and destination must be defined - origin:' + origin + ' destination:' + destination);
     return function (roomName) {
         if (Game.map.getRoomLinearDistance(origin, roomName) > options.restrictDistance)
             return false;
@@ -293,7 +293,7 @@ mod.roomDistance = function (roomName1, roomName2, diagonal, continuous) {
 };
 mod.rebuildCostMatrix = function (roomName) {
     if (global.DEBUG)
-        global.Util.logSystem(roomName, 'Invalidating costmatrix to force a rebuild when we have vision.');
+        global.logSystem(roomName, 'Invalidating costmatrix to force a rebuild when we have vision.');
     _.set(Room, ['pathfinderCache', roomName, 'stale'], true);
     _.set(Room, ['pathfinderCache', roomName, 'updated'], Game.time);
     Room.pathfinderCacheDirty = true;
@@ -324,7 +324,7 @@ mod.getCachedStructureMatrix = function (roomName) {
             ttl = Game.time - mem.updated;
         if (mem.version === Room.COSTMATRIX_CACHE_VERSION && (mem.serializedMatrix || mem.costMatrix) && !mem.stale && ttl < COST_MATRIX_VALIDITY) {
             if (global.DEBUG && global.TRACE)
-                global.Util.trace('PathFinder', {roomName: roomName, ttl, PathFinder: 'CostMatrix'}, 'cached costmatrix');
+                global.trace('PathFinder', {roomName: roomName, ttl, PathFinder: 'CostMatrix'}, 'cached costmatrix');
             return true;
         }
         return false;
@@ -340,7 +340,7 @@ mod.getCachedStructureMatrix = function (roomName) {
             cache.costMatrix = costMatrix;
             return costMatrix;
         } else {
-            global.Util.logError('Room.getCachedStructureMatrix', `Cached costmatrix for ${roomName} is invalid ${cache}`);
+            global.logError('Room.getCachedStructureMatrix', `Cached costmatrix for ${roomName} is invalid ${cache}`);
             delete Room.pathfinderCache[roomName];
         }
     }

@@ -38,7 +38,7 @@ mod.extend = function () {
             const ret = _(Memory.population).filter({flagName}).find(findFunc);
             return ret ? ret.creepName : null;
         } else {
-            global.Util.logError(`${this.name} - Invalid arguments for Creep.findGroupMemberBy ${flagName} ${findFunc}`);
+            global.logError(`${this.name} - Invalid arguments for Creep.findGroupMemberBy ${flagName} ${findFunc}`);
         }
         return null;
     };
@@ -97,13 +97,13 @@ mod.extend = function () {
                 p.checkCPU('buildNearby', global.PROFILING.MIN_THRESHOLD);
             }
             if (global.DEBUG && global.TRACE)
-                global.Util.trace('Creep', {creepName: this.name, pos: this.pos, Behaviour: behaviour && behaviour.name, Creep: 'run'});
+                global.trace('Creep', {creepName: this.name, pos: this.pos, Behaviour: behaviour && behaviour.name, Creep: 'run'});
             if (behaviour) {
                 behaviour.run(this);
                 p.checkCPU('behaviour.run', global.PROFILING.MIN_THRESHOLD);
             } else if (!this.data) {
                 if (global.DEBUG && global.TRACE)
-                    global.Util.trace('Creep', {creepName: this.name, pos: this.pos, Creep: 'run'}, 'memory init');
+                    global.trace('Creep', {creepName: this.name, pos: this.pos, Creep: 'run'}, 'memory init');
                 let type = this.memory.setup;
                 let weight = this.memory.cost;
                 let home = this.memory.home;
@@ -111,7 +111,7 @@ mod.extend = function () {
                 let breeding = this.memory.breeding;
                 if (type && weight && home && spawn && breeding) {
                     //console.log( 'Fixing corrupt creep without population entry: ' + this.name );
-                    let entry = ROOT.population.setCreep({
+                    let entry = global.Population.setCreep({
                         creepName: this.name,
                         creepType: type,
                         weight: weight,
@@ -124,14 +124,14 @@ mod.extend = function () {
                         flagName: null,
                         body: _.countBy(this.body, 'type')
                     });
-                    ROOT.population.countCreep(this.room, entry);
+                    global.Population.countCreep(this.room, entry);
                 } else {
-                    console.log(global.Util.dye(global.CRAYON.error, 'Corrupt creep without population entry!! : ' + this.name), global.Util.stack());
+                    console.log(global.dye(global.CRAYON.error, 'Corrupt creep without population entry!! : ' + this.name), global.stack());
                     // trying to import creep
                     let counts = _.countBy(this.body, 'type');
                     if (counts[WORK] && counts[CARRY]) {
                         let weight = (counts[WORK] * BODYPART_COST[WORK]) + (counts[CARRY] * BODYPART_COST[CARRY]) + (counts[MOVE] * BODYPART_COST[MOVE]);
-                        let entry = ROOT.population.setCreep({
+                        let entry = global.Population.setCreep({
                             creepName: this.name,
                             creepType: 'worker',
                             weight: weight,
@@ -144,7 +144,7 @@ mod.extend = function () {
                             flagName: null,
                             body: _.countBy(this.body, 'type')
                         });
-                        ROOT.population.countCreep(this.room, entry);
+                        global.Population.countCreep(this.room, entry);
                     } else this.suicide();
                     p.checkCPU('!this.data', global.PROFILING.MIN_THRESHOLD);
                 }
@@ -241,7 +241,7 @@ mod.extend = function () {
         if (HONK) this.say('\u{1F500}\u{FE0E}', SAY_PUBLIC);
     };
     Creep.prototype.fleeMove = function () {
-        if (global.DEBUG && global.TRACE) global.Util.trace('Creep', {creepName: this.name, pos: this.pos, Action: 'fleeMove', Creep: 'run'});
+        if (global.DEBUG && global.TRACE) global.trace('Creep', {creepName: this.name, pos: this.pos, Action: 'fleeMove', Creep: 'run'});
         let drop = r => {
             if (this.carry[r] > 0) this.drop(r);
         };
@@ -360,12 +360,12 @@ mod.extend = function () {
             const repairRange = this.data && this.data.creepType === 'remoteHauler' ? global.REMOTE_HAULER.DRIVE_BY_REPAIR_RANGE : global.DRIVE_BY_REPAIR_RANGE;
             const repairTarget = _(this.pos.findInRange(FIND_STRUCTURES, repairRange)).find(s => Room.shouldRepair(this.room, s));
             if (repairTarget) {
-                if (global.DEBUG && global.TRACE) global.Util.trace('Creep', {creepName: this.name, Action: 'repairing', Creep: 'repairNearby'}, repairTarget.pos);
+                if (global.DEBUG && global.TRACE) global.trace('Creep', {creepName: this.name, Action: 'repairing', Creep: 'repairNearby'}, repairTarget.pos);
                 this.repair(repairTarget);
             }
         } else {
             if (global.DEBUG && global.TRACE)
-                global.Util.trace('Creep', {creepName: this.name, pos: this.pos, Action: 'repairing', Creep: 'repairNearby'}, 'not repairing');
+                global.trace('Creep', {creepName: this.name, pos: this.pos, Action: 'repairing', Creep: 'repairNearby'}, 'not repairing');
 
         }
     };
@@ -378,11 +378,11 @@ mod.extend = function () {
                 s.structureType === STRUCTURE_ROAD));
         if (buildTarget) {
             if (global.DEBUG && global.TRACE)
-                global.Util.trace('Creep', {creepName: this.name, Action: 'building', Creep: 'buildNearby'}, buildTarget.pos);
+                global.trace('Creep', {creepName: this.name, Action: 'building', Creep: 'buildNearby'}, buildTarget.pos);
             this.build(buildTarget);
         } else {
             if (global.DEBUG && global.TRACE)
-                global.Util.trace('Creep', {creepName: this.name, Action: 'building', Creep: 'buildNearby'}, 'not building');
+                global.trace('Creep', {creepName: this.name, Action: 'building', Creep: 'buildNearby'}, 'not building');
         }
     };
     Creep.prototype.controllerSign = function () {

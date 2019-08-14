@@ -53,114 +53,11 @@ mod.isObject = function (value) {
     return typeof value === 'function' || typeof value === 'object';
 };
 
-/**
- * Returns a HTML formatted string with the style applied
- * @param {Object|string} style - Either a colour string or an object with CSS properties
- * @param {...string} text - The text to format
- * @returns {string}
- */
-mod.dye = function (style, ...text) {
-    const msg = text.join(' ');
-    if (mod.isObject(style)) {
-        let css = '',
-            format = key => css += `${key}: ${style[key]};`;
-        _.forEach(Object.keys(style), format);
-        return `<span style="${css}">${msg}</span>`;
-    }
-    if (style)
-        return `<span style="color: ${style}">${msg}</span>`;
 
-    return msg;
-};
 
-/**
- * Build a stacktrace if DEBUG_STACKS or the first argument is true.
- */
-mod.stack = function (force = false, placeholder = ' ') {
 
-    if (global.DEBUG_STACKS || force)
-        return new Error(`\nSTACK; param:${global.DEBUG_STACKS}, force:${force}`).stack;
 
-    return placeholder;
-};
 
-/**
- * Trace an error or debug statement
- * @param {string} category - The error category
- * @param {*} entityWhere - The entity where the error was caused
- * @param {Object|string} message - A string or object describing the error
- */
-mod.trace = function (category, entityWhere, ...message) {
-    function reduceMemoryWhere(result, value, key) {
-        const setting = Memory.debugTrace[key];
-        /*
-        if (!Reflect.has(Memory.debugTrace, key))
-            return result;
-
-         */
-        if (_.some(_.keys(Memory.debugTrace), prop => {
-          return key === prop;
-        }))
-            return result;
-        else if (result)
-            return setting === value || (!value && setting === `${value}`);
-        return false;
-    }
-    function noMemoryWhere(e) {
-        const setting = Memory.debugTrace.no[e[0]];
-        return setting === true || e[0] in Memory.debugTrace.no &&
-            (setting === e[1] || (!e[1] && setting === `${e[1]}`));
-    }
-    if (!(Memory.debugTrace[category] === true || _(entityWhere).reduce(reduceMemoryWhere, 1) === true))
-        return;
-    if (Memory.debugTrace.no && _(entityWhere).pairs().some(noMemoryWhere) === true)
-        return;
-
-    let msg = message,
-        key;
-
-    if (message.length === 0 && category) {
-
-        let leaf = category;
-        do {
-            key = leaf;
-            leaf = entityWhere[leaf];
-        } while (entityWhere[leaf] && leaf !== category);
-
-        if (leaf && leaf !== category) {
-            if (typeof leaf === 'string')
-                msg = [leaf];
-            else
-                msg = [key, '=', leaf];
-        }
-    }
-
-    console.log(Game.time, mod.dye(global.CRAYON.error, category), ...msg, mod.dye(global.CRAYON.birth, JSON.stringify(entityWhere)), mod.stack());
-};
-
-/**
- * Logs an error to console
- * @param {string} message - A string describing the error
- * @param {*} [entityWhere] - The entity where the error was caused
- */
-mod.logError = function (message, entityWhere) {
-    const msg = mod.dye(global.CRAYON.error, message);
-    if (entityWhere) {
-        mod.trace('error', entityWhere, msg);
-    } else {
-        console.log(msg, mod.stack());
-    }
-};
-
-/**
- * Log text as a system message showing a "preFix" as a label
- * @param {string} preFix - text displaying before message
- * @param {...string} message - The message to log
- */
-mod.logSystem = function (preFix, ...message) {
-    const text = mod.dye(global.CRAYON.system, preFix);
-    console.log(mod.dye(global.CRAYON.system, `<a href="/a/#!/room/${Game.shard.name}/${preFix}">${text}</a> &gt;`), ...message, mod.stack());
-};
 
 /**
  * Load existing profiling data or initialize to defaults.

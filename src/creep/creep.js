@@ -5,12 +5,12 @@ module.exports = mod;
 
 mod.execute = function () {
     if (global.DEBUG && Memory.CPU_CRITICAL)
-        global.Util.logSystem('system', `${Game.time}: CPU Bucket level is critical (${Game.cpu.bucket}). Skipping non critical creep roles.`);
+        global.logSystem('system', `${Game.time}: CPU Bucket level is critical (${Game.cpu.bucket}). Skipping non critical creep roles.`);
     let run = creep => {
         try {
             creep.run();
         } catch (e) {
-            console.log('<span style="color:FireBrick">Creep ' + creep.name + (e.stack || e.toString()) + '</span>', global.Util.stack());
+            console.log('<span style="color:FireBrick">Creep ' + creep.name + (e.stack || e.toString()) + '</span>', global.stack());
         }
     };
     _.forEach(Game.creeps, run);
@@ -18,7 +18,7 @@ mod.execute = function () {
 mod.bodyCosts = function (body) {
     let costs = 0;
     if (body) {
-        body.forEach(function (part) {
+        body.forEach(part => {
             costs += BODYPART_COST[part];
         });
     }

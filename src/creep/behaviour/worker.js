@@ -62,7 +62,7 @@ behaviour.outflowActions = function (creep) {
 behaviour.nextAction = function (creep) {
     if (creep.data.creepType === "worker" && creep.pos.roomName !== creep.data.homeRoom && Game.rooms[creep.data.homeRoom] && Game.rooms[creep.data.homeRoom].controller) {
         if (global.DEBUG && global.TRACE)
-            global.Util.trace('Behaviour', {actionName: 'travelling', behaviourName: this.name, creepName: creep.name, assigned: true, Behaviour: 'nextAction', Action: 'assign'});
+            global.trace('Behaviour', {actionName: 'travelling', behaviourName: this.name, creepName: creep.name, assigned: true, Behaviour: 'nextAction', Action: 'assign'});
         Creep.action.travelling.assignRoom(creep, creep.data.homeRoom);
         return true;
     }

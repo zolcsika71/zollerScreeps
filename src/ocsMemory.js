@@ -12,21 +12,21 @@ mod.activateSegment = (id, reset = false) => {
         return;
     }
     if (id < 0 || id > 99)
-        return global.Util.logError('RawMemory', 'cannot activate invalid segment ' + id);
+        return global.logError('RawMemory', 'cannot activate invalid segment ' + id);
     let numActive = _.size(RawMemory.segments);
     if (mod.numSaved >= 10)
-        return global.Util.logError('RawMemory', '10 segments saved, cannot activate segment ' + id);
+        return global.logError('RawMemory', '10 segments saved, cannot activate segment ' + id);
     if (!reset) {
         if (numActive >= 10)
-            return global.Util.logError('RawMemory', '10 segments loaded, cannot activate segment ' + id);
+            return global.logError('RawMemory', '10 segments loaded, cannot activate segment ' + id);
         if (numActive + mod.numSaved >= 10)
-            return global.Util.logError('RawMemory', 'combined loaded and saved exceeds limit(10), cannot activate segment ' + id);
+            return global.logError('RawMemory', 'combined loaded and saved exceeds limit(10), cannot activate segment ' + id);
     }
     mod.toActivate[id] = true;
 };
 mod.deactivateSegment = (id) => {
     if (id < 0 || id > 99)
-        return global.Util.logError('RawMemory', 'cannot deactivate invalid segment ' + id);
+        return global.logError('RawMemory', 'cannot deactivate invalid segment ' + id);
     if (_.size(mod.toActivate) === 0)
         Object.keys(RawMemory.segments).forEach(id => mod.toActivate[id] = true);
     delete mod.toActivate[id];
@@ -81,26 +81,26 @@ mod.saveSegment = (range, inputData) => {
                 }
                 if (!encodedData && temp && temp.length > 0) {
                     let size = _.round((temp.length + 2) / 1024, 2);
-                    return global.Util.logError('RawMemory', `Cannot save data at key ${keyNum}, exceeds 100kb limit ${size}kb`);
+                    return global.logError('RawMemory', `Cannot save data at key ${keyNum}, exceeds 100kb limit ${size}kb`);
                 }
                 if (global.DEBUG)
-                    global.Util.logSystem('OCSMemory.saveSegment', 'Saving ' + _.round(encodedData.length / 1024, 2) + 'kb of data to segment ' + id);
+                    global.logSystem('OCSMemory.saveSegment', 'Saving ' + _.round(encodedData.length / 1024, 2) + 'kb of data to segment ' + id);
                 RawMemory.segments[id] = encodedData + '}';
                 Memory.cacheValid[id] = Game.time;
                 encodedData = full && temp ? '{' + temp : '{';
                 if (_.isUndefined(RawMemory.segments[id])) mod.numSaved++;
             } else if (numActive > 10) {
                 // TODO: also defer? (This should be impossible)
-                return global.Util.logError('RawMemory', 'cannot save segment ' + id + ' too many active segments.');
+                return global.logError('RawMemory', 'cannot save segment ' + id + ' too many active segments.');
             } else if (numActive + mod.numSaved > 10) {
                 // TODO: defer one tick?
-                return global.Util.logError('RawMemory', 'cannot save segment ' + id + ' loaded + saved exceeds limit(10).');
+                return global.logError('RawMemory', 'cannot save segment ' + id + ' loaded + saved exceeds limit(10).');
             } else {
-                global.Util.logError('RawMemory', 'should not be here.');
+                global.logError('RawMemory', 'should not be here.');
             }
         } else if (Memory.cacheValid[id]) { // no more data, clear this segment
             if (global.DEBUG)
-                global.Util.logSystem('OCSMemory.saveSegment', 'clearing unused segment ' + id);
+                global.logSystem('OCSMemory.saveSegment', 'clearing unused segment ' + id);
             RawMemory.segments[id] = '';
             delete Memory.cacheValid[id];
         }

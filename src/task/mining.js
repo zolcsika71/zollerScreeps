@@ -126,11 +126,11 @@ mod.checkForRequiredCreeps = (flag) => {
     // TODO: calculate creeps by type needed per source / mineral
 
     if (global.DEBUG && global.TRACE)
-        global.Util.trace('Task', {Task: mod.name, flagName: flag.name, sourceCount, haulerCount, minerCount, workerCount, [mod.name]: 'Flag.found'}, 'checking flag@', flag.pos);
+        global.trace('Task', {Task: mod.name, flagName: flag.name, sourceCount, haulerCount, minerCount, workerCount, [mod.name]: 'Flag.found'}, 'checking flag@', flag.pos);
 
     if (mod.strategies.miner.shouldSpawn(minerCount, sourceCount)) {
         if (global.DEBUG && global.TRACE)
-            global.Util.trace('Task', {Task: mod.name, room: roomName, minerCount,
+            global.trace('Task', {Task: mod.name, room: roomName, minerCount,
             minerTTLs: _.map(_.map(memory.running.remoteMiner, n=>Game.creeps[n]), "ticksToLive"), [mod.name]: 'minerCount'});
         let miner = mod.strategies.miner.setup(roomName);
         for (let i = minerCount; i < sourceCount; i++) {
@@ -238,7 +238,7 @@ mod.findSpawning = (roomName, type) => {
     let spawning = [];
     _.forEach(Game.spawns, s => {
         if (s.spawning && (_.includes(s.spawning.name, type) || (s.newSpawn && _.includes(s.newSpawn.name, type)))) {
-            let c = ROOT.population.getCreep(s.spawning.name);
+            let c = global.Population.getCreep(s.spawning.name);
             if (c && c.destiny.room === roomName) {
                 let params = {
                     spawn: s.name,
@@ -416,7 +416,7 @@ mod.checkCapacity = function (roomName) {
             message = 'with ' + totalDropped + ' dropped energy.';
         }
         if (population <= minPopulation || totalDropped >= maxDropped) {
-            console.log(mod.carry(roomName), message, global.Util.stack());
+            console.log(mod.carry(roomName), message, global.stack());
             return true;
         }
         return false;
@@ -474,7 +474,7 @@ mod.strategies = {
             if (population < global.REMOTE_RESERVE_HAUL_CAPACITY) {
                 // TODO if this room & all exits are currently reserved (by anyone) then use default to prevent Invaders?
                 if (global.DEBUG && global.TRACE)
-                    global.Util.trace('Task', {flagName: flag.name, pos: flag.pos, population, spawnParams: 'population', [mod.name]: 'spawnParams', Task: mod.name});
+                    global.trace('Task', {flagName: flag.name, pos: flag.pos, population, spawnParams: 'population', [mod.name]: 'spawnParams', Task: mod.name});
                 return {count: 0, priority: 'Low'};
             }
 
@@ -528,7 +528,7 @@ mod.strategies = {
                 neededCarry = ept * travel * 2 + (memory.carryParts || 0) - existingCarry - queuedCarry,
                 maxWeight = haulerCarryToWeight(neededCarry);
             if (global.DEBUG && global.TRACE)
-                global.Util.trace('Task', {Task: mod.name, room: flagRoomName, homeRoom: homeRoomName,
+                global.trace('Task', {Task: mod.name, room: flagRoomName, homeRoom: homeRoomName,
                 haulers: existingHaulers.length + queuedHaulers.length, ept, travel, existingCarry, queuedCarry,
                 neededCarry, maxWeight, [mod.name]: 'maxWeight'});
             return maxWeight;

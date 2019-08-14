@@ -18,7 +18,7 @@ let Behaviour = function (name) { // base class for behaviours
                 valid = action.isValidAction(creep);
 
             if (global.DEBUG && global.TRACE)
-                global.Util.trace('Action', {actionName: action.name, behaviourName: this.name, creepName: creep.name, valid, Action: 'isValidAction'});
+                global.trace('Action', {actionName: action.name, behaviourName: this.name, creepName: creep.name, valid, Action: 'isValidAction'});
             if (!valid) {
                 p.checkCPU('!valid', 0.3);
                 return false;
@@ -28,7 +28,7 @@ let Behaviour = function (name) { // base class for behaviours
                 addable = action.isAddableAction(creep);
 
             if (global.DEBUG && global.TRACE)
-                global.Util.trace('Action', {actionName: action.name, behaviourName: this.name, creepName: creep.name, addable, Action: 'isAddableAction'});
+                global.trace('Action', {actionName: action.name, behaviourName: this.name, creepName: creep.name, addable, Action: 'isAddableAction'});
             if (!addable) {
                 p.checkCPU('!addable', 0.3);
                 return false;
@@ -38,7 +38,7 @@ let Behaviour = function (name) { // base class for behaviours
             const assigned = action.assignDebounce ? action.assignDebounce(creep, debouncePriority, target) : action.assign(creep, target);
             if (assigned) {
                 if (global.DEBUG && global.TRACE)
-                    global.Util.trace('Behaviour', {actionName: action.name, behaviourName: this.name, creepName: creep.name,
+                    global.trace('Behaviour', {actionName: action.name, behaviourName: this.name, creepName: creep.name,
                     assigned, Behaviour: 'nextAction', Action: 'assign', target: creep.target.id || creep.target.name});
 
                 creep.data.lastAction = action.name;
@@ -47,7 +47,7 @@ let Behaviour = function (name) { // base class for behaviours
                 return true;
 
             } else if (global.DEBUG && global.TRACE)
-                global.Util.trace('Action', {actionName: action.name, behaviourName: this.name, creepName: creep.name, assigned, Behaviour: 'assignAction', Action: 'assign'});
+                global.trace('Action', {actionName: action.name, behaviourName: this.name, creepName: creep.name, assigned, Behaviour: 'assignAction', Action: 'assign'});
 
             p.checkCPU('!assigned', 0.3);
             return false;
@@ -76,7 +76,7 @@ let Behaviour = function (name) { // base class for behaviours
             for (let action of actions) {
                 // new line (action !== null && action !== undefined)
                 if (action !== null && action !== undefined && !actionChecked[action.name]) {
-                    //global.Util.logSystem(creep.name, `action: ${global.json(action.name)}`);
+                    //global.logSystem(creep.name, `action: ${global.json(action.name)}`);
                     actionChecked[action.name] = true;
                     if (this.assignAction(creep, action)) {
                         p.checkCPU('assigned' + action.name, 1.5);
@@ -126,10 +126,10 @@ let Behaviour = function (name) { // base class for behaviours
             // Do some work
             if (creep.action && creep.target) {
                 if (global.DEBUG && global.TRACE)
-                    global.Util.trace('Behaviour', {actionName: creep.action.name, behaviourName: this.name, creepName: creep.name, target: creep.target.id || creep.target.name, Action: 'run'});
+                    global.trace('Behaviour', {actionName: creep.action.name, behaviourName: this.name, creepName: creep.name, target: creep.target.id || creep.target.name, Action: 'run'});
                 creep.action.step(creep);
             } else {
-                global.Util.logError('Creep without action/activity!\nCreep: ' + creep.name + '\ndata: ' + JSON.stringify(creep.data));
+                global.logError('Creep without action/activity!\nCreep: ' + creep.name + '\ndata: ' + JSON.stringify(creep.data));
             }
         };
         this.assign = function (creep) {

@@ -182,7 +182,7 @@ mod.analyze = function () {
                 cloaking: flag.cloaking
             });
         } catch (e) {
-            global.Util.logError(e.stack || e.message);
+            global.logError(e.stack || e.message);
         }
     };
     _.forEach(Game.flags, register);
@@ -193,7 +193,7 @@ mod.analyze = function () {
                 this.stale.push(flagName);
             }
         } catch (e) {
-            global.Util.logError(e.stack || e.message);
+            global.logError(e.stack || e.message);
         }
     };
     _.forEach(Memory.flags, findStaleFlags);
@@ -210,7 +210,7 @@ mod.execute = function () {
                 p.checkCPU(entry.name, global.PROFILING.EXECUTE_LIMIT, mod.flagType(flag));
             }
         } catch (e) {
-            global.Util.logError(e.stack || e.message);
+            global.logError(e.stack || e.message);
         }
     };
     this.list.forEach(triggerFound);
@@ -235,7 +235,7 @@ mod.flagType = function (flag) {
                 return `${primary}.${secondary}`;
         }
     }
-    global.Util.logError(`Unknown flag type for flag: ${flag ? flag.name : 'undefined flag'}.`);
+    global.logError(`Unknown flag type for flag: ${flag ? flag.name : 'undefined flag'}.`);
     return 'undefined';
 };
 mod.specialFlag = function (create) {

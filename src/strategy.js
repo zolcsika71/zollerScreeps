@@ -14,9 +14,9 @@ mod.decorateAgent = function (prototype, ...definitions) {
             strategyKey = currentStrategy.key,
             strategyName = currentStrategy.name;
         if (global.DEBUG && global.TRACE)
-            global.Util.trace('Strategy', {agent: this.name, strategyKey, strategyName, method});
+            global.trace('Strategy', {agent: this.name, strategyKey, strategyName, method});
         if (returnValOrMethod === undefined) {
-            global.Util.logError('strategy handler returned undefined', {agent: this.name || this.id, strategyKey, strategyName, method, stack: new Error().stack});
+            global.logError('strategy handler returned undefined', {agent: this.name || this.id, strategyKey, strategyName, method, stack: new Error().stack});
             return;
         }
         if (args.length === 0) {
@@ -26,7 +26,7 @@ mod.decorateAgent = function (prototype, ...definitions) {
         if (returnVal !== undefined) {
             return returnVal;
         }
-        global.Util.logError('handler returned undefined for args', {agent: this.name || this.id, strategyKey, strategyName, method, args: args.toString(), stack: new Error().stack});
+        global.logError('handler returned undefined for args', {agent: this.name || this.id, strategyKey, strategyName, method, args: args.toString(), stack: new Error().stack});
     };
     prototype._strategyCache = {};
     prototype.strategyKey = function (ids) {

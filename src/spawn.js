@@ -18,9 +18,9 @@ mod.register = function () {
 };
 mod.handleSpawningCompleted = function (creep) {
     if (global.DEBUG && global.TRACE)
-        global.Util.trace('Spawn', {behaviour: creep.data.creepType, creepName: creep.name, Spawn: 'Creep.spawningCompleted'});
+        global.trace('Spawn', {behaviour: creep.data.creepType, creepName: creep.name, Spawn: 'Creep.spawningCompleted'});
     if (global.CENSUS_ANNOUNCEMENTS)
-        global.Util.logSystem(creep.pos.roomName, global.Util.dye(global.CRAYON.birth, 'Off to work ' + creep.name + '!'));
+        global.logSystem(creep.pos.roomName, global.dye(global.CRAYON.birth, 'Off to work ' + creep.name + '!'));
 };
 mod.execute = function () {
     let run = spawn => {
