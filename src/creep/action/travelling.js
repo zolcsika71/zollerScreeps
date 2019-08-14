@@ -1,9 +1,6 @@
 "use strict";
 
 const
-    GLOBAL = {
-        util: require(`./global.util`)
-    },
     ROOT = {
         flagDir: require('./flagDir')
     },
@@ -26,7 +23,7 @@ action.isAddableTarget = function () {
 };
 action.newTarget = function (creep) {
     // TODO trace it: console.log(creep.strategy([action.name]).key);
-    GLOBAL.util.trace('travelling - newTarget', {strategy: creep.strategy([action.name]).key}, 'hmmm...');
+    global.Util.trace('travelling - newTarget', {strategy: creep.strategy([action.name]).key}, 'hmmm...');
     return creep.getStrategyHandler([action.name], 'newTarget', creep);
 };
 action.step = function (creep) {
@@ -45,7 +42,7 @@ action.step = function (creep) {
                 target = new RoomPosition(25, 25, creep.data.travelRoom);
             }
         } else {
-            GLOBAL.util.logError(creep.name + 'Creep.action.travelling called with specialFlag target and travelRoom undefined.');
+            global.Util.logError(creep.name + 'Creep.action.travelling called with specialFlag target and travelRoom undefined.');
             target = null;
         }
     }
@@ -57,7 +54,7 @@ action.step = function (creep) {
             if (target.pos.lookFor(LOOK_CREEPS).length > 0) {
                 // avoid trying to pathfind to a blocked location
                 if (global.DEBUG)
-                    GLOBAL.util.logSystem(creep.name, 'travelling.step: destination blocked, stopping.');
+                    global.Util.logSystem(creep.name, 'travelling.step: destination blocked, stopping.');
                 return action.unregister(creep);
             }
         }
@@ -76,14 +73,14 @@ action.step = function (creep) {
 };
 action.assignRoom = function (creep, roomName) {
     if (!roomName) {
-        GLOBAL.util.logError(creep.name + 'Creep.action.travelling.assignRoom called with no room.');
+        global.Util.logError(creep.name + 'Creep.action.travelling.assignRoom called with no room.');
         return;
     }
     if (_.isUndefined(creep.data.travelRange))
         creep.data.travelRange = global.TRAVELLING_BORDER_RANGE || 22;
     creep.data.travelRoom = roomName;
     if (global.DEBUG && global.TRACE)
-        GLOBAL.util.trace('Action', {creepName: creep.name, assign: this.name, roomName, Action: 'assign'});
+        global.Util.trace('Action', {creepName: creep.name, assign: this.name, roomName, Action: 'assign'});
     return Creep.action.travelling.assign(creep, ROOT.flagDir.specialFlag());
 };
 action.unregister = function (creep) {

@@ -1,10 +1,5 @@
 "use strict";
 
-const
-    GLOBAL = {
-        util: require('./global.util')
-    };
-
 let mod = {};
 module.exports = mod;
 mod.analyzeRoom = function (room) {
@@ -14,7 +9,7 @@ let triggerNewInvaders = creep => {
     // create notification
     const bodyCount = JSON.stringify(_.countBy(creep.body, 'type'));
     if (global.DEBUG || global.NOTIFICATE_INVADER || (global.NOTIFICATE_INTRUDER && creep.room.my) || global.NOTIFICATE_HOSTILES)
-        GLOBAL.util.logSystem(creep.pos.roomName, `Hostile intruder (${bodyCount}) from "${creep.owner.username}".`);
+        global.Util.logSystem(creep.pos.roomName, `Hostile intruder (${bodyCount}) from "${creep.owner.username}".`);
     if (global.NOTIFICATE_INVADER || (global.NOTIFICATE_INTRUDER && creep.owner.username !== 'Invader' && creep.room.my) || (global.NOTIFICATE_HOSTILES && creep.owner.username !== 'Invader')) {
         Game.notify(`Hostile intruder ${creep.id} (${bodyCount}) from "${creep.owner.username}" in room ${creep.pos.roomName} at ${global.toDateTimeString(global.toLocalDate(new Date()))}`);
     }
@@ -24,7 +19,7 @@ let triggerNewInvaders = creep => {
 let triggerKnownInvaders = id =>  Room.knownInvader.trigger(id);
 let triggerGoneInvaders = id =>  Room.goneInvader.trigger(id);
 mod.executeRoom = function (memory, roomName) {
-    let p = GLOBAL.util.startProfiling(roomName + '.defense.execute', {enabled: global.PROFILING.ROOMS}),
+    let p = global.Util.startProfiling(roomName + '.defense.execute', {enabled: global.PROFILING.ROOMS}),
         room = Game.rooms[roomName];
     if (room) { // has sight
         room.goneInvader.forEach(triggerGoneInvaders);

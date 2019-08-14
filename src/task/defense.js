@@ -3,10 +3,8 @@
 const
     ROOT = {
         flagDir: require('./flagDir')
-    },
-    GLOBAL = {
-        util: require(`./global.util`)
     };
+
 
 // Defense task handles spotted invaders. Spawns defenders and gives them special behaviour.
 let mod = {};
@@ -21,7 +19,7 @@ mod.handleNewInvader = invaderCreep => {
         return;
     // if not our room and not our reservation
 
-    GLOBAL.util.logSystem(invaderCreep.pos.roomName, `Hostile Invaders detected`);
+    global.Util.logSystem(invaderCreep.pos.roomName, `Hostile Invaders detected`);
 
     if (!invaderCreep.room.my && !invaderCreep.room.reserved) {
         // if it is not our exploiting target
@@ -32,21 +30,21 @@ mod.handleNewInvader = invaderCreep => {
         let flag = ROOT.flagDir.find(validColor, invaderCreep.pos, true);
 
         if (!flag) {
-            GLOBAL.util.logSystem(invaderCreep.pos.roomName, `Hostile Invaders not in range`);
+            global.Util.logSystem(invaderCreep.pos.roomName, `Hostile Invaders not in range`);
             return; // ignore invader
         }
     }
     // check room threat balance
 
-    GLOBAL.util.logSystem(invaderCreep.pos.roomName, `THREAT: ${invaderCreep.room.hostileThreatLevel} DEFENSE: ${invaderCreep.room.defenseLevel.sum}`);
+    global.Util.logSystem(invaderCreep.pos.roomName, `THREAT: ${invaderCreep.room.hostileThreatLevel} DEFENSE: ${invaderCreep.room.defenseLevel.sum}`);
 
     if (invaderCreep.room.defenseLevel.sum > invaderCreep.room.hostileThreatLevel) {
-        GLOBAL.util.logSystem(invaderCreep.pos.roomName, `Defense HIGHER than Threat`);
+        global.Util.logSystem(invaderCreep.pos.roomName, `Defense HIGHER than Threat`);
         // room can handle that
         return;
     } else {
         // order a defender for each invader (if not happened yet)
-        GLOBAL.util.logSystem(invaderCreep.pos.roomName, `Defense LOWER than Threat`);
+        global.Util.logSystem(invaderCreep.pos.roomName, `Defense LOWER than Threat`);
         let lastAllocatedGUID = global.guid();
         invaderCreep.room.hostiles.forEach(hostile => {
             mod.orderDefenses(hostile, lastAllocatedGUID);
@@ -276,7 +274,7 @@ mod.orderDefenses = function (invaderCreep, GUID) {
         } else {
             // Can't spawn. Invader will not get handled!
             if (global.TRACE || global.DEBUG)
-                GLOBAL.util.trace('Task', {task: 'defense', invaderId: invaderId, targetRoom: invadersRoom}, 'Unable to spawn. Invader will not get handled!');
+                global.Util.trace('Task', {task: 'defense', invaderId: invaderId, targetRoom: invadersRoom}, 'Unable to spawn. Invader will not get handled!');
             return;
         }
     }

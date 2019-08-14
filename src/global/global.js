@@ -1,29 +1,16 @@
 "use strict";
 
-const
-    GLOBAL = {
-        parameter: require(`./global.parameter`),
-        util: require(`./global.util`)
-    };
-
-
-
 let mod = {};
 module.exports = mod;
-
-
 mod.BB = function (x) {
     console.log(JSON.stringify(x, null, 2));
 };
-
 mod.json = (x) => {
     return JSON.stringify(x, null, 2);
 };
-
 mod.len = function (number) {
     return ("00" + number).slice(-2);
 };
-
 mod.toLocalDate = function (date) {
     if (!date)
         date = new Date();
@@ -31,7 +18,6 @@ mod.toLocalDate = function (date) {
     if (global.USE_SUMMERTIME && mod.isSummerTime(date)) offset++;
     return new Date(date.getTime() + (3600000 * offset));
 };
-
 // for notify mails: format dateTime (as date & time)
 mod.toDateTimeString = function (date) {
     return (mod.len(date.getDate()) + "." + mod.len(date.getMonth() + 1) + "." + mod.len(date.getFullYear()) + " " + mod.len(date.getHours()) + ":" + mod.len(date.getMinutes()) + ":" + mod.len(date.getSeconds()));
@@ -47,7 +33,6 @@ mod.isSummerTime = function (date) {
 
     return (begin < date && date < end);
 };
-
 mod.execute = function () {
 
     //console.log(Parameter.DEBUG);
@@ -55,13 +40,6 @@ mod.execute = function () {
     return true;
 
 };
-
-mod.consoleMe = function () {
-
-    console.log(`global`);
-
-};
-
 mod.initMemory = function () {
 
     Object.keys(Memory).forEach(segment => {
@@ -70,7 +48,6 @@ mod.initMemory = function () {
     });
 
 };
-
 // base class for events
 mod.LiteEvent = function () {
     // registered subscribers
@@ -88,11 +65,10 @@ mod.LiteEvent = function () {
         try {
             this.handlers.slice(0).forEach(h => h(data));
         } catch (e) {
-            GLOBAL.util.logError('Error in LiteEvent.trigger: ' + (e.stack || e));
+            global.Util.logError('Error in LiteEvent.trigger: ' + (e.stack || e));
         }
     }
 };
-
 mod.addById = function (array, id) {
     if (array == null)
         array = [];
@@ -101,14 +77,12 @@ mod.addById = function (array, id) {
         array.push(obj);
     return array;
 };
-
 mod.guid = function () {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
 };
-
 mod.LAB_REACTIONS = {};
 for (let a in REACTIONS) {
     for (let b in REACTIONS[a]) {

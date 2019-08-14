@@ -3,16 +3,9 @@
 const
     //_ = require('lodash'),
     strategy = require('./strategy'),
-    GLOBAL = {
-        global: require('./global.global'),
-        parameter: require(`./global.parameter`),
-        util: require(`./global.util`)
-
-    },
     ROOT = {
         population: require('./population')
     };
-
 
 let mod = {};
 module.exports = mod;
@@ -45,7 +38,7 @@ mod.extend = function () {
             const ret = _(Memory.population).filter({flagName}).find(findFunc);
             return ret ? ret.creepName : null;
         } else {
-            GLOBAL.util.logError(`${this.name} - Invalid arguments for Creep.findGroupMemberBy ${flagName} ${findFunc}`);
+            global.Util.logError(`${this.name} - Invalid arguments for Creep.findGroupMemberBy ${flagName} ${findFunc}`);
         }
         return null;
     };
@@ -95,7 +88,7 @@ mod.extend = function () {
             }
             const
                 total = global.Util.startProfiling('Creep.run', {enabled: global.PROFILING.CREEPS}),
-                p = GLOBAL.util.startProfiling(this.name + '.run', {enabled: this.data && this.data.creepType && global.PROFILING.CREEP_TYPE === this.data.creepType});
+                p = global.Util.startProfiling(this.name + '.run', {enabled: this.data && this.data.creepType && global.PROFILING.CREEP_TYPE === this.data.creepType});
 
             if (this.data && !_.contains(['remoteMiner', 'miner', 'upgrader'], this.data.creepType)) {
                 this.repairNearby();
@@ -104,13 +97,13 @@ mod.extend = function () {
                 p.checkCPU('buildNearby', global.PROFILING.MIN_THRESHOLD);
             }
             if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('Creep', {creepName: this.name, pos: this.pos, Behaviour: behaviour && behaviour.name, Creep: 'run'});
+                global.Util.trace('Creep', {creepName: this.name, pos: this.pos, Behaviour: behaviour && behaviour.name, Creep: 'run'});
             if (behaviour) {
                 behaviour.run(this);
                 p.checkCPU('behaviour.run', global.PROFILING.MIN_THRESHOLD);
             } else if (!this.data) {
                 if (global.DEBUG && global.TRACE)
-                    GLOBAL.util.trace('Creep', {creepName: this.name, pos: this.pos, Creep: 'run'}, 'memory init');
+                    global.Util.trace('Creep', {creepName: this.name, pos: this.pos, Creep: 'run'}, 'memory init');
                 let type = this.memory.setup;
                 let weight = this.memory.cost;
                 let home = this.memory.home;
@@ -133,7 +126,7 @@ mod.extend = function () {
                     });
                     ROOT.population.countCreep(this.room, entry);
                 } else {
-                    console.log(GLOBAL.util.dye(global.CRAYON.error, 'Corrupt creep without population entry!! : ' + this.name), GLOBAL.util.stack());
+                    console.log(global.Util.dye(global.CRAYON.error, 'Corrupt creep without population entry!! : ' + this.name), global.Util.stack());
                     // trying to import creep
                     let counts = _.countBy(this.body, 'type');
                     if (counts[WORK] && counts[CARRY]) {
@@ -248,7 +241,7 @@ mod.extend = function () {
         if (HONK) this.say('\u{1F500}\u{FE0E}', SAY_PUBLIC);
     };
     Creep.prototype.fleeMove = function () {
-        if (global.DEBUG && global.TRACE) GLOBAL.util.trace('Creep', {creepName: this.name, pos: this.pos, Action: 'fleeMove', Creep: 'run'});
+        if (global.DEBUG && global.TRACE) global.Util.trace('Creep', {creepName: this.name, pos: this.pos, Action: 'fleeMove', Creep: 'run'});
         let drop = r => {
             if (this.carry[r] > 0) this.drop(r);
         };
@@ -367,12 +360,12 @@ mod.extend = function () {
             const repairRange = this.data && this.data.creepType === 'remoteHauler' ? global.REMOTE_HAULER.DRIVE_BY_REPAIR_RANGE : global.DRIVE_BY_REPAIR_RANGE;
             const repairTarget = _(this.pos.findInRange(FIND_STRUCTURES, repairRange)).find(s => Room.shouldRepair(this.room, s));
             if (repairTarget) {
-                if (global.DEBUG && global.TRACE) GLOBAL.util.trace('Creep', {creepName: this.name, Action: 'repairing', Creep: 'repairNearby'}, repairTarget.pos);
+                if (global.DEBUG && global.TRACE) global.Util.trace('Creep', {creepName: this.name, Action: 'repairing', Creep: 'repairNearby'}, repairTarget.pos);
                 this.repair(repairTarget);
             }
         } else {
             if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('Creep', {creepName: this.name, pos: this.pos, Action: 'repairing', Creep: 'repairNearby'}, 'not repairing');
+                global.Util.trace('Creep', {creepName: this.name, pos: this.pos, Action: 'repairing', Creep: 'repairNearby'}, 'not repairing');
 
         }
     };
@@ -385,15 +378,15 @@ mod.extend = function () {
                 s.structureType === STRUCTURE_ROAD));
         if (buildTarget) {
             if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('Creep', {creepName: this.name, Action: 'building', Creep: 'buildNearby'}, buildTarget.pos);
+                global.Util.trace('Creep', {creepName: this.name, Action: 'building', Creep: 'buildNearby'}, buildTarget.pos);
             this.build(buildTarget);
         } else {
             if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('Creep', {creepName: this.name, Action: 'building', Creep: 'buildNearby'}, 'not building');
+                global.Util.trace('Creep', {creepName: this.name, Action: 'building', Creep: 'buildNearby'}, 'not building');
         }
     };
     Creep.prototype.controllerSign = function () {
-        const signMessage = Util.fieldOrFunction(CONTROLLER_SIGN_MESSAGE, this.room);
+        const signMessage = global.Util.fieldOrFunction(CONTROLLER_SIGN_MESSAGE, this.room);
         if (CONTROLLER_SIGN && (!this.room.controller.sign || this.room.controller.sign.username !== this.owner.username || (CONTROLLER_SIGN_UPDATE && this.room.controller.sign.text !== signMessage))) {
             this.signController(this.room.controller, signMessage);
         }

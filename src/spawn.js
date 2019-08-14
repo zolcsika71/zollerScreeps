@@ -1,11 +1,5 @@
 "use strict";
 
-const
-    GLOBAL = {
-        util: require(`./global.util`)
-    };
-
-
 let mod = {};
 module.exports = mod;
 mod.priorityHigh = [
@@ -24,9 +18,9 @@ mod.register = function () {
 };
 mod.handleSpawningCompleted = function (creep) {
     if (global.DEBUG && global.TRACE)
-        GLOBAL.util.trace('Spawn', {behaviour: creep.data.creepType, creepName: creep.name, Spawn: 'Creep.spawningCompleted'});
+        global.Util.trace('Spawn', {behaviour: creep.data.creepType, creepName: creep.name, Spawn: 'Creep.spawningCompleted'});
     if (global.CENSUS_ANNOUNCEMENTS)
-        GLOBAL.util.logSystem(creep.pos.roomName, GLOBAL.util.dye(global.CRAYON.birth, 'Off to work ' + creep.name + '!'));
+        global.Util.logSystem(creep.pos.roomName, global.Util.dye(global.CRAYON.birth, 'Off to work ' + creep.name + '!'));
 };
 mod.execute = function () {
     let run = spawn => {

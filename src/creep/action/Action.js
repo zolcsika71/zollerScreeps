@@ -1,9 +1,6 @@
 "use strict";
 
 const
-    GLOBAL = {
-        util: require(`./global.util`)
-    },
     ROOT = {
         population: require('./population'),
         visuals: require('./visuals')
@@ -25,23 +22,15 @@ let Action = function (actionName) {
     // if false, an invalid target wil invalidate the action as well (causing to get a new action)
     this.renewTarget = true;
     // get unique identifier of any object (id or name)
-    this.getTargetId = function (target) {
-        return target.id || target.name;
-    };
+    this.getTargetId = target => target.id || target.name;
     // get an object by its unique identifier (id or name)
-    this.getTargetById = function (id) {
-        return Game.getObjectById(id) || Game.spawns[id] || Game.flags[id];
-    };
+    this.getTargetById = id => Game.getObjectById(id) || Game.spawns[id] || Game.flags[id];
     // determines, if an action is (still) valid. Gets validated each tick.
     // check possible override in derived action
-    this.isValidAction = function (creep) {
-        return true;
-    };
+    this.isValidAction = creep => true;
     // determines, if a target is (still) valid. Gets validated each tick.
     // check possible override in derived action
-    this.isValidTarget = function (target, creep) {
-        return (target != null);
-    };
+    this.isValidTarget = (target, creep) => (target != null);
     // determines, if an action is valid. Gets validated only once upon assignment.
     // check possible override in derived action
     this.isAddableAction = function (creep) {
@@ -54,10 +43,8 @@ let Action = function (actionName) {
     };
     // find a new target for that action
     // needs implementation in derived action
-    this.newTarget = function (creep) {
-        return null;
-    };
-    this.unassign = function (creep) {
+    this.newTarget = creep => null;
+    this.unassign = creep => {
         delete creep.data.actionName;
         delete creep.data.targetId;
         delete creep.action;
@@ -118,7 +105,7 @@ let Action = function (actionName) {
         if (target === undefined) target = this.newTarget(creep);
         if (target && this.isAddableTarget(target, creep)) {
             if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('Action', {creepName: creep.name, assign: this.name, target: !target || target.name || target.id, Action: 'assign'});
+                global.Util.trace('Action', {creepName: creep.name, assign: this.name, target: !target || target.name || target.id, Action: 'assign'});
             if (!creep.action || creep.action.name !== this.name || !creep.target || creep.target.id !== target.id || creep.target.name !== target.name) {
                 ROOT.population.registerAction(creep, this, target);
                 this.onAssignment(creep, target);

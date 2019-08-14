@@ -1,21 +1,16 @@
-const
-    GLOBAL = {
-        global: require('./global.global'),
-        parameter: require(`./global.parameter`),
-        util: require(`./global.util`)
-    };
+"use strict";
 
 let mod = {};
 module.exports = mod;
 
 mod.execute = function () {
     if (global.DEBUG && Memory.CPU_CRITICAL)
-        GLOBAL.util.logSystem('system', `${Game.time}: CPU Bucket level is critical (${Game.cpu.bucket}). Skipping non critical creep roles.`);
+        global.Util.logSystem('system', `${Game.time}: CPU Bucket level is critical (${Game.cpu.bucket}). Skipping non critical creep roles.`);
     let run = creep => {
         try {
             creep.run();
         } catch (e) {
-            console.log('<span style="color:FireBrick">Creep ' + creep.name + (e.stack || e.toString()) + '</span>', GLOBAL.util.stack());
+            console.log('<span style="color:FireBrick">Creep ' + creep.name + (e.stack || e.toString()) + '</span>', global.Util.stack());
         }
     };
     _.forEach(Game.creeps, run);

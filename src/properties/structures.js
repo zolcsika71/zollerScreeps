@@ -1,13 +1,5 @@
 "use strict";
 
-const
-    GLOBAL = {
-        global: require('./global.global'),
-        parameter: require(`./global.parameter`),
-        util: require(`./global.util`)
-    };
-
-
 let mod = {};
 module.exports = mod;
 mod.extend = function () {
@@ -123,7 +115,7 @@ mod.extend = function () {
         configurable: true,
         get: function () {
             // TODO per-room strategy
-            return Util.chargeScale(this.store.energy,
+            return global.Util.chargeScale(this.store.energy,
                 MIN_STORAGE_ENERGY[this.room.controller.level],
                 MAX_STORAGE_ENERGY[this.room.controller.level]);
         }
@@ -143,7 +135,7 @@ mod.extend = function () {
         get: function () {
             const needs = this.getNeeds(RESOURCE_ENERGY);
             const terminalTarget = needs ? this.store[RESOURCE_ENERGY] + needs : TERMINAL_ENERGY;
-            return GLOBAL.util.chargeScale(this.store.energy,
+            return global.Util.chargeScale(this.store.energy,
                 terminalTarget,
                 terminalTarget * 2);
         }

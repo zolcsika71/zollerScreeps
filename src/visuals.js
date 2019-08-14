@@ -2,9 +2,6 @@
 
 
 const
-    GLOBAL = {
-        util: require('./global.util')
-    },
     BLACK = '#000000',
     WHITE = '#FFFFFF',
     RED = '#FF0000',
@@ -42,7 +39,7 @@ let getResourceColour = (resourceType) => {
 };
 
 let storageObject = (vis, store, x, startY) => {
-    Object.keys(store).forEach(resource => vis.text(`${resource}: ${Util.formatNumber(store[resource])}`, x, startY += 0.6, Object.assign({color: getResourceColour(resource)}, {align: 'left', font: 0.5})));
+    Object.keys(store).forEach(resource => vis.text(`${resource}: ${global.Util.formatNumber(store[resource])}`, x, startY += 0.6, Object.assign({color: getResourceColour(resource)}, {align: 'left', font: 0.5})));
 };
 
 
@@ -95,7 +92,7 @@ let Visuals = class {
             stroke: colour,
             strokeWidth: 0.05
         });
-        vis.text(Number.isFinite(inner) ? GLOBAL.util.formatNumber(inner) : inner, center.x, center.y + 0.33, {
+        vis.text(Number.isFinite(inner) ? global.Util.formatNumber(inner) : inner, center.x, center.y + 0.33, {
             color: WHITE,
             font: '1 monospace',
             align: 'center',
@@ -154,7 +151,7 @@ let Visuals = class {
                 delta_y = from.y - to.y,
                 theta_radians = Math.atan2(delta_y, delta_x),
                 base_angle = 0.610865,
-                length = Math.log1p(GLOBAL.util.getDistance(from, to)) * 0.5;
+                length = Math.log1p(global.Util.getDistance(from, to)) * 0.5;
 
             style = style instanceof Creep ? this.creepPathStyle(style) : (style || {});
 
@@ -211,19 +208,19 @@ let Visuals = class {
     }
 
     run() {
-        let p = GLOBAL.util.startProfiling('Visuals', {enabled: global.PROFILING.VISUALS});
+        let p = global.Util.startProfiling('Visuals', {enabled: global.PROFILING.VISUALS});
 
         _.forEach(Object.keys(Game.rooms), roomName => {
 
             let room = Game.rooms[roomName],
-                p2 = GLOBAL.util.startProfiling('Visuals: ' + room.name, {enabled: global.PROFILING.VISUALS});
+                p2 = global.Util.startProfiling('Visuals: ' + room.name, {enabled: global.PROFILING.VISUALS});
 
             if (!room)
                 return;
             if (!global.ROOM_VISUALS_ALL && !room.my)
                 return;
 
-            GLOBAL.util.set(Memory, 'heatmap', false);
+            global.Util.set(Memory, 'heatmap', false);
 
             if (global.VISUALS.HEATMAP) {
                 if (Game.time % global.VISUALS.HEATMAP_INTERVAL === 0) {
@@ -417,7 +414,7 @@ let Visuals = class {
     }
 
     collectSparklineStats() {
-        GLOBAL.util.set(Memory, 'visualStats.cpu', []);
+        global.Util.set(Memory, 'visualStats.cpu', []);
         Memory.visualStats.cpu.push({
             limit: Game.cpu.limit,
             bucket: Game.cpu.bucket,
@@ -536,9 +533,9 @@ let Visuals = class {
         const x = mineral.pos.x + 1;
         const y = mineral.pos.y - 0.5;
         if (mineral.mineralAmount) {
-            vis.text(`Amount: ${GLOBAL.util.formatNumber(mineral.mineralAmount)}`, x, y, this.toolTipStyle);
+            vis.text(`Amount: ${global.Util.formatNumber(mineral.mineralAmount)}`, x, y, this.toolTipStyle);
         } else {
-            vis.text(`Regen: ${GLOBAL.util.formatNumber(mineral.ticksToRegeneration)}`, x, y, this.toolTipStyle);
+            vis.text(`Regen: ${global.Util.formatNumber(mineral.ticksToRegeneration)}`, x, y, this.toolTipStyle);
         }
     }
 
@@ -559,8 +556,8 @@ let Visuals = class {
         let y = controller.pos.y - 0.5;
         const style = this.toolTipStyle;
         let line0 = `L: ${controller.level}`;
-        let line1 = `P: ${GLOBAL.util.formatNumber(controller.progress)}/${GLOBAL.util.formatNumber(controller.progressTotal)} (${(controller.progress / controller.progressTotal * 100).toFixed(2)}%)`;
-        let line2 = `D: ${GLOBAL.util.formatNumber(controller.ticksToDowngrade)}`;
+        let line1 = `P: ${global.Util.formatNumber(controller.progress)}/${global.Util.formatNumber(controller.progressTotal)} (${(controller.progress / controller.progressTotal * 100).toFixed(2)}%)`;
+        let line2 = `D: ${global.Util.formatNumber(controller.ticksToDowngrade)}`;
         if (controller.level === 8) {
             line1 = undefined;
         } else if (controller.reservation) {
@@ -606,7 +603,7 @@ let Visuals = class {
                     }
                 }
             }
-            vis.text(`H: ${GLOBAL.util.formatNumber(weakest.hits)} (${(weakest.hits / weakest.hitsMax * 100).toFixed(2)}%)`, weakest.pos.x + 1, y, this.toolTipStyle);
+            vis.text(`H: ${global.Util.formatNumber(weakest.hits)} (${(weakest.hits / weakest.hitsMax * 100).toFixed(2)}%)`, weakest.pos.x + 1, y, this.toolTipStyle);
         }
     }
 
@@ -626,7 +623,7 @@ let Visuals = class {
         }
         vis.text('Room Orders', x, ++y, {align: 'left'});
         for (let order of room.memory.resources.orders) {
-            vis.text(`${order.type}: ${GLOBAL.util.formatNumber(order.amount)}`, x, y += 0.6, Object.assign({color: getResourceColour(order.type)}, this.toolTipStyle));
+            vis.text(`${order.type}: ${global.Util.formatNumber(order.amount)}`, x, y += 0.6, Object.assign({color: getResourceColour(order.type)}, this.toolTipStyle));
         }
     }
 
@@ -648,7 +645,7 @@ let Visuals = class {
         }
         vis.text('Room Offerings', x, ++y, {align: 'left'});
         for (let offer of room.memory.resources.offers) {
-            vis.text(`${offer.type}: ${GLOBAL.util.formatNumber(offer.amount)} (to ${offer.room})`, x, y += 0.6, Object.assign({color: getResourceColour(offer.type)}, this.toolTipStyle));
+            vis.text(`${offer.type}: ${global.Util.formatNumber(offer.amount)} (to ${offer.room})`, x, y += 0.6, Object.assign({color: getResourceColour(offer.type)}, this.toolTipStyle));
         }
     }
 
@@ -714,10 +711,10 @@ let Visuals = class {
         const x = lab.pos.x + 0.8;
         let y = lab.pos.y - 0.5;
         if (lab.energy) {
-            vis.text(`E: ${GLOBAL.util.formatNumber(lab.energy)}`, x, y, Object.assign({color: getResourceColour(RESOURCE_ENERGY)}, this.toolTipStyle));
+            vis.text(`E: ${global.Util.formatNumber(lab.energy)}`, x, y, Object.assign({color: getResourceColour(RESOURCE_ENERGY)}, this.toolTipStyle));
         }
         if (lab.mineralAmount) {
-            vis.text(`M: ${lab.mineralType} (${GLOBAL.util.formatNumber(lab.mineralAmount)})`, x, y += 0.4, Object.assign({color: getResourceColour(lab.mineralType)}, this.toolTipStyle));
+            vis.text(`M: ${lab.mineralType} (${global.Util.formatNumber(lab.mineralAmount)})`, x, y += 0.4, Object.assign({color: getResourceColour(lab.mineralType)}, this.toolTipStyle));
         }
         if (lab.cooldown) {
             vis.text(`C: ${lab.cooldown}`, x, y += 0.4, Object.assign({color: RED}, this.toolTipStyle));
@@ -725,7 +722,7 @@ let Visuals = class {
     }
 
     setHeatMapData(room) {
-        GLOBAL.util.set(room.memory, 'heatmap', () => {
+        global.Util.set(room.memory, 'heatmap', () => {
             const r = {};
             for (let x = 0; x < 50; x++) {
                 for (let y = 0; y < 50; y++) {
@@ -778,7 +775,7 @@ let Visuals = class {
             return c;
         }
 
-        GLOBAL.util.set(creep.data, 'pathColour', randomColour);
+        global.Util.set(creep.data, 'pathColour', randomColour);
 
         return {
             width: 0.15,

@@ -1,10 +1,5 @@
 "use strict";
 
-const
-    GLOBAL = {
-        util: require(`./global.util`)
-    };
-
 let action = new Creep.Action('mining');
 module.exports = action;
 action.renewTarget = true;
@@ -103,7 +98,7 @@ action.determineSpot = function (creep, source) {
         }
     }
     if (!creep.data.determinatedSpot) {
-        GLOBAL.util.logError('Unable to determine working location for miner in room ' + creep.pos.roomName);
+        global.Util.logError('Unable to determine working location for miner in room ' + creep.pos.roomName);
     }
 };
 action.work = function (creep) {
@@ -168,7 +163,7 @@ action.getEnergy = function (creep) {
     })[0];
     if (dropped) {
         if (global.DEBUG && global.TRACE)
-            GLOBAL.util.trace('Action', {actionName: this.name, method: 'getEnergy', creepName: creep.name, pos: creep.pos, pickup: dropped.id});
+            global.Util.trace('Action', {actionName: this.name, method: 'getEnergy', creepName: creep.name, pos: creep.pos, pickup: dropped.id});
         creep.pickup(dropped);
         return true;
     }
@@ -197,7 +192,7 @@ action.getEnergy = function (creep) {
 action.maintain = function (creep) {
     const minCarry = (creep.data.body && creep.data.body.work ? (creep.data.body.work * 5) : (creep.carryCapacity / 2));
     if (global.DEBUG && global.TRACE)
-        GLOBAL.util.trace('Action', {actionName: this.name, method: 'maintain', creepName: creep.name, pos: creep.pos, energy: creep.carryenergy, minCarry});
+        global.Util.trace('Action', {actionName: this.name, method: 'maintain', creepName: creep.name, pos: creep.pos, energy: creep.carryenergy, minCarry});
     if (creep.carry.energy <= minCarry) {
         if (!creep.data.energyChecked || Game.time - creep.data.energyChecked > global.MINER_WORK_THRESHOLD) {
             this.getEnergy(creep);
@@ -214,7 +209,7 @@ action.maintain = function (creep) {
             if (repairTarget) {
                 creep.data.repairTarget = repairTarget.id;
                 if (global.DEBUG && global.TRACE)
-                    GLOBAL.util.trace('Action', {actionName: this.name, method: 'maintain', creepName: creep.name, pos: creep.pos, repairTarget: repairTarget.id, progress: repairTarget.hits / repairTarget.hitsMax});
+                    global.Util.trace('Action', {actionName: this.name, method: 'maintain', creepName: creep.name, pos: creep.pos, repairTarget: repairTarget.id, progress: repairTarget.hits / repairTarget.hitsMax});
                 return creep.repair(repairTarget);
             }  else {
                 delete creep.data.repairTarget;
@@ -231,7 +226,7 @@ action.maintain = function (creep) {
             if (buildTarget) {
                 creep.data.buildTarget = buildTarget.id;
                 if (global.DEBUG && global.TRACE)
-                    GLOBAL.util.trace('Action', {actionName: this.name, method: 'maintain', creepName: creep.name, pos: creep.pos, buildTarget: buildTarget.id, progress: buildTarget.progress / buildTarget.progressTotal});
+                    global.Util.trace('Action', {actionName: this.name, method: 'maintain', creepName: creep.name, pos: creep.pos, buildTarget: buildTarget.id, progress: buildTarget.progress / buildTarget.progressTotal});
                 return creep.build(buildTarget);
             } else {
                 delete creep.data.buildTarget;
@@ -241,7 +236,7 @@ action.maintain = function (creep) {
     }
     return false; // idle
 };
-action.defaultStrategy.newTarget = function (creep) {
+action.defaultStrategy.newTarget = creep => {
     const addable = s => Creep.action.mining.isValidTarget(s, creep) && Creep.action.mining.isAddableTarget(s, creep);
     return _(creep.room.sources).sortBy(s => creep.pos.getRangeTo(s)).find(addable) || null;
 };

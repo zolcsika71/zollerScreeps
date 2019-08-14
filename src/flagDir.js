@@ -1,12 +1,5 @@
 "use strict";
 
-const
-    GLOBAL = {
-        global: require('./global.global'),
-        parameter: require(`./global.parameter`),
-        util: require(`./global.util`)
-    };
-
 let mod = {};
 module.exports = mod;
 
@@ -189,7 +182,7 @@ mod.analyze = function () {
                 cloaking: flag.cloaking
             });
         } catch (e) {
-            GLOBAL.util.logError(e.stack || e.message);
+            global.Util.logError(e.stack || e.message);
         }
     };
     _.forEach(Game.flags, register);
@@ -200,7 +193,7 @@ mod.analyze = function () {
                 this.stale.push(flagName);
             }
         } catch (e) {
-            GLOBAL.util.logError(e.stack || e.message);
+            global.Util.logError(e.stack || e.message);
         }
     };
     _.forEach(Memory.flags, findStaleFlags);
@@ -211,13 +204,13 @@ mod.execute = function () {
     let triggerFound = entry => {
         try {
             if (!entry.cloaking || entry.cloaking === 0) {
-                let p = GLOBAL.util.startProfiling('Flag.execute', {enabled: global.PROFILING.FLAGS}),
+                let p = global.Util.startProfiling('Flag.execute', {enabled: global.PROFILING.FLAGS}),
                     flag = Game.flags[entry.name];
                 Flag.found.trigger(flag);
                 p.checkCPU(entry.name, global.PROFILING.EXECUTE_LIMIT, mod.flagType(flag));
             }
         } catch (e) {
-            Util.logError(e.stack || e.message);
+            global.Util.logError(e.stack || e.message);
         }
     };
     this.list.forEach(triggerFound);
@@ -242,7 +235,7 @@ mod.flagType = function (flag) {
                 return `${primary}.${secondary}`;
         }
     }
-    GLOBAL.util.logError(`Unknown flag type for flag: ${flag ? flag.name : 'undefined flag'}.`);
+    global.Util.logError(`Unknown flag type for flag: ${flag ? flag.name : 'undefined flag'}.`);
     return 'undefined';
 };
 mod.specialFlag = function (create) {

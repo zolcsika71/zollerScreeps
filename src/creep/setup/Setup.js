@@ -75,7 +75,7 @@ let Setup = function (typeName) {
     this.isValidSetup = function (room) {
         if (room.controller.level < this.minControllerLevel) {
             if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('Setup', {setupType: this.type, room: room.name, rcl: room.controller.level, Setup: 'isValidSetup'}, 'low RCL');
+                global.Util.trace('Setup', {setupType: this.type, room: room.name, rcl: room.controller.level, Setup: 'isValidSetup'}, 'low RCL');
             return false;
         }
 
@@ -87,7 +87,7 @@ let Setup = function (typeName) {
         if (absEnergy < minAbsEnergyAvailable ||
             energy < minEnergyAvailable) {
             if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('Setup', {setupType: this.type, room: room.name, absEnergy, energy, Setup: 'isValidSetup'}, 'not enough energy');
+                global.Util.trace('Setup', {setupType: this.type, room: room.name, absEnergy, energy, Setup: 'isValidSetup'}, 'not enough energy');
             return false;
         }
 
@@ -95,7 +95,7 @@ let Setup = function (typeName) {
             maxWeight = this.SelfOrCall(this._maxWeight, room);
         if (maxCount === 0 || maxWeight === 0) {
             if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('Setup', {setupType: this.type, room: room.name, maxCount, maxWeight, Setup: 'isValidSetup'}, 'too many creeps');
+                global.Util.trace('Setup', {setupType: this.type, room: room.name, maxCount, maxWeight, Setup: 'isValidSetup'}, 'too many creeps');
             return false;
         }
         if (maxCount == null)

@@ -1,9 +1,6 @@
 "use strict";
 
 const
-    GLOBAL = {
-        util: require(`./global.util`)
-    },
     ROOT = {
         flagDir: require('./flagDir')
     };
@@ -13,13 +10,9 @@ module.exports = action;
 action.maxPerAction = 3;
 action.maxPerTarget = 3;
 action.renewTarget = false;
-action.isValidAction = function (creep) {
-    return creep.carryCapacity === 0 || creep.sum < creep.carryCapacity;
-};
-action.isValidTarget = function (target) {
-    return target != null;
-};
-action.newTarget = function (creep) {
+action.isValidAction = creep => creep.carryCapacity === 0 || creep.sum < creep.carryCapacity;
+action.isValidTarget = target => target != null;
+action.newTarget = creep => {
     let target;
     let flag = ROOT.flagDir.find(global.FLAG_COLOR.destroy.dismantle, creep.pos, true);
     if (flag) {
@@ -39,7 +32,7 @@ action.newTarget = function (creep) {
                 };
                 flag = ROOT.flagDir.find(global.FLAG_COLOR.destroy.dismantle, creep.pos, true, otherFlagMod, oldName);
                 if (oldName === flag.name)
-                    GLOBAL.util.logError('Removed flag found again in dismantling.newTarget!');
+                    global.Util.logError('Removed flag found again in dismantling.newTarget!');
                 if (flag) {
                     if (flag.room !== undefined) { // room is visible
                         let targets = flag.room.lookForAt(LOOK_STRUCTURES, flag.pos.x, flag.pos.y);
@@ -47,7 +40,7 @@ action.newTarget = function (creep) {
                             return targets[0];
                         else { // remove flag. try next flag
                             Room.costMatrixInvalid.trigger(flag.room);
-                            FlagDir.removeFromDir(flag.name);
+                            global.FlagDir.removeFromDir(flag.name);
                             flag.remove();
                         }
                     } else target = flag; // target in other room
@@ -57,6 +50,4 @@ action.newTarget = function (creep) {
     }
     return target;
 };
-action.work = function (creep) {
-    return creep.dismantle(creep.target);
-};
+action.work = creep => creep.dismantle(creep.target);

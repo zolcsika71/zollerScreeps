@@ -1,10 +1,5 @@
 "use strict";
 
-const
-    GLOBAL = {
-        util: require(`./global.util`)
-    };
-
 let mod = {},
     cache = {};
 
@@ -87,7 +82,7 @@ mod.execute = function () {
     });
 };
 mod.memory = (task, s) => { // task:  (string) name of the task, s: (string) any selector for that task, could be room name, flag name, enemy name
-    let memory = GLOBAL.util.get(Memory, ['tasks', task, s], {});
+    let memory = global.Util.get(Memory, ['tasks', task, s], {});
     // temporary migration, remove if in dev
     delete memory.queuedValid;
     delete memory.runningValid;
@@ -166,7 +161,7 @@ mod.spawn = (creepDefinition, destiny, roomParams, onQueued) => {
     };
     if (creepSetup.parts.length === 0) {
         // creep has no body.
-        GLOBAL.util.logSystem(flag.pos.roomName, GLOBAL.util.dye(global.CRAYON.error, `${destiny.task} task tried to queue a zero parts body ${creepDefinition.behaviour} creep. Aborted.`));
+        global.Util.logSystem(flag.pos.roomName, global.Util.dye(global.CRAYON.error, `${destiny.task} task tried to queue a zero parts body ${creepDefinition.behaviour} creep. Aborted.`));
         return null;
     }
     // queue creep for spawning
@@ -225,7 +220,7 @@ mod.forceSpawn = (creepDef, roomParams, target) => {
 mod.validateQueued = function (memory, flag, task, options = {}) {
     let subKey = options.subKey ? 'queued.' + options.subKey : 'queued',
         checkPath = options.subKey ? 'nextQueuedCheck.' + options.subKey : 'nextQueuedCheck',
-        queued = GLOBAL.util.get(memory, subKey, []),
+        queued = global.Util.get(memory, subKey, []),
         nextCheck = _.get(memory, checkPath, 0);
 
     // if checkPathValid = true, it will only revalidate if 50 ticks have passed since the last validation
@@ -246,7 +241,7 @@ mod.validateQueued = function (memory, flag, task, options = {}) {
         queued.forEach(_validateQueued);
         _.set(memory, subKey, validated);
         nextCheck = Game.time + 50;
-        GLOBAL.util.set(memory, checkPath, nextCheck, false); // set the queued check
+        global.Util.set(memory, checkPath, nextCheck, false); // set the queued check
 
     } else if (queued.length === 0) {
         if (options.subKey && memory.nextQueuedCheck)
@@ -263,7 +258,7 @@ mod.validateQueued = function (memory, flag, task, options = {}) {
 mod.validateSpawning = function (memory, flag, task, options = {}) {
     let subKey = options.subKey ? 'spawning.' + options.subKey : 'spawning',
         checkPath = options.subKey ? 'nextSpawnCheck.' + options.subKey : 'nextSpawnCheck',
-        spawning = Util.get(memory, subKey, []),
+        spawning = global.Util.get(memory, subKey, []),
         nextCheck = _.get(memory, checkPath, 0);
 
     if (spawning.length && (!options.checkValid || Game.time > nextCheck)) {
@@ -285,7 +280,7 @@ mod.validateSpawning = function (memory, flag, task, options = {}) {
 
         if (minRemaining) {
             nextCheck = Game.time + minRemaining;
-            GLOBAL.util.set(memory, checkPath, nextCheck, false); // set the spawning check
+            global.Util.set(memory, checkPath, nextCheck, false); // set the spawning check
         } else {
             if (options.subKey && memory.nextSpawnCheck)
                 delete memory.nextSpawnCheck[options.subKey];
@@ -302,7 +297,7 @@ mod.validateSpawning = function (memory, flag, task, options = {}) {
 mod.validateRunning = function (memory, flag, task, options = {}) {
     let subKey = options.subKey ? 'running.' + options.subKey : 'running',
         checkPath = options.subKey ? 'nextRunningCheck.' + options.subKey : 'nextRunningCheck',
-        running = Util.get(memory, subKey, []),
+        running = global.Util.get(memory, subKey, []),
         roomName = options.roomName,
         nextCheck = _.get(memory, checkPath, 0);
 
@@ -325,8 +320,8 @@ mod.validateRunning = function (memory, flag, task, options = {}) {
             if (creep.data.predictedRenewal)
                 prediction = creep.data.predictedRenewal;
             else if (creep.data.spawningTime)
-                prediction = (creep.data.spawningTime + (GLOBAL.util.routeRange(creep.data.homeRoom, roomName) * 50));
-            else prediction = (GLOBAL.util.routeRange(creep.data.homeRoom, roomName) + 1) * 50;
+                prediction = (creep.data.spawningTime + (global.Util.routeRange(creep.data.homeRoom, roomName) * 50));
+            else prediction = (global.Util.routeRange(creep.data.homeRoom, roomName) + 1) * 50;
             if (creep.name !== deadCreep && creep.ticksToLive > prediction) {
                 const untilRenewal = creep.ticksToLive - prediction;
                 minRemaining = (!minRemaining || untilRenewal < minRemaining) ? untilRenewal : minRemaining;
@@ -337,7 +332,7 @@ mod.validateRunning = function (memory, flag, task, options = {}) {
         _.set(memory, subKey, validated);
         if (minRemaining) {
             nextCheck = Game.time + Math.min(global.TASK_CREEP_CHECK_INTERVAL, minRemaining); // check running at least every 250 ticks
-            GLOBAL.util.set(memory, checkPath, nextCheck, false);
+            global.Util.set(memory, checkPath, nextCheck, false);
         } else {
             if (options.subKey && memory.nextRunningCheck)
                 delete memory.nextRunningCheck[options.subKey];
@@ -354,7 +349,7 @@ mod.validateRunning = function (memory, flag, task, options = {}) {
 };
 mod.validateAll = function (memory, flag, task, options = {}) {
     if (_.isUndefined(options.roomName))
-        return GLOBAL.util.logError('Task.validateAll', 'roomName undefined' + flag + options.subKey);
+        return global.Util.logError('Task.validateAll', 'roomName undefined' + flag + options.subKey);
     mod.validateQueued(memory, flag, task, options);
     mod.validateSpawning(memory, flag, task, options);
     mod.validateRunning(memory, flag, task, options);

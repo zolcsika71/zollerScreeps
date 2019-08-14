@@ -1,13 +1,5 @@
 "use strict";
 
-const
-    GLOBAL = {
-        global: require('./global.global'),
-        parameter: require(`./global.parameter`),
-        util: require(`./global.util`)
-
-    };
-
 let Behaviour = function (name) { // base class for behaviours
         this.name = name;
         this.actions = (creep) => []; // priority list of non resource based actions
@@ -15,7 +7,7 @@ let Behaviour = function (name) { // base class for behaviours
         this.outflowActions = (creep) => []; // priority list of actions for using resources
         this.assignAction = function (creep, action, target, debouncePriority) {
 
-            const p = GLOBAL.util.startProfiling(creep.name + '.assignAction' + ':' + action.name || action, {enabled: global.PROFILING.BEHAVIOUR});
+            const p = global.Util.startProfiling(creep.name + '.assignAction' + ':' + action.name || action, {enabled: global.PROFILING.BEHAVIOUR});
 
             let valid,
                 addable;
@@ -26,7 +18,7 @@ let Behaviour = function (name) { // base class for behaviours
                 valid = action.isValidAction(creep);
 
             if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('Action', {actionName: action.name, behaviourName: this.name, creepName: creep.name, valid, Action: 'isValidAction'});
+                global.Util.trace('Action', {actionName: action.name, behaviourName: this.name, creepName: creep.name, valid, Action: 'isValidAction'});
             if (!valid) {
                 p.checkCPU('!valid', 0.3);
                 return false;
@@ -36,7 +28,7 @@ let Behaviour = function (name) { // base class for behaviours
                 addable = action.isAddableAction(creep);
 
             if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('Action', {actionName: action.name, behaviourName: this.name, creepName: creep.name, addable, Action: 'isAddableAction'});
+                global.Util.trace('Action', {actionName: action.name, behaviourName: this.name, creepName: creep.name, addable, Action: 'isAddableAction'});
             if (!addable) {
                 p.checkCPU('!addable', 0.3);
                 return false;
@@ -46,7 +38,7 @@ let Behaviour = function (name) { // base class for behaviours
             const assigned = action.assignDebounce ? action.assignDebounce(creep, debouncePriority, target) : action.assign(creep, target);
             if (assigned) {
                 if (global.DEBUG && global.TRACE)
-                    GLOBAL.util.trace('Behaviour', {actionName: action.name, behaviourName: this.name, creepName: creep.name,
+                    global.Util.trace('Behaviour', {actionName: action.name, behaviourName: this.name, creepName: creep.name,
                     assigned, Behaviour: 'nextAction', Action: 'assign', target: creep.target.id || creep.target.name});
 
                 creep.data.lastAction = action.name;
@@ -55,14 +47,14 @@ let Behaviour = function (name) { // base class for behaviours
                 return true;
 
             } else if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('Action', {actionName: action.name, behaviourName: this.name, creepName: creep.name, assigned, Behaviour: 'assignAction', Action: 'assign'});
+                global.Util.trace('Action', {actionName: action.name, behaviourName: this.name, creepName: creep.name, assigned, Behaviour: 'assignAction', Action: 'assign'});
 
             p.checkCPU('!assigned', 0.3);
             return false;
         };
         this.selectInflowAction = function (creep) {
             const
-                p = GLOBAL.util.startProfiling('selectInflowAction' + creep.name, {enabled: global.PROFILING.BEHAVIOUR}),
+                p = global.Util.startProfiling('selectInflowAction' + creep.name, {enabled: global.PROFILING.BEHAVIOUR}),
                 actionChecked = {},
                 outflowActions = this.outflowActions(creep);
 
@@ -79,12 +71,12 @@ let Behaviour = function (name) { // base class for behaviours
             return Creep.action.idle.assign(creep);
         };
         this.selectAction = function (creep, actions) {
-            let p = GLOBAL.util.startProfiling('selectAction' + creep.name, {enabled: global.PROFILING.BEHAVIOUR}),
+            let p = global.Util.startProfiling('selectAction' + creep.name, {enabled: global.PROFILING.BEHAVIOUR}),
                 actionChecked = {};
             for (let action of actions) {
                 // new line (action !== null && action !== undefined)
                 if (action !== null && action !== undefined && !actionChecked[action.name]) {
-                    //GLOBAL.util.logSystem(creep.name, `action: ${global.json(action.name)}`);
+                    //global.Util.logSystem(creep.name, `action: ${global.json(action.name)}`);
                     actionChecked[action.name] = true;
                     if (this.assignAction(creep, action)) {
                         p.checkCPU('assigned' + action.name, 1.5);
@@ -134,10 +126,10 @@ let Behaviour = function (name) { // base class for behaviours
             // Do some work
             if (creep.action && creep.target) {
                 if (global.DEBUG && global.TRACE)
-                    GLOBAL.util.trace('Behaviour', {actionName: creep.action.name, behaviourName: this.name, creepName: creep.name, target: creep.target.id || creep.target.name, Action: 'run'});
+                    global.Util.trace('Behaviour', {actionName: creep.action.name, behaviourName: this.name, creepName: creep.name, target: creep.target.id || creep.target.name, Action: 'run'});
                 creep.action.step(creep);
             } else {
-                GLOBAL.util.logError('Creep without action/activity!\nCreep: ' + creep.name + '\ndata: ' + JSON.stringify(creep.data));
+                global.Util.logError('Creep without action/activity!\nCreep: ' + creep.name + '\ndata: ' + JSON.stringify(creep.data));
             }
         };
         this.assign = function (creep) {

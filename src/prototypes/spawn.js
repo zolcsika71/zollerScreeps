@@ -1,10 +1,6 @@
 "use strict";
 
 const
-    //setup = require(`./creep.setup.Setup`),
-    GLOBAL = {
-        util: require(`./global.util`)
-    },
     ROOT = {
         population: require('./population')
     },
@@ -12,7 +8,7 @@ const
         room: require('./properties.room')
     };
 
-PROPERTIES.room.extend();
+//PROPERTIES.room.extend();
 
 let mod = {};
 module.exports = mod;
@@ -35,7 +31,7 @@ mod.extend = function () {
             return returnValue;
         };
 
-        const spawnDelay = GLOBAL.util.get(this.room.memory, 'spawnDelay', {});
+        const spawnDelay = global.Util.get(this.room.memory, 'spawnDelay', {});
         let busy = this.createCreepByQueue(room.spawnQueueHigh, 'High');
 
         // don't spawn lower if there is one waiting in the higher queue
@@ -58,7 +54,7 @@ mod.extend = function () {
     };
     Spawn.prototype.createCreepBySetup = function (setup) {
         if (global.DEBUG && global.TRACE)
-            GLOBAL.util.trace('Spawn', {setupType: this.type, rcl: this.room.controller.level, energy: this.room.energyAvailable, maxEnergy: this.room.energyCapacityAvailable, Spawn: 'createCreepBySetup'}, 'creating creep');
+            global.Util.trace('Spawn', {setupType: this.type, rcl: this.room.controller.level, energy: this.room.energyAvailable, maxEnergy: this.room.energyCapacityAvailable, Spawn: 'createCreepBySetup'}, 'creating creep');
         let params = setup.buildParams(this);
         //console.log(`by setup: ${global.json(params)}`);
         // plus lines
@@ -72,7 +68,7 @@ mod.extend = function () {
 
         // no parts
         if (cost === 0) {
-            GLOBAL.util.logSystem(this.pos.roomName, GLOBAL.util.dye(global.CRAYON.error, 'Zero parts body creep queued. Removed.'));
+            global.Util.logSystem(this.pos.roomName, global.Util.dye(global.CRAYON.error, 'Zero parts body creep queued. Removed.'));
             return false;
         }
 
@@ -87,7 +83,7 @@ mod.extend = function () {
         return null;
     };
     Spawn.prototype.createCreepByQueue = function (queue, level) {
-        const spawnDelay = GLOBAL.util.get(this.room.memory, 'spawnDelay', {});
+        const spawnDelay = global.Util.get(this.room.memory, 'spawnDelay', {});
         if (!queue)
             return null;
         else if (Memory.CPU_CRITICAL && spawnDelay[level] === queue.length)
@@ -102,7 +98,7 @@ mod.extend = function () {
         }
         if (!params) {
             if (queue.length && global.DEBUG)
-                GLOBAL.util.logSystem(this.pos.roomName, 'No non-CRITICAL creeps to spawn, delaying spawn until CPU is not CRITICAL, or new entries are added.');
+                global.Util.logSystem(this.pos.roomName, 'No non-CRITICAL creeps to spawn, delaying spawn until CPU is not CRITICAL, or new entries are added.');
             spawnDelay[level] = queue.length;
             return null;
         }
@@ -113,7 +109,7 @@ mod.extend = function () {
         });
         // no parts
         if (cost === 0) {
-            GLOBAL.util.logSystem(this.pos.roomName, GLOBAL.util.dye(global.CRAYON.error, 'Zero parts body creep queued. Removed.'));
+            global.Util.logSystem(this.pos.roomName, global.Util.dye(global.CRAYON.error, 'Zero parts body creep queued. Removed.'));
             return false;
         }
         // wait with spawning until enough resources are available
@@ -122,7 +118,7 @@ mod.extend = function () {
 
         if (cost > this.room.remainingEnergyAvailable) {
             if (cost > this.room.energyCapacityAvailable || (cost > 300 && !this.room.creeps.length)) {
-                GLOBAL.util.logSystem(this.pos.roomName, GLOBAL.util.dye(global.CRAYON.error, 'Queued creep too big for room: ' + JSON.stringify(params)));
+                global.Util.logSystem(this.pos.roomName, global.Util.dye(global.CRAYON.error, 'Queued creep too big for room: ' + JSON.stringify(params)));
                 return false;
             }
             queue.unshift(params);
@@ -163,12 +159,12 @@ mod.extend = function () {
             this.newSpawn = {name: name};
             Creep.spawningStarted.trigger({spawn: this.name, name: name, body: body, destiny: destiny, spawnTime: body.length * CREEP_SPAWN_TIME});
             if (global.CENSUS_ANNOUNCEMENTS)
-                GLOBAL.util.logSystem(this.pos.roomName, GLOBAL.util.dye(global.CRAYON.birth, 'Good morning ' + name + '!'));
+                global.Util.logSystem(this.pos.roomName, global.Util.dye(global.CRAYON.birth, 'Good morning ' + name + '!'));
             return true;
         }
         if (global.DEBUG || global.CENSUS_ANNOUNCEMENTS)
-            GLOBAL.util.logSystem(this.pos.roomName,
-                GLOBAL.util.dye(global.CRAYON.error, 'Offspring failed: ' + GLOBAL.util.translateErrorCode(success) + '<br/> - body: ' + JSON.stringify(_.countBy(body)) + '<br/> - name: ' + name + '<br/> - behaviour: ' + behaviour + '<br/> - destiny: ' + destiny));
+            global.Util.logSystem(this.pos.roomName,
+                global.Util.dye(global.CRAYON.error, 'Offspring failed: ' + global.Util.translateErrorCode(success) + '<br/> - body: ' + JSON.stringify(_.countBy(body)) + '<br/> - name: ' + name + '<br/> - behaviour: ' + behaviour + '<br/> - destiny: ' + destiny));
         return false;
     };
 

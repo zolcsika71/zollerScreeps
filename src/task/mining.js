@@ -1,9 +1,6 @@
 "use strict";
 
 const
-    GLOBAL = {
-        util: require(`./global.util`)
-    },
     TASK = {
         task: require('./task.task')
     },
@@ -37,8 +34,8 @@ mod.handleFlagRemoved = flagName => {
 mod.handleFlagFound = flag => {
     // Analyze Flag
     if (flag.compareTo(global.FLAG_COLOR.claim.mining) && TASK.task.nextCreepCheck(flag, mod.name)) {
-        GLOBAL.util.set(flag.memory, 'roomName', flag.pos.roomName);
-        GLOBAL.util.set(flag.memory, 'task', mod.name);
+        global.Util.set(flag.memory, 'roomName', flag.pos.roomName);
+        global.Util.set(flag.memory, 'task', mod.name);
         // check if a new creep has to be spawned
         mod.checkForRequiredCreeps(flag);
     }
@@ -70,7 +67,7 @@ mod.handleSpawningCompleted = creep => {
     if (flag) {
         // calculate & set time required to spawn and send next substitute creep
         // TODO: implement better distance calculation
-        creep.data.predictedRenewal = creep.data.spawningTime + (GLOBAL.util.routeRange(creep.data.homeRoom, creep.data.destiny.room) * 50);
+        creep.data.predictedRenewal = creep.data.spawningTime + (global.Util.routeRange(creep.data.homeRoom, creep.data.destiny.room) * 50);
         // get task memory
         let memory = mod.memory(creep.data.destiny.room);
         // save running creep to task memory
@@ -129,11 +126,11 @@ mod.checkForRequiredCreeps = (flag) => {
     // TODO: calculate creeps by type needed per source / mineral
 
     if (global.DEBUG && global.TRACE)
-        GLOBAL.util.trace('Task', {Task: mod.name, flagName: flag.name, sourceCount, haulerCount, minerCount, workerCount, [mod.name]: 'Flag.found'}, 'checking flag@', flag.pos);
+        global.Util.trace('Task', {Task: mod.name, flagName: flag.name, sourceCount, haulerCount, minerCount, workerCount, [mod.name]: 'Flag.found'}, 'checking flag@', flag.pos);
 
     if (mod.strategies.miner.shouldSpawn(minerCount, sourceCount)) {
         if (global.DEBUG && global.TRACE)
-            GLOBAL.util.trace('Task', {Task: mod.name, room: roomName, minerCount,
+            global.Util.trace('Task', {Task: mod.name, room: roomName, minerCount,
             minerTTLs: _.map(_.map(memory.running.remoteMiner, n=>Game.creeps[n]), "ticksToLive"), [mod.name]: 'minerCount'});
         let miner = mod.strategies.miner.setup(roomName);
         for (let i = minerCount; i < sourceCount; i++) {
@@ -419,7 +416,7 @@ mod.checkCapacity = function (roomName) {
             message = 'with ' + totalDropped + ' dropped energy.';
         }
         if (population <= minPopulation || totalDropped >= maxDropped) {
-            console.log(mod.carry(roomName), message, GLOBAL.util.stack());
+            console.log(mod.carry(roomName), message, global.Util.stack());
             return true;
         }
         return false;
@@ -477,7 +474,7 @@ mod.strategies = {
             if (population < global.REMOTE_RESERVE_HAUL_CAPACITY) {
                 // TODO if this room & all exits are currently reserved (by anyone) then use default to prevent Invaders?
                 if (global.DEBUG && global.TRACE)
-                    GLOBAL.util.trace('Task', {flagName: flag.name, pos: flag.pos, population, spawnParams: 'population', [mod.name]: 'spawnParams', Task: mod.name});
+                    global.Util.trace('Task', {flagName: flag.name, pos: flag.pos, population, spawnParams: 'population', [mod.name]: 'spawnParams', Task: mod.name});
                 return {count: 0, priority: 'Low'};
             }
 
@@ -531,7 +528,7 @@ mod.strategies = {
                 neededCarry = ept * travel * 2 + (memory.carryParts || 0) - existingCarry - queuedCarry,
                 maxWeight = haulerCarryToWeight(neededCarry);
             if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('Task', {Task: mod.name, room: flagRoomName, homeRoom: homeRoomName,
+                global.Util.trace('Task', {Task: mod.name, room: flagRoomName, homeRoom: homeRoomName,
                 haulers: existingHaulers.length + queuedHaulers.length, ept, travel, existingCarry, queuedCarry,
                 neededCarry, maxWeight, [mod.name]: 'maxWeight'});
             return maxWeight;

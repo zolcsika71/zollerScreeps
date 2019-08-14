@@ -1,11 +1,5 @@
 "use strict";
 
-const
-    GLOBAL = {
-        global: require('./global.global'),
-        util: require(`./global.util`)
-    };
-
 let mod = {};
 module.exports = mod;
 mod.extend = function () {
@@ -431,7 +425,7 @@ mod.extend = function () {
                         this._structureMatrix = cachedMatrix;
                     } else {
                         if (global.DEBUG)
-                            GLOBAL.util.logSystem(this.name, 'Calculating cost matrix');
+                            global.Util.logSystem(this.name, 'Calculating cost matrix');
                         const costMatrix = new PathFinder.CostMatrix;
                         let setCosts = structure => {
                             const site = structure instanceof ConstructionSite;
@@ -461,7 +455,7 @@ mod.extend = function () {
                         };
                         Room.pathfinderCacheDirty = true;
                         if (global.DEBUG && global.TRACE)
-                            GLOBAL.util.trace('PathFinder', {roomName: this.name, prevTime, structures: this.structures.all.length, PathFinder: 'CostMatrix'}, 'updated costmatrix');
+                            global.Util.trace('PathFinder', {roomName: this.name, prevTime, structures: this.structures.all.length, PathFinder: 'CostMatrix'}, 'updated costmatrix');
                         this._structureMatrix = costMatrix;
                     }
                 }
@@ -594,7 +588,7 @@ mod.extend = function () {
         'skip': {
             configurable: true,
             get() {
-                return GLOBAL.util.get(this, '_skip', !!global.FlagDir.find(global.FLAG_COLOR.command.skipRoom, this));
+                return global.Util.get(this, '_skip', !!global.FlagDir.find(global.FLAG_COLOR.command.skipRoom, this));
             }
         },
         'nuked': {

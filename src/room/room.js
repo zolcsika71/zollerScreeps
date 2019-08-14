@@ -1,10 +1,6 @@
 "use strict";
 
 const
-    GLOBAL = {
-        parameter: require(`./global.parameter`),
-        util: require(`./global.util`)
-    },
     ROOT = {
         mainInjection: require(`./mainInjection`)
     };
@@ -68,7 +64,7 @@ mod.needMemoryResync = function (room) {
     return Game.time % global.MEMORY_RESYNC_INTERVAL === 0 || room.name === 'sim';
 };
 mod.analyze = function () {
-    const p = GLOBAL.util.startProfiling('Room.analyze', {enabled: global.PROFILING.ROOMS});
+    const p = global.Util.startProfiling('Room.analyze', {enabled: global.PROFILING.ROOMS});
     // run analyze in each of our submodules
     for (let key of Object.keys(Room._ext)) {
         if (Room._ext[key].analyze) Room._ext[key].analyze();
@@ -90,7 +86,7 @@ mod.analyze = function () {
         }
         catch (err) {
             Game.notify('Error in room.js (Room.prototype.loop) for "' + room.name + '" : ' + err.stack ? err + '<br/>' + err.stack : err);
-            console.log(GLOBAL.util.dye(global.CRAYON.error, 'Error in room.js (Room.prototype.loop) for "' + room.name + '": <br/>' + (err.stack || err.toString()) + '<br/>' + err.stack));
+            console.log(global.Util.dye(global.CRAYON.error, 'Error in room.js (Room.prototype.loop) for "' + room.name + '": <br/>' + (err.stack || err.toString()) + '<br/>' + err.stack));
         }
     };
     _.forEach(Game.rooms, r => {
@@ -101,7 +97,7 @@ mod.analyze = function () {
     });
 };
 mod.execute = function () {
-    const p = GLOBAL.util.startProfiling('Room.execute', {enabled: global.PROFILING.ROOMS});
+    const p = global.Util.startProfiling('Room.execute', {enabled: global.PROFILING.ROOMS});
     // run execute in each of our submodules
     for (let key of Object.keys(Room._ext))
         if (Room._ext[key].execute) Room._ext[key].execute();
@@ -115,13 +111,13 @@ mod.execute = function () {
             let room = Game.rooms[roomName];
             if (room) { // has sight
                 if (room.collapsed) {
-                    let p2 = GLOBAL.util.startProfiling(roomName + 'execute', {enabled: global.PROFILING.ROOMS});
+                    let p2 = global.Util.startProfiling(roomName + 'execute', {enabled: global.PROFILING.ROOMS});
                     Room.collapsed.trigger(room);
                     p2.checkCPU('collapsed', 0.5);
                 }
             }
         } catch (e) {
-            GLOBAL.util.logError(e.stack || e.message);
+            global.Util.logError(e.stack || e.message);
         }
     };
     _.forEach(Memory.rooms, (memory, roomName) => {
@@ -165,7 +161,7 @@ mod.cleanup = function () {
 };
 mod.routeCallback = function (origin, destination, options) {
     if (_.isUndefined(origin) || _.isUndefined(destination))
-        GLOBAL.util.logError('Room.routeCallback', 'both origin and destination must be defined - origin:' + origin + ' destination:' + destination);
+        global.Util.logError('Room.routeCallback', 'both origin and destination must be defined - origin:' + origin + ' destination:' + destination);
     return function (roomName) {
         if (Game.map.getRoomLinearDistance(origin, roomName) > options.restrictDistance)
             return false;
@@ -297,7 +293,7 @@ mod.roomDistance = function (roomName1, roomName2, diagonal, continuous) {
 };
 mod.rebuildCostMatrix = function (roomName) {
     if (global.DEBUG)
-        GLOBAL.util.logSystem(roomName, 'Invalidating costmatrix to force a rebuild when we have vision.');
+        global.Util.logSystem(roomName, 'Invalidating costmatrix to force a rebuild when we have vision.');
     _.set(Room, ['pathfinderCache', roomName, 'stale'], true);
     _.set(Room, ['pathfinderCache', roomName, 'updated'], Game.time);
     Room.pathfinderCacheDirty = true;
@@ -328,7 +324,7 @@ mod.getCachedStructureMatrix = function (roomName) {
             ttl = Game.time - mem.updated;
         if (mem.version === Room.COSTMATRIX_CACHE_VERSION && (mem.serializedMatrix || mem.costMatrix) && !mem.stale && ttl < COST_MATRIX_VALIDITY) {
             if (global.DEBUG && global.TRACE)
-                GLOBAL.util.trace('PathFinder', {roomName: roomName, ttl, PathFinder: 'CostMatrix'}, 'cached costmatrix');
+                global.Util.trace('PathFinder', {roomName: roomName, ttl, PathFinder: 'CostMatrix'}, 'cached costmatrix');
             return true;
         }
         return false;
@@ -344,7 +340,7 @@ mod.getCachedStructureMatrix = function (roomName) {
             cache.costMatrix = costMatrix;
             return costMatrix;
         } else {
-            GLOBAL.util.logError('Room.getCachedStructureMatrix', `Cached costmatrix for ${roomName} is invalid ${cache}`);
+            global.Util.logError('Room.getCachedStructureMatrix', `Cached costmatrix for ${roomName} is invalid ${cache}`);
             delete Room.pathfinderCache[roomName];
         }
     }
