@@ -4,7 +4,7 @@ let behaviour = new Creep.Behaviour('hauler');
 
 module.exports = behaviour;
 
-behaviour.inflowActions = (creep) => {
+behaviour.inflowActions = creep => {
     return [
         Creep.action.uncharging,
         Creep.action.picking,
@@ -12,7 +12,7 @@ behaviour.inflowActions = (creep) => {
         Creep.action.reallocating
     ];
 };
-behaviour.outflowActions = (creep) => {
+behaviour.outflowActions = creep => {
     let priority = [
         Creep.action.feeding,
         Creep.action.charging,

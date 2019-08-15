@@ -1,6 +1,5 @@
 "use strict";
 
-const date = require("grunt");
 let mod = {};
 module.exports = mod;
 
