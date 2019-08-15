@@ -2,9 +2,9 @@
 
 let behaviour = new Creep.Behaviour('worker');
 module.exports = behaviour;
-behaviour.inflowActions = function (creep) {
+behaviour.inflowActions = creep => {
     let priority = [
-        Creep.action.bulldozing,
+        //Creep.action.bulldozing,
         Creep.action.picking,
         Creep.action.dismantling,
         Creep.action.withdrawing,
@@ -17,7 +17,7 @@ behaviour.inflowActions = function (creep) {
     }
     return priority;
 };
-behaviour.outflowActions = function (creep) {
+behaviour.outflowActions = creep => {
     if (creep.room.situation.invasion && creep.room.controller && creep.room.controller.level > 2) {
         return [
             Creep.action.fueling,
