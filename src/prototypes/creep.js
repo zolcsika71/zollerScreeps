@@ -420,8 +420,8 @@ mod.extend = function () {
     };
 
     // API
-    Creep.prototype.staticCustomStrategy = function (actionName, behaviourName, taskName) {};
-    Creep.prototype.customStrategy = function (actionName, behaviourName, taskName) {};
+    Creep.prototype.staticCustomStrategy = (actionName, behaviourName, taskName) => {};
+    Creep.prototype.customStrategy = (actionName, taskName) => {};
 
     // Creep.prototype.strategy = function(actionName, behaviourName, taskName)
     strategy.decorateAgent(Creep.prototype,

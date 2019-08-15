@@ -9,36 +9,36 @@ mod.tasks = [];
 mod.executeCache = {};
 
 
-mod.populate = function () {
+mod.populate = () => {
     mod.addTasks(...[
-        //Task.attackController,
-        //Task.claim,
-        Task.defense,
-        //Task.guard,
-        //Task.labTech,
-        Task.mining,
-        //Task.pioneer,
-        Task.reputation
-        //Task.reserve,
-        //Task.robbing,
-        //Task.safeGen,
-        //Task.scheduler
+        //global.Task.attackController,
+        //global.Task.claim,
+        global.Task.defense,
+        //global.Task.guard,
+        //global.Task.labTech,
+        global.Task.mining,
+        //global.Task.pioneer,
+        global.Task.reputation
+        //global.Task.reserve,
+        //global.Task.robbing,
+        //global.Task.safeGen,
+        //global.Task.scheduler
     ]);
 };
 mod.addTasks = (...task) => mod.tasks.push(...task);
 mod.installTask = (...taskNames) => {
     taskNames.forEach(taskName => {
-        Task[taskName] = require(`task.${taskName}`);
-        mod.addTasks(Task[taskName]);
+        global.Task[taskName] = require(`task.${taskName}`);
+        mod.addTasks(global.Task[taskName]);
     });
 };
-mod.flush = function () {
+mod.flush = () => {
     mod.tasks.forEach(task => {
         if (task.flush)
             task.flush();
     });
 };
-mod.register = function () {
+mod.register = () => {
     mod.tasks.forEach(task => {
         // Extending of any other kind
         if (task.register)
@@ -77,7 +77,7 @@ mod.execute = function () {
         try {
             n.execute();
         } catch (e) {
-            console.log(`Error executing Task "${k}"<br>${e.stack || e.toString()}`);
+            console.log(`Error executing global.Task "${k}"<br>${e.stack || e.toString()}`);
         }
     });
 };
@@ -349,7 +349,7 @@ mod.validateRunning = function (memory, flag, task, options = {}) {
 };
 mod.validateAll = function (memory, flag, task, options = {}) {
     if (_.isUndefined(options.roomName))
-        return global.logError('Task.validateAll', 'roomName undefined' + flag + options.subKey);
+        return global.logError('global.Task.validateAll', 'roomName undefined' + flag + options.subKey);
     mod.validateQueued(memory, flag, task, options);
     mod.validateSpawning(memory, flag, task, options);
     mod.validateRunning(memory, flag, task, options);

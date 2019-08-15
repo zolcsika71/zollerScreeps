@@ -27,13 +27,13 @@ mod.handleFlagRemoved = flagName => {
             return;
         else {
             // no more mining in that room.
-            TASK.task.cleanup(['remoteMiner', 'remoteWorker', 'remoteHauler'], mod.name, flagMem.roomName);
+            global.Task.task.cleanup(['remoteMiner', 'remoteWorker', 'remoteHauler'], mod.name, flagMem.roomName);
         }
     }
 };
 mod.handleFlagFound = flag => {
     // Analyze Flag
-    if (flag.compareTo(global.FLAG_COLOR.claim.mining) && TASK.task.nextCreepCheck(flag, mod.name)) {
+    if (flag.compareTo(global.FLAG_COLOR.claim.mining) && global.Task.task.nextCreepCheck(flag, mod.name)) {
         global.Util.set(flag.memory, 'roomName', flag.pos.roomName);
         global.Util.set(flag.memory, 'task', mod.name);
         // check if a new creep has to be spawned
@@ -73,7 +73,7 @@ mod.handleSpawningCompleted = creep => {
         // save running creep to task memory
         memory.running[creep.data.destiny.type].push(creep.name);
         // clean/validate task memory spawning creeps
-        TASK.task.validateSpawning(memory, flag, mod.name, {roomName: creep.data.destiny.room, subKey: creep.data.destiny.type});
+        global.Task.task.validateSpawning(memory, flag, mod.name, {roomName: creep.data.destiny.room, subKey: creep.data.destiny.type});
     }
 };
 // when a creep died (or will die soon)
@@ -87,7 +87,7 @@ mod.handleCreepDied = name => {
     if (flag) {
         // clean/validate task memory running creeps
         let memory = mod.memory(mem.destiny.room);
-        TASK.task.validateRunning(memory, flag, mod.name, {subKey: mem.creepType, roomName: mem.destiny.room, deadCreep: name});
+        global.Task.task.validateRunning(memory, flag, mod.name, {subKey: mem.creepType, roomName: mem.destiny.room, deadCreep: name});
     }
 };
 mod.needsReplacement = (creep) => {
@@ -117,7 +117,7 @@ mod.checkForRequiredCreeps = (flag) => {
 
     let countExisting = type => {
         let priority = _.find(mod.creep, {behaviour: type}).queue;
-        TASK.task.validateAll(memory, flag, mod.name, {roomName, subKey: type, queues: [priority], checkValid: true, task: mod.name});
+        global.Task.task.validateAll(memory, flag, mod.name, {roomName, subKey: type, queues: [priority], checkValid: true, task: mod.name});
         return memory.queued[type].length + memory.spawning[type].length + memory.running[type].length;
     };
     let haulerCount = countExisting('remoteHauler'),
@@ -261,7 +261,7 @@ mod.findRunning = (roomName, type) => {
     return running;
 };
 mod.memory = key => {
-    let memory = TASK.task.memory(mod.name, key);
+    let memory = global.Task.task.memory(mod.name, key);
     if (!memory.hasOwnProperty('queued')) {
         memory.queued = {
             remoteMiner: [],
@@ -394,7 +394,7 @@ mod.carry = function (roomName, partChange) {
     memory.carryParts = (memory.carryParts || 0) + (partChange || 0);
     const population = Math.round(mod.carryPopulation(roomName) * 100);
     if (partChange) {
-        TASK.task.forceCreepCheck(TASK.task.mining.getFlag(roomName), mod.name);
+        global.Task.task.forceCreepCheck(global.Task.task.mining.getFlag(roomName), mod.name);
         delete memory.capacityLastChecked;
     }
     return `Task.${mod.name}: hauler carry capacity for ${roomName} ${memory.carryParts >= 0 ? 'increased' : 'decreased'} by ${Math.abs(memory.carryParts)}. Currently at ${population}% of desired capacity`;

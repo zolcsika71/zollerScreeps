@@ -28,7 +28,7 @@ mod.translateErrorCode = function (code) {
         11: 'ERR_TIRED',
         12: 'ERR_NO_BODYPART',
         14: 'ERR_RCL_NOT_ENOUGH',
-        15: 'ERR_GCL_NOT_ENOUGH',
+        15: 'ERR_GCL_NOT_ENOUGH'
     }[code * -1];
 };
 
@@ -53,17 +53,11 @@ mod.isObject = function (value) {
     return typeof value === 'function' || typeof value === 'object';
 };
 
-
-
-
-
-
-
 /**
  * Load existing profiling data or initialize to defaults.
  * @param {Boolean} [reset=false] - Optionally reset all profiling data
  */
-mod.loadProfiler = function (reset = false) {
+mod.loadProfiler = (reset = false) => {
     if (reset) {
         mod.logSystem('Profiler', 'resetting profiler data.');
         Memory.profiler = {
@@ -79,10 +73,9 @@ mod.loadProfiler = function (reset = false) {
 /**
  * Reset all profiling data
  */
-mod.resetProfiler = function () {
+mod.resetProfiler = () => {
     mod.loadProfiler(true);
 };
-
 
 
 /**
@@ -90,7 +83,7 @@ mod.resetProfiler = function () {
  * @param {Number} number
  * @returns {string}
  */
-mod.formatNumber = function (number) {
+mod.formatNumber = number => {
     let ld = Math.log10(number) / 3;
     if (!number)
         return number;
@@ -99,13 +92,13 @@ mod.formatNumber = function (number) {
         return n;
     }
     if (ld < 2) {
-        return n.substring(0, n.length - 3) + 'k';
+        return `${n.substring(0, n.length - 3)}k`;
     }
     if (ld < 3) {
-        return n.substring(0, n.length - 6) + 'M';
+        return `${n.substring(0, n.length - 6)}M`;
     }
     if (ld < 4) {
-        return n.substring(0, n.length - 9) + 'B';
+        return `${n.substring(0, n.length - 9)}B`;
     }
     return number.toString();
 };
@@ -118,7 +111,7 @@ mod.formatNumber = function (number) {
  * @param {Boolean} [setDefault=true] - Will set the property to the default value if property doesn't exist
  * @returns {*}
  */
-mod.get = function (object, path, defaultValue, setDefault = true) {
+mod.get = (object, path, defaultValue, setDefault = true) => {
     const r = _.get(object, path);
     if (_.isUndefined(r) && !_.isUndefined(defaultValue) && setDefault) {
         defaultValue = mod.fieldOrFunction(defaultValue);
@@ -136,7 +129,7 @@ mod.get = function (object, path, defaultValue, setDefault = true) {
  * @param {*} value - The value to set
  * @param {Boolean} [onlyIfNotExists=true] - Will only set the property if it doesn't already exist
  */
-mod.set = function (object, path, value, onlyIfNotExists = true) {
+mod.set = (object, path, value, onlyIfNotExists = true) => {
     if (onlyIfNotExists) {
         mod.get(object, path, value);
         return;
@@ -150,15 +143,12 @@ mod.set = function (object, path, value, onlyIfNotExists = true) {
  * @param options (enabled true/false)
  * @returns {{totalCPU(), checkCPU()}} - functions to be called to check usage and output totals
  */
-mod.startProfiling = function (name, options = {enabled: false, startCPU: undefined}) {
-    const
-        enabled = options.enabled,
-        startCPU = options.startCPU;
-
-    let returnValue,
-        checkCPU = function (localName, limit, type) {
-    },
-        totalCPU = function () {
+mod.startProfiling = (name, options = {enabled: false, startCPU: undefined}) => {
+    let enabled = options.enabled,
+        startCPU = options.startCPU,
+        returnValue,
+        checkCPU = (localName, limit, type) => {},
+        totalCPU = () => {
         // if you would like to do a baseline comparison
         // if (_.isUndefined(Memory.profiling)) Memory.profiling = {ticks:0, cpu: 0};
         // let thisTick = Game.cpu.getUsed() - startCPU;
@@ -183,12 +173,12 @@ mod.startProfiling = function (name, options = {enabled: false, startCPU: undefi
              * @param {Number} limit - CPU threshold for reporting usage
              * @param {string} [type] - Optional, will store average usage for all calls that share this type
              */
-            checkCPU = function (localName, limit, type) {
-                const
-                    current = Game.cpu.getUsed(),
+            checkCPU = (localName, limit, type) => {
+                let current = Game.cpu.getUsed(),
                     used = _.round(current - start, 2);
+
                 if (!limit || used > limit) {
-                    mod.logSystem(name + ':' + localName, used);
+                    mod.logSystem(`${name}:${localName}`, used);
                 }
                 if (type) {
                     if (_.isUndefined(profiler.types[type])) profiler.types[type] = {totalCPU: 0, count: 0, totalCount: 0};
@@ -201,9 +191,8 @@ mod.startProfiling = function (name, options = {enabled: false, startCPU: undefi
 
         // Calculates total usage and outputs usage based on parameter settings
 
-        totalCPU = function () {
-            const
-                totalUsed = Game.cpu.getUsed() - onLoad,
+        totalCPU = () => {
+            let totalUsed = Game.cpu.getUsed() - onLoad,
                 avgCPU = profiler.totalCPU / profiler.totalTicks;
 
             profiler.totalCPU += totalUsed;
@@ -230,7 +219,7 @@ mod.startProfiling = function (name, options = {enabled: false, startCPU: undefi
                 string += `</table>`;
                 mod.logSystem('Average Usage', `<table style="font-size:80%;"><tr><th>Type${Array(longestType.length + 2).join(' ')}</th><th>(avg/creep/tick)</th><th>(active)</th><th>(weighted avg)</th><th>(executions)</th></tr>`.concat(string));
             }
-            mod.logSystem(name, ' loop:' + _.round(totalUsed, 2), 'other:' + _.round(onLoad, 2), 'avg:' + _.round(avgCPU, 2), 'ticks:' + profiler.totalTicks, 'bucket:' + Game.cpu.bucket);
+            mod.logSystem(name, ` loop:${_.round(totalUsed, 2)}`, `other:${_.round(onLoad, 2)}`, `avg:${_.round(avgCPU, 2)}`, `ticks:${profiler.totalTicks}`, `bucket:${Game.cpu.bucket}`);
             if (global.PROFILE && !global.PROFILING.BASIC_ONLY)
                 console.log('\n');
             Memory.profiler = profiler;
@@ -248,9 +237,7 @@ mod.startProfiling = function (name, options = {enabled: false, startCPU: undefi
  * @param {RoomPosition|Object} point2 - The second point
  * @returns {Number}
  */
-mod.getDistance = function (point1, point2) {
-    return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
-};
+mod.getDistance = (point1, point2) => Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
 
 /**
  * Gets the distances between two rooms, respecting natural walls
@@ -258,16 +245,26 @@ mod.getDistance = function (point1, point2) {
  * @param {string} toRoom - Ending room
  * @returns {Number}
  */
-mod.routeRange = function (fromRoom, toRoom) {
+mod.routeRange = (fromRoom, toRoom) => {
     if (fromRoom === toRoom) return 0;
 
-    return mod.get(Memory, `routeRange.${fromRoom}.${toRoom}`, function() {
-        const room = fromRoom instanceof Room ? fromRoom : Game.rooms[fromRoom];
-        if (!room) return Room.roomDistance(fromRoom, toRoom, false);
+    return mod.get(Memory, `routeRange.${fromRoom}.${toRoom}`, () => {
+        let room = fromRoom instanceof Room ? fromRoom : Game.rooms[fromRoom];
 
-        const route = room.findRoute(toRoom, false, false);
-        if (!route) return Room.roomDistance(fromRoom, toRoom, false);
+        if (!room)
+            return Room.roomDistance(fromRoom, toRoom, false);
+
+        let route = room.findRoute(toRoom, false, false);
+
+        if (!route)
+            return Room.roomDistance(fromRoom, toRoom, false);
 
         return route === ERR_NO_PATH ? Infinity : route.length;
     });
+};
+mod.creepData = creepName => {
+    console.log('Explain');
+    Game.creeps[creepName].explain();
+    console.log('JSON');
+    console.log(JSON.stringify(Game.creeps[creepName].data));
 };

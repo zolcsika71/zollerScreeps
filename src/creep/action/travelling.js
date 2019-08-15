@@ -59,9 +59,9 @@ action.step = function (creep) {
             }
         }
         // TODO: Only check if moving towards the rampart
-        if (!!creep.room.owner && creep.room.owner !== global.ME && TASK.reputation.isAlly(creep.room.owner) && _.find(creep.pos.adjacent, pos => {
+        if (!!creep.room.owner && creep.room.owner !== global.ME && global.Task.reputation.isAlly(creep.room.owner) && _.find(creep.pos.adjacent, pos => {
             return _.find(pos.lookFor(LOOK_STRUCTURES), s => {
-                return s instanceof StructureRampart && TASK.reputation.allyOwner(s);
+                return s instanceof StructureRampart && global.Task.reputation.allyOwner(s);
             });
         })) {
             creep.say(String.fromCodePoint(0x1f44b) + String.fromCodePoint(0x1f3fe) + String.fromCodePoint(0x1F6AA) + String.fromCodePoint(0x1f510), true);

@@ -64,8 +64,10 @@ let Action = function (actionName) {
             }
             // low CPU pathfinding for last few steps.
             else if (range > this.reachedRange) {
-                const direction = creep.pos.getDirectionTo(creep.target);
-                const targetPos = Traveler.positionAtDirection(creep.pos, direction);
+                const
+                    direction = creep.pos.getDirectionTo(creep.target),
+                    targetPos = Traveler.positionAtDirection(creep.pos, direction);
+
                 if (creep.room.isWalkable(targetPos.x, targetPos.y)) { // low cost last steps if possible
                     creep.move(direction);
                 } else if (!creep.pos.isNearTo(creep.target)) { // travel there if we're not already adjacent
@@ -77,19 +79,20 @@ let Action = function (actionName) {
         }
     };
     // order for the creep to execute when at target
-    this.work = function (creep) {
-        return ERR_INVALID_ARGS;
-    };
+    this.work = creep => ERR_INVALID_ARGS;
     // validate, if this action is still valid for a certain creep and target
     // returns the target (could be a ne one) if valid or null
     this.validateActionTarget = function (creep, target) {
-        if (this.isValidAction(creep)) { // validate target or new
-            if (!this.isValidTarget(target, creep)) {
-                if (this.renewTarget) { // invalid. try to find a new one...
-                    delete creep.data.path;
-                    return this.newTarget(creep);
-                }
-            } else return target;
+        if (this.isValidAction(creep)) {
+            // validate target or new
+            if (this.isValidTarget(target, creep)) {
+                return target;
+            } else if (this.renewTarget) {
+                // invalid. try to find a new one...
+                delete creep.data.path;
+                return this.newTarget(creep);
+            }
+
         }
         return null;
     };
@@ -109,10 +112,10 @@ let Action = function (actionName) {
         return false;
     };
     this.showAssignment = function (creep, target) {
-        if (global.SAY_ASSIGNMENT && global.ACTION_SAY[this.name.toUpperCase()]) creep.say(global.ACTION_SAY[this.name.toUpperCase()], global.SAY_PUBLIC);
-        if (target instanceof RoomObject || target instanceof RoomPosition && global.VISUALS.ACTION_ASSIGNMENT) {
+        if (global.SAY_ASSIGNMENT && global.ACTION_SAY[this.name.toUpperCase()])
+            creep.say(global.ACTION_SAY[this.name.toUpperCase()], global.SAY_PUBLIC);
+        if (target instanceof RoomObject || target instanceof RoomPosition && global.VISUALS.ACTION_ASSIGNMENT)
             global.Visuals.drawArrow(creep, target);
-        }
     };
     // assignment postprocessing
     this.onAssignment = function (creep, target) {
@@ -121,9 +124,7 @@ let Action = function (actionName) {
     // empty default strategy
     this.defaultStrategy = {
         name: `default-${actionName}`,
-        moveOptions: function (options) {
-            return options || {};
-        }
+        moveOptions: options => options || {}
     };
     // strategy accessor
     this.selectStrategies = function () {

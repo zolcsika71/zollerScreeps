@@ -3,11 +3,13 @@
 let mod = {};
 module.exports = mod;
 
-mod.decorateAgent = function (prototype, ...definitions) {
+mod.decorateAgent = (prototype, ...definitions) => {
     if (!prototype.customStrategy)
-        prototype.customStrategy = function (ids) {};
+        prototype.customStrategy = ids => {};
+
     if (!prototype.staticCustomStrategy)
-        prototype.staticCustomStrategy = function (ids) {};
+        prototype.staticCustomStrategy = ids => {};
+
     prototype.getStrategyHandler = function (ids, method, ...args) {
         let currentStrategy = this.currentStrategy || this.strategy(ids),
             returnValOrMethod = currentStrategy[method],
@@ -37,9 +39,7 @@ mod.decorateAgent = function (prototype, ...definitions) {
         }
         return key;
     };
-    prototype.selectClient = function (ids, index) {
-        return ids[index] && definitions[index].select(ids[index]);
-    };
+    prototype.selectClient = (ids, index) => ids[index] && definitions[index].select(ids[index]);
     prototype.strategy = function (ids) {
         const key = this.strategyKey(ids);
 
@@ -64,17 +64,15 @@ mod.decorateAgent = function (prototype, ...definitions) {
     // Explain current activity
     prototype.explain = function () {
         const strategyKey = this.strategyKey([]);
-        let explained = this.toString() + ': ';
+        let explained = `${this.toString()}: `;
         if (this.explainAgent) {
-            explained += this.explainAgent() + ' ';
+            explained += `${this.explainAgent()} `;
         }
         explained += `assigned:[${strategyKey}]`;
         for (let i = 0; i < strategyKey.length; i++) {
-            const client = this.selectClient(i);
-            if (client && client.explain) {
-                explained += `
-	${strategyKey[i]}: ${client.explain(this)}`;
-            }
+            let client = this.selectClient(i);
+            if (client && client.explain)
+                explained += `${strategyKey[i]}: ${client.explain(this)}`;
         }
 
         return explained;
@@ -83,35 +81,36 @@ mod.decorateAgent = function (prototype, ...definitions) {
 };
 
 // agent will prefer this strategy until it is free'd
-mod.allocateStrategy = function (agent, ...definitions) {
+mod.allocateStrategy = (agent, ...definitions) => {
     agent.currentStrategy = agent.strategy.apply(agent, definitions);
 };
 
-mod.freeStrategy = function (agent) {
+mod.freeStrategy = agent => {
     mod.freeStrategyChain(agent.currentStrategy);
     delete agent.currentStrategy;
 };
 
-mod.buildStrategy = function (key, utils, definitions, custom) {
+mod.buildStrategy = (key, utils, definitions, custom) => {
     const currentStrategy = {key,name: []};
     mod.appendStrategies(currentStrategy, undefined, [utils]);
 
     let head;
     for (let i = 0; i < definitions.length; i++) {
-        const id = key[i];
-        const selector = id && definitions[i].selector(id);
-        const strategies = selector && selector.selectStrategies && selector.selectStrategies.apply(selector, key);
+        let id = key[i],
+            selector = id && definitions[i].selector(id),
+            strategies = selector && selector.selectStrategies && selector.selectStrategies.apply(selector, key);
+
         head = mod.appendStrategies(currentStrategy, head, strategies);
     }
-    if (custom) {
+    if (custom)
         head = mod.appendStrategies(currentStrategy, head, [custom]);
-    }
-    if (head) {
+
+    if (head)
         return currentStrategy;
-    }
+
 };
 
-mod.appendStrategies = function (currentStrategy, head, strategies) {
+mod.appendStrategies = (currentStrategy, head, strategies) => {
     if (!strategies) return head;
     for (let i = 0; i < strategies.length; i++) {
         const strategy = strategies[i];
@@ -130,11 +129,11 @@ mod.appendStrategies = function (currentStrategy, head, strategies) {
     return head;
 };
 
-mod.freeStrategyChain = function (chain) {
+mod.freeStrategyChain = chain => {
     // used to clean prototype changes (feature in performance testing)
 };
 
-mod.customizeStrategy = function (agent, key, cachedStrategy) {
+mod.customizeStrategy = (agent, key, cachedStrategy) => {
     const customStrategy = agent.customStrategy.apply(agent, key);
     if (!customStrategy) return cachedStrategy;
 
@@ -164,11 +163,9 @@ mod.strategyChainUtils = {
 };
 
 // TODO NEED cache invalidation
-mod.getCachedStrategy = function (agent, key) {
-    return _.get(agent._strategyCache, key);
-};
+mod.getCachedStrategy = (agent, key) => _.get(agent._strategyCache, key);
 
-mod.putCachedStrategy = function (agent, key, strategy) {
+mod.putCachedStrategy = (agent, key, strategy) => {
     Object.freeze(strategy);
     _.set(agent._strategyCache, key, strategy);
 };

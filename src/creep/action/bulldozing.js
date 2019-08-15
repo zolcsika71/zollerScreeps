@@ -1,20 +1,15 @@
 "use strict";
 
-const
-    TASK = {
-        reputation: require('./task.reputation')
-    };
-
 let action = new Creep.Action('bulldozing');
 module.exports = action;
 action.maxPerAction = 2;
 action.maxPerTarget = 1;
-action.isValidTarget = function (target) {
+action.isValidTarget = target => {
     if (!target.room.my && target.room.controller && target.room.controller.safeMode)
         return false;
-    return target instanceof ConstructionSite && TASK.reputation.notAlly(target.owner.username);
+    return target instanceof ConstructionSite && global.Task.reputation.notAlly(target.owner.username);
 };
-action.newTarget = function (creep) {
+action.newTarget = creep => {
     const target = _(creep.room.constructionSites)
         .filter(action.isValidTarget)
         .max(target => {
@@ -31,6 +26,4 @@ action.newTarget = function (creep) {
     if (target instanceof ConstructionSite)
         return target;
 };
-action.work = function (creep) {
-    return creep.move(creep.pos.getDirectionTo(creep.target));
-};
+action.work = creep => creep.move(creep.pos.getDirectionTo(creep.target));

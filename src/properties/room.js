@@ -2,7 +2,7 @@
 
 let mod = {};
 module.exports = mod;
-mod.extend = function () {
+mod.extend = () => {
 
     let Structures = function (room) {
         this.room = room;
@@ -841,7 +841,7 @@ mod.extend = function () {
                 if (_.isUndefined(this._sources)) {
                     this._sources = [];
                     let addSource = id => {
-                        GLOBAL.global.addById(this._sources, id);
+                        global.addById(this._sources, id);
                     };
                     this.memory.sources.forEach(addSource);
                 }
