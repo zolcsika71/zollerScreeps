@@ -1,9 +1,6 @@
 "use strict";
 
-const
-    ROOT = {
-        mainInjection: require(`./mainInjection`)
-    };
+
 
 let mod = {};
 module.exports = mod;
@@ -13,11 +10,11 @@ mod.pathfinderCacheDirty = false;
 mod.pathfinderCacheLoaded = false;
 mod.COSTMATRIX_CACHE_VERSION = global.COMPRESS_COST_MATRICES ? 4 : 5; // change this to invalidate previously cached costmatrices
 
-mod.register = function () {
+mod.register = () => {
     // run register in each of our submodules
-    for (const key of Object.keys(Room._ext)) {
+    for (let key of Object.keys(Room._ext))
         if (Room._ext[key].register) Room._ext[key].register();
-    }
+
     Room.costMatrixInvalid.on(room => mod.rebuildCostMatrix(room.name || room));
     Room.RCLChange.on(room => room.structures.all.filter(s => ![STRUCTURE_ROAD, STRUCTURE_WALL, STRUCTURE_RAMPART].includes(s.structureType)).forEach(s => {
         if (!s.isActive()) _.set(room.memory, ['structures', s.id, 'active'], false);

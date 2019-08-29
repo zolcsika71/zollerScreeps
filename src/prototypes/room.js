@@ -5,7 +5,7 @@ let find = Room.prototype.find;
 
 let mod = {};
 module.exports = mod;
-mod.extend = function () {
+mod.extend = () => {
 
     // run extend in each of our room submodules
     for (let key of Object.keys(Room._ext))
@@ -21,11 +21,10 @@ mod.extend = function () {
         }
     };
     Room.prototype.checkNuked = function () {
-        if (!this.nuked)
-            return false;
-        else {
+        if (this.nuked) {
             Room.nuked.trigger(this);
-        }
+        } else
+            return false;
     };
     Room.prototype.countMySites = function () {
         const numSites = _.size(this.myConstructionSites);
@@ -59,7 +58,8 @@ mod.extend = function () {
             return find.apply(this, arguments);
     };
     Room.prototype.findRoute = function (destination, checkOwner = true, preferHighway = true, allowSK = true) {
-        if (this.name == destination) return [];
+        if (this.name === destination)
+            return [];
         const options = {checkOwner, preferHighway, allowSK};
         return Game.map.findRoute(this, destination, {
             routeCallback: Room.routeCallback(this.name, destination, options)
