@@ -7,12 +7,6 @@ let mod = {};
 module.exports = mod;
 mod.extend = () => {
 
-    // run extend in each of our room submodules
-    for (let key of Object.keys(Room._ext))
-        if (Room._ext[key].extend)
-            Room._ext[key].extend();
-
-
     Room.prototype.checkRCL = function () {
         if (!this.controller) return;
         if (this.memory.RCL !== this.controller.level) {
@@ -518,7 +512,7 @@ mod.extend = () => {
         };
         return _.min(sites, rangeOrder);
     };
-    Room.prototype.roadConstruction = function (minDeviation = ROAD_CONSTRUCTION_MIN_DEVIATION) {
+    Room.prototype.roadConstruction = function (minDeviation = global.ROAD_CONSTRUCTION_MIN_DEVIATION) {
         const forced = ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] && ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name) != -1;
         if ((!ROAD_CONSTRUCTION_ENABLE && !forced) || Game.time % ROAD_CONSTRUCTION_INTERVAL != 0) return;
         if (!forced && (_.isNumber(ROAD_CONSTRUCTION_ENABLE) && (!this.my || ROAD_CONSTRUCTION_ENABLE > this.controller.level))) return;
@@ -1372,7 +1366,7 @@ mod.extend = () => {
         //console.log(lab_master,"found slave labs",lab_slave_a,"for",component_a,"and",lab_slave_b,"for",component_b);
         return OK;
     };
-    Room.prototype.placeFlowerReactionOrder = function(orderId, resourceType, amount, mode = REACTOR_MODE_BURST) {
+    Room.prototype.placeFlowerReactionOrder = function(orderId, resourceType, amount, mode = global.REACTOR_MODE_BURST) {
         if (amount <= 0) return OK;
         if (!LAB_REACTIONS.hasOwnProperty(resourceType)) {
             return ERR_INVALID_ARGS;
@@ -1411,7 +1405,7 @@ mod.extend = () => {
 
         return OK;
     };
-    Room.prototype.placeReactionOrder = function(orderId, resourceType, amount, mode = REACTOR_MODE_BURST) {
+    Room.prototype.placeReactionOrder = function(orderId, resourceType, amount, mode = global.REACTOR_MODE_BURST) {
         if (amount <= 0) return OK;
         if (!LAB_REACTIONS.hasOwnProperty(resourceType)) {
             return ERR_INVALID_ARGS;

@@ -11,16 +11,20 @@ mod.pathfinderCacheLoaded = false;
 mod.COSTMATRIX_CACHE_VERSION = global.COMPRESS_COST_MATRICES ? 4 : 5; // change this to invalidate previously cached costmatrices
 
 mod.register = () => {
+    /*
     // run register in each of our submodules
     for (let key of Object.keys(Room._ext))
-        if (Room._ext[key].register) Room._ext[key].register();
+        if (Room._ext[key].register)
+            Room._ext[key].register();
+
+*/
 
     Room.costMatrixInvalid.on(room => mod.rebuildCostMatrix(room.name || room));
     Room.RCLChange.on(room => room.structures.all.filter(s => ![STRUCTURE_ROAD, STRUCTURE_WALL, STRUCTURE_RAMPART].includes(s.structureType)).forEach(s => {
         if (!s.isActive()) _.set(room.memory, ['structures', s.id, 'active'], false);
     }));
 };
-mod.flush = function () {
+mod.flush = () => {
     // run flush in each of our submodules
     for (const key of Object.keys(Room._ext)) {
         if (Room._ext[key].flush) Room._ext[key].flush();
@@ -32,7 +36,7 @@ mod.flush = function () {
     };
     _.forEach(Game.rooms, clean);
 };
-mod.totalSitesChanged = function () {
+mod.totalSitesChanged = () => {
     let numSites = _.size(Game.constructionSites),
         oldSites = Memory.rooms.myTotalSites || 0;
 
@@ -43,7 +47,7 @@ mod.totalSitesChanged = function () {
 
     return oldSites && oldSites !== numSites;
 };
-mod.totalStructuresChanged = function () {
+mod.totalStructuresChanged = () => {
     let numStructures = _.size(Game.structures),
         oldStructures = Memory.rooms.myTotalStructures || 0;
     if (numStructures > 0)
@@ -53,14 +57,14 @@ mod.totalStructuresChanged = function () {
 
     return oldStructures && oldStructures !== numStructures;
 };
-mod.needMemoryResync = function (room) {
+mod.needMemoryResync = room => {
     if (_.isUndefined(room.memory.initialized)) {
         room.memory.initialized = Game.time;
         return true;
     }
     return Game.time % global.MEMORY_RESYNC_INTERVAL === 0 || room.name === 'sim';
 };
-mod.analyze = function () {
+mod.analyze = () => {
     const p = global.Util.startProfiling('Room.analyze', {enabled: global.PROFILING.ROOMS});
     // run analyze in each of our submodules
     for (let key of Object.keys(Room._ext)) {
@@ -82,8 +86,8 @@ mod.analyze = function () {
             room.checkRCL();
         }
         catch (err) {
-            Game.notify('Error in room.js (Room.prototype.loop) for "' + room.name + '" : ' + err.stack ? err + '<br/>' + err.stack : err);
-            console.log(global.dye(global.CRAYON.error, 'Error in room.js (Room.prototype.loop) for "' + room.name + '": <br/>' + (err.stack || err.toString()) + '<br/>' + err.stack));
+            Game.notify(`Error in room.js (Room.prototype.loop) for "${room.name}" : ${err.stack}` ? `${err}<br/>${err.stack}` : err);
+            console.log(global.dye(global.CRAYON.error, `Error in room.js (Room.prototype.loop) for "${room.name}": <br/>${err.stack || err.toString()}<br/>${err.stack}`));
         }
     };
     _.forEach(Game.rooms, r => {
@@ -93,7 +97,7 @@ mod.analyze = function () {
         p.checkCPU(r.name, global.PROFILING.ANALYZE_LIMIT / 5);
     });
 };
-mod.execute = function () {
+mod.execute = () => {
     const p = global.Util.startProfiling('Room.execute', {enabled: global.PROFILING.ROOMS});
     // run execute in each of our submodules
     for (let key of Object.keys(Room._ext))
@@ -108,7 +112,7 @@ mod.execute = function () {
             let room = Game.rooms[roomName];
             if (room) { // has sight
                 if (room.collapsed) {
-                    let p2 = global.Util.startProfiling(roomName + 'execute', {enabled: global.PROFILING.ROOMS});
+                    let p2 = global.Util.startProfiling(`${roomName}execute`, {enabled: global.PROFILING.ROOMS});
                     Room.collapsed.trigger(room);
                     p2.checkCPU('collapsed', 0.5);
                 }
@@ -119,21 +123,21 @@ mod.execute = function () {
     };
     _.forEach(Memory.rooms, (memory, roomName) => {
         run(memory, roomName);
-        p.checkCPU(roomName + '.run', 1);
+        p.checkCPU(`${roomName}.run`, 1);
         if (Game.time % global.MEMORY_RESYNC_INTERVAL === 0 && !Game.rooms[roomName] && typeof Memory.rooms[roomName].hostile !== 'boolean') {
             // clean up stale room memory for rooms no longer in use, but preserve manually set 'hostile' entries
             delete Memory.rooms[roomName];
         }
     });
 };
-mod.cleanup = function () {
+mod.cleanup = () => {
     // run cleanup in each of our submodules
-    for (const key of Object.keys(Room._ext)) {
+    for (let key of Object.keys(Room._ext)) {
         if (Room._ext[key].cleanup) Room._ext[key].cleanup();
     }
     // flush changes to the pathfinderCache but wait until load
     if (!_.isUndefined(Memory.pathfinder)) {
-        OCSMemory.saveSegment(MEM_SEGMENTS.COSTMATRIX_CACHE, Memory.pathfinder);
+        global.OCSMemory.saveSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, Memory.pathfinder);
         delete Memory.pathfinder;
     }
     if (Room.pathfinderCacheDirty && Room.pathfinderCacheLoaded) {
@@ -144,7 +148,7 @@ mod.cleanup = function () {
             if (entry.version === Room.COSTMATRIX_CACHE_VERSION) {
                 encodedCache[key] = {
                     serializedMatrix: entry.serializedMatrix || (global.COMPRESS_COST_MATRICES ?
-                        CompressedMatrix.serialize(entry.costMatrix) : entry.costMatrix.serialize()),
+                        global.CompressedMatrix.serialize(entry.costMatrix) : entry.costMatrix.serialize()),
                     updated: entry.updated,
                     version: entry.version
                 };
@@ -152,14 +156,14 @@ mod.cleanup = function () {
                 if (entry.stale) encodedCache[key].stale = true;
             }
         }
-        ROOT.ocsMemory.saveSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, encodedCache);
+        global.OCSMemory.saveSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, encodedCache);
         Room.pathfinderCacheDirty = false;
     }
 };
-mod.routeCallback = function (origin, destination, options) {
+mod.routeCallback = (origin, destination, options) => {
     if (_.isUndefined(origin) || _.isUndefined(destination))
-        global.logError('Room.routeCallback', 'both origin and destination must be defined - origin:' + origin + ' destination:' + destination);
-    return function (roomName) {
+        global.logError('Room.routeCallback', `both origin and destination must be defined - origin:${origin} destination:${destination}`);
+    return roomName => {
         if (Game.map.getRoomLinearDistance(origin, roomName) > options.restrictDistance)
             return false;
         if (roomName !== destination && global.ROUTE_ROOM_COST[Game.shard.name] && global.ROUTE_ROOM_COST[Game.shard.name][roomName]) {
@@ -182,7 +186,7 @@ mod.routeCallback = function (origin, destination, options) {
             roomName !== destination && roomName !== origin) {
             return Number.POSITIVE_INFINITY;
         }
-        if (isMyOrNeutralRoom || roomName == origin || roomName == destination)
+        if (isMyOrNeutralRoom || roomName === origin || roomName === destination)
             return 1;
         else if (isHighway)
             return 3;
@@ -191,20 +195,21 @@ mod.routeCallback = function (origin, destination, options) {
         return Number.POSITIVE_INFINITY;
     };
 };
-mod.getCostMatrix = function (roomName) {
-    var room = Game.rooms[roomName];
-    if (!room) return;
+mod.getCostMatrix = roomName => {
+    let room = Game.rooms[roomName];
+    if (!room)
+        return;
     return room.costMatrix;
 };
-mod.isMine = function (roomName) {
+mod.isMine = roomName => {
     let room = Game.rooms[roomName];
     return (room && room.my);
 };
-mod.calcCardinalDirection = function (roomName) {
+mod.calcCardinalDirection = roomName => {
     const parsed = /^([WE])[0-9]+([NS])[0-9]+$/.exec(roomName);
     return [parsed[1], parsed[2]];
 };
-mod.calcGlobalCoordinates = function (roomName, callBack) {
+mod.calcGlobalCoordinates = (roomName, callBack) => {
     if (!callBack) return null;
     const parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
     let x = +parsed[1],
@@ -212,18 +217,16 @@ mod.calcGlobalCoordinates = function (roomName, callBack) {
 
     return callBack(x, y);
 };
-mod.calcCoordinates = function (roomName, callBack) {
+mod.calcCoordinates = (roomName, callBack) => {
     if (!callBack) return null;
     return Room.calcGlobalCoordinates(roomName, (x, y) => {
         return callBack(x % 10, y % 10);
     });
 };
-mod.isCenterRoom = function (roomName) {
-    return Room.calcCoordinates(roomName, (x,y) => {
-        return x === 5 && y === 5;
-    });
-};
-mod.isCenterNineRoom = function (roomName) {
+mod.isCenterRoom = roomName => Room.calcCoordinates(roomName, (x, y) => {
+    return x === 5 && y === 5;
+});
+mod.isCenterNineRoom = roomName => {
     if (roomName === 'sim')
         return false;
 
@@ -231,24 +234,20 @@ mod.isCenterNineRoom = function (roomName) {
             return x > 3 && x < 7 && y > 3 && y < 7;
         });
 };
-mod.isControllerRoom = function (roomName) {
-    return Room.calcCoordinates(roomName, (x,y) => {
-        return x !== 0 && y !== 0 && (x < 4 || x > 6 || y < 4 || y > 6);
-    });
-};
-mod.isSKRoom = function (roomName) {
+mod.isControllerRoom = roomName => Room.calcCoordinates(roomName, (x, y) => {
+    return x !== 0 && y !== 0 && (x < 4 || x > 6 || y < 4 || y > 6);
+});
+mod.isSKRoom = roomName => {
     if (roomName === 'sim')
         return false;
     return Room.calcCoordinates(roomName, (x,y) => {
         return x > 3 && x < 7 && y > 3 && y < 7 && (x !== 5 || y !== 5);
     });
 };
-mod.isHighwayRoom = function (roomName) {
-    return Room.calcCoordinates(roomName, (x,y) => {
-        return x === 0 || y === 0;
-    });
-};
-mod.adjacentRooms = function (roomName) {
+mod.isHighwayRoom = roomName => Room.calcCoordinates(roomName, (x, y) => {
+    return x === 0 || y === 0;
+});
+mod.adjacentRooms = roomName => {
     let parts = roomName.split(/([NESW])/);
     let dirs = ['N','E','S','W'];
     let toggle = q => dirs[ (dirs.indexOf(q) + 2) % 4 ];
@@ -260,7 +259,7 @@ mod.adjacentRooms = function (roomName) {
     }
     return names;
 };
-mod.adjacentAccessibleRooms = function (roomName, diagonal = true) {
+mod.adjacentAccessibleRooms = (roomName, diagonal = true) => {
     let validRooms = [];
     let exits = Game.map.describeExits(roomName);
     let addValidRooms = (roomName, direction) => {
@@ -278,24 +277,24 @@ mod.adjacentAccessibleRooms = function (roomName, diagonal = true) {
     _.forEach(exits, addValidRooms);
     return validRooms;
 };
-mod.roomDistance = function (roomName1, roomName2, diagonal, continuous) {
+mod.roomDistance = (roomName1, roomName2, diagonal, continuous) => {
     if (diagonal) return Game.map.getRoomLinearDistance(roomName1, roomName2, continuous);
-    if (roomName1 == roomName2) return 0;
+    if (roomName1 === roomName2) return 0;
     let posA = roomName1.split(/([NESW])/);
     let posB = roomName2.split(/([NESW])/);
-    let xDif = posA[1] == posB[1] ? Math.abs(posA[2] - posB[2]) : posA[2] + posB[2] + 1;
-    let yDif = posA[3] == posB[3] ? Math.abs(posA[4] - posB[4]) : posA[4] + posB[4] + 1;
+    let xDif = posA[1] === posB[1] ? Math.abs(posA[2] - posB[2]) : posA[2] + posB[2] + 1;
+    let yDif = posA[3] === posB[3] ? Math.abs(posA[4] - posB[4]) : posA[4] + posB[4] + 1;
     //if( diagonal ) return Math.max(xDif, yDif); // count diagonal as 1
     return xDif + yDif; // count diagonal as 2
 };
-mod.rebuildCostMatrix = function (roomName) {
+mod.rebuildCostMatrix = roomName => {
     if (global.DEBUG)
         global.logSystem(roomName, 'Invalidating costmatrix to force a rebuild when we have vision.');
     _.set(Room, ['pathfinderCache', roomName, 'stale'], true);
     _.set(Room, ['pathfinderCache', roomName, 'updated'], Game.time);
     Room.pathfinderCacheDirty = true;
 };
-mod.loadCostMatrixCache = function (cache) {
+mod.loadCostMatrixCache = cache => {
     let count = 0;
     for (const key in cache) {
         if (!mod.pathfinderCache[key] || mod.pathfinderCache[key].updated < cache[key].updated) {
@@ -304,10 +303,10 @@ mod.loadCostMatrixCache = function (cache) {
         }
     }
     if (global.DEBUG && count > 0)
-        global.logSystem('RawMemory', 'loading pathfinder cache.. updated ' + count + ' stale entries.');
+        global.logSystem('RawMemory', `loading pathfinder cache.. updated ${count} stale entries.`);
     mod.pathfinderCacheLoaded = true;
 };
-mod.getCachedStructureMatrix = function (roomName) {
+mod.getCachedStructureMatrix = roomName => {
     const cacheValid = (roomName) => {
         if (_.isUndefined(Room.pathfinderCache)) {
             Room.pathfinderCache = {};
@@ -333,7 +332,7 @@ mod.getCachedStructureMatrix = function (roomName) {
             return cache.costMatrix;
         } else if (cache.serializedMatrix) {
             // disabled until the CPU efficiency can be improved
-            let costMatrix = global.COMPRESS_COST_MATRICES ? CompressedMatrix.deserialize(cache.serializedMatrix) : PathFinder.CostMatrix.deserialize(cache.serializedMatrix);
+            let costMatrix = global.COMPRESS_COST_MATRICES ? global.CompressedMatrix.deserialize(cache.serializedMatrix) : PathFinder.CostMatrix.deserialize(cache.serializedMatrix);
             cache.costMatrix = costMatrix;
             return costMatrix;
         } else {
@@ -342,7 +341,7 @@ mod.getCachedStructureMatrix = function (roomName) {
         }
     }
 };
-mod.getStructureMatrix = function (roomName, options) {
+mod.getStructureMatrix = (roomName, options) => {
     const room = Game.rooms[roomName];
     let matrix;
     if (Room.isSKRoom(roomName) && options.avoidSKCreeps) {
@@ -357,12 +356,10 @@ mod.getStructureMatrix = function (roomName, options) {
 
     return matrix;
 };
-mod.validFields = function (roomName, minX, maxX, minY, maxY, checkWalkable = false, where = null) {
-    const
-        room = Game.rooms[roomName],
-        look = checkWalkable ? room.lookAtArea(minY, minX, maxY, maxX) : null;
-
-    let fields = [];
+mod.validFields = (roomName, minX, maxX, minY, maxY, checkWalkable = false, where = null) => {
+    let room = Game.rooms[roomName],
+        look = checkWalkable ? room.lookAtArea(minY, minX, maxY, maxX) : null,
+        fields = [];
 
     for (let x = minX; x <= maxX; x++) {
         for (let y = minY; y <= maxY; y++) {
@@ -377,7 +374,7 @@ mod.validFields = function (roomName, minX, maxX, minY, maxY, checkWalkable = fa
     }
     return fields;
 };
-mod.fieldsInRange = function (args) {
+mod.fieldsInRange = args => {
     let plusRangeX = args.spots.map(spot => spot.pos.x + spot.range);
     let plusRangeY = args.spots.map(spot => spot.pos.y + spot.range);
     let minusRangeX = args.spots.map(spot => spot.pos.x - spot.range);
@@ -388,31 +385,29 @@ mod.fieldsInRange = function (args) {
     let maxY = Math.min(...plusRangeY);
     return Room.validFields(args.roomName, minX, maxX, minY, maxY, args.checkWalkable, args.where);
 };
-mod.shouldRepair = function (room, structure) {
-    return (
-        // is not at 100%
-        structure.hits < structure.hitsMax &&
-        // not owned room or hits below RCL repair limit
-        (!room.my || structure.hits < global.MAX_REPAIR_LIMIT[room.controller.level] || structure.hits < (global.LIMIT_URGENT_REPAIRING + (2 * global.DECAY_AMOUNT[structure.structureType] || 0))) &&
-        // not decayable or below threshold
-        (!DECAYABLES.includes(structure.structureType) || (structure.hitsMax - structure.hits) > global.GAP_REPAIR_DECAYABLE) &&
-        // not pavement art
-        (Memory.pavementArt[room.name] === undefined || Memory.pavementArt[room.name].indexOf('x' + structure.pos.x + 'y' + structure.pos.y + 'x') < 0) &&
-        // not flagged for removal
-        (!FlagDir.list.some(f => f.roomName == structure.pos.roomName && f.color == COLOR_ORANGE && f.x == structure.pos.x && f.y == structure.pos.y))
-    );
-};
+mod.shouldRepair = (room, structure) => (
+    // is not at 100%
+    structure.hits < structure.hitsMax &&
+    // not owned room or hits below RCL repair limit
+    (!room.my || structure.hits < global.MAX_REPAIR_LIMIT[room.controller.level] || structure.hits < (global.LIMIT_URGENT_REPAIRING + (2 * global.DECAY_AMOUNT[structure.structureType] || 0))) &&
+    // not decayable or below threshold
+    (!global.DECAYABLES.includes(structure.structureType) || (structure.hitsMax - structure.hits) > global.GAP_REPAIR_DECAYABLE) &&
+    // not pavement art
+    (Memory.pavementArt[room.name] === undefined || Memory.pavementArt[room.name].indexOf(`x${structure.pos.x}y${structure.pos.y}x`) < 0) &&
+    // not flagged for removal
+    (!global.FlagDir.list.some(f => f.roomName === structure.pos.roomName && f.color === COLOR_ORANGE && f.x === structure.pos.x && f.y === structure.pos.y))
+);
 
 // from room.spawn
 
-mod.bestSpawnRoomFor = function (targetRoomName) {
-    var range = room => room.my ? routeRange(room.name, targetRoomName) : Infinity;
+mod.bestSpawnRoomFor = targetRoomName => {
+    let range = room => room.my ? global.Util.routeRange(room.name, targetRoomName) : Infinity;
     return _.min(Game.rooms, range);
 };
 // find a room to spawn
 // params: { targetRoom, minRCL = 0, maxRange = Infinity, minEnergyAvailable = 0, minEnergyCapacity = 0, callBack = null, allowTargetRoom = false, rangeRclRatio = 3, rangeQueueRatio = 51 }
 // requiredParams: targetRoom
-mod.findSpawnRoom = function (params) {
+mod.findSpawnRoom = params => {
     if (!params || !params.targetRoom) return null;
     // filter validRooms
     let isValidRoom = room => (
@@ -420,12 +415,12 @@ mod.findSpawnRoom = function (params) {
         (params.maxRange === undefined || Util.routeRange(room.name, params.targetRoom) <= params.maxRange) &&
         (params.minEnergyCapacity === undefined || params.minEnergyCapacity <= room.energyCapacityAvailable) &&
         (params.minEnergyAvailable === undefined || params.minEnergyAvailable <= room.energyAvailable) &&
-        (room.name != params.targetRoom || params.allowTargetRoom === true) &&
+        (room.name !== params.targetRoom || params.allowTargetRoom === true) &&
         (params.minRCL === undefined || room.controller.level >= params.minRCL) &&
         (params.callBack === undefined || params.callBack(room))
     );
     let validRooms = _.filter(Game.rooms, isValidRoom);
-    if (validRooms.length == 0) return null;
+    if (validRooms.length === 0) return null;
     // select "best"
     // range + roomLevelsUntil8/rangeRclRatio + spawnQueueDuration/rangeQueueRatio
     let queueTime = queue => _.sum(queue, c => (c.parts.length * 3));
@@ -437,11 +432,6 @@ mod.findSpawnRoom = function (params) {
     };
     return _.min(validRooms, evaluation);
 };
-
-
-
-
-
 
 // from room.construction
 mod.roomLayoutArray =
@@ -459,7 +449,7 @@ mod.roomLayoutArray =
     [,,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],
     [,,,,,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION]];
 
-mod.roomLayout = function (flag) {
+mod.roomLayout = flag => {
     if (!Flag.compare(flag, global.FLAG_COLOR.command.roomLayout)) return;
     flag = Game.flags[flag.name];
     const room = flag.room;

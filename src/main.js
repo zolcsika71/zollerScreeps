@@ -29,35 +29,12 @@ function wrapLoop(fn) {
 
 let //_ = require('lodash'),
     cpuAtLoad = Game.cpu.getUsed(),
-    PROPERTIES = {
-        creep: require('./properties.creep'),
-        mineral: require('./properties.mineral'),
-        roomObject: require('./properties.roomObject'),
-        roomPosition: require('./properties.roomPosition'),
-        source: require('./properties.source'),
-        structures: require('./properties.structures'),
-        flag: require('./properties.flag'),
-        room: require('./properties.room'),
-        lab: require('./properties.lab')
-    },
-    PROTOTYPES = {
-        structures: require('./prototypes.structures'),
-        creep: require('./prototypes.creep'),
-        spawn: require('./prototypes.spawn'),
-        room: require('./prototypes.room'),
-        roomPosition: require('./prototypes.roomPosition'),
-        compounds: require('./prototypes.compounds'),
-        visuals: require('./prototypes.visuals')
-    };
-
-
-let inject = (base, alien, namespace) => {
+    inject = (base, alien, namespace) => {
     let keys = _.keys(alien);
     for (let key of keys) {
         if (typeof alien[key] === "function") {
             if (namespace) {
                 let original = base[key];
-                //console.log(`nameSpace: ${original}`);
                 if (!base.baseOf)
                     base.baseOf = {};
                 if (!base.baseOf[namespace])
@@ -83,13 +60,13 @@ _.assign(global, require(`./global.parameter`));
 global.mainInjection = require(`./mainInjection`);
 global.initMemory = require('./initMemory');
 
-
-
 // Load modules
 
 _.assign(global, {
+    Extensions: require("./require"),
+    CompressedMatrix: require("./compressedMatrix"),
     Task: require('./task.task'),
-    OcsMemory: require('./ocsMemory'),
+    OCSMemory: require('./ocsMemory'),
     Events: require('./events'),
     FlagDir: require('./flagDir'),
     Population: require('./population'),
@@ -151,14 +128,10 @@ _.assign(Creep, {
 });
 
 inject(Creep, require('./creep.creep'));
-inject(Creep, PROTOTYPES.creep);
-inject(Creep, PROPERTIES.creep);
+
 
 
 inject(Room, require('./room.room'));
-inject(Room, PROPERTIES.room);
-inject(Room, PROTOTYPES.room);
-inject(Room, PROTOTYPES.compounds);
 
 _.assign(Room, {
     _ext: {
@@ -174,24 +147,19 @@ _.assign(Room, {
 });
 
 inject(Spawn, require('./spawn'));
-inject(Spawn, PROTOTYPES.spawn);
+//inject(Spawn, PROTOTYPES.spawn);
 
 // plus line!!
 global.initMemory.init();
 
-Object.keys(PROPERTIES).forEach(property => {
-    PROPERTIES[property].extend();
-});
-Object.keys(PROTOTYPES).forEach(prototype => {
-    PROTOTYPES[prototype].extend();
-});
+global.Extensions.extend();
 
 global.Task.populate();
 
 if (global.mainInjection.extend)
     global.mainInjection.extend();
 
-global.OcsMemory.activateSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, true);
+global.OCSMemory.activateSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, true);
 
 let Traveler = require('./traveler');
 //require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
@@ -199,7 +167,7 @@ let Traveler = require('./traveler');
 if (global.DEBUG)
     global.logSystem('Global.install', 'Code reloaded.');
 
-module.exports.loop = wrapLoop(function () {
+module.exports.loop = wrapLoop(() => {
 
     const cpuAtLoop = Game.cpu.getUsed();
 
@@ -226,7 +194,7 @@ module.exports.loop = wrapLoop(function () {
         _.assign(global, require(`./global.parameter`));
         _.merge(global, Memory.parameters);
 
-        global.OcsMemory.processSegments();
+        global.OCSMemory.processSegments();
         p.checkCPU('processSegments', global.PROFILING.ANALYZE_LIMIT);
 
         // Flush cache
@@ -309,7 +277,7 @@ module.exports.loop = wrapLoop(function () {
         if (global.mainInjection.cleanup)
             global.mainInjection.cleanup();
 
-        global.OcsMemory.cleanup(); // must come last
+        global.OCSMemory.cleanup(); // must come last
         p.checkCPU('OCSMemory.cleanup', global.PROFILING.ANALYZE_LIMIT);
         if (global.ROOM_VISUALS && !Memory.CPU_CRITICAL)
             global.Visuals.run(); // At end to correctly display used CPU.

@@ -1,10 +1,7 @@
 "use strict";
-/*
-const
-    _ = require('lodash');
-*/
+
 let mod = {};
-mod.init = function () {
+mod.init = () => {
 
     // extensions.js
     if (_.isUndefined(Memory.pavementArt))
