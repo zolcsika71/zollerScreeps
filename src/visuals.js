@@ -17,7 +17,7 @@ let getColourByPercentage = (percentage, reverse) => {
 };
 
 let getResourceColour = (resourceType) => {
-    const BASE = {
+    let BASE = {
         [RESOURCE_ENERGY]: '#FFE56D',
         [RESOURCE_POWER]: RED,
         [RESOURCE_CATALYST]: '#FF7A7A',
@@ -41,8 +41,6 @@ let getResourceColour = (resourceType) => {
 let storageObject = (vis, store, x, startY) => {
     Object.keys(store).forEach(resource => vis.text(`${resource}: ${global.Util.formatNumber(store[resource])}`, x, startY += 0.6, Object.assign({color: getResourceColour(resource)}, {align: 'left', font: 0.5})));
 };
-
-
 
 let Visuals = class {
 
@@ -109,7 +107,7 @@ let Visuals = class {
             align: 'center'
         });
 
-        vis.text('' + Math.floor(p * 100) + '%', lastPol.x + (lastPol.x - center.x) * 0.7, lastPol.y + (lastPol.y - center.y) * 0.4 + 0.1, {
+        vis.text(`${Math.floor(p * 100)}%`, lastPol.x + (lastPol.x - center.x) * 0.7, lastPol.y + (lastPol.y - center.y) * 0.4 + 0.1, {
             color: WHITE,
             font: '0.4 monospace',
             align: 'center'
@@ -171,10 +169,10 @@ let Visuals = class {
 
             let targetStructure = getStructure(to);
 
-            if (targetStructure !== null)
-                vis.structure(targetStructure.pos.x, targetStructure.pos.y, targetStructure.structureType);
-            else
+            if (targetStructure === null) {
                 vis.structure(to.x, to.y, null);
+            } else
+                vis.structure(targetStructure.pos.x, targetStructure.pos.y, targetStructure.structureType);
 
         }
     }

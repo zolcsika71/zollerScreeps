@@ -380,8 +380,8 @@ mod.extend = () => {
         _.forEach(this.hostiles, registerHostile);
 
         let registerHostileLeave = id => {
-            const creep = Game.getObjectById(id);
-            const stillHostile = creep && Task.reputation.hostileOwner(creep);
+            let creep = Game.getObjectById(id),
+                stillHostile = creep && global.Task.reputation.hostileOwner(creep);
             // for each known invader
             if (!stillHostile) {
                 // save to trigger subscribers later
@@ -412,9 +412,12 @@ mod.extend = () => {
 
     //room.container
     Room.prototype.saveContainers = function () {
+        /*
         let containers = this.structures.all.filter(
             structure => structure.structureType == STRUCTURE_CONTAINER
         );
+         */
+        let containers = this.structures.container.all;
         if (containers.length > 0) {
             this.memory.container = [];
             let add = (cont) => {

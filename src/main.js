@@ -153,6 +153,7 @@ inject(Spawn, require('./spawn'));
 global.initMemory.init();
 
 global.Extensions.extend();
+Room.extend();
 
 global.Task.populate();
 

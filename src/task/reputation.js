@@ -19,7 +19,7 @@ mod.CONST = {
 mod.isAlly = username => mod.score(username) >= mod.CONST.ALLY;
 mod.notAlly = username => !mod.isAlly(username);
 mod.allyOwner = creep => creep.owner && mod.isAlly(creep.owner.username);
-mod.cache = table => Task.cache(mod.name, table);
+mod.cache = table => global.Task.cache(mod.name, table);
 mod.score = username => {
     let reps = mod.cache('score');
     if (username === undefined)
