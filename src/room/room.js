@@ -1,7 +1,5 @@
 "use strict";
 
-
-
 let mod = {};
 module.exports = mod;
 
@@ -1423,7 +1421,7 @@ mod.findSpawnRoom = params => {
     // filter validRooms
     let isValidRoom = room => (
         room.my &&
-        (params.maxRange === undefined || Util.routeRange(room.name, params.targetRoom) <= params.maxRange) &&
+        (params.maxRange === undefined || global.Util.routeRange(room.name, params.targetRoom) <= params.maxRange) &&
         (params.minEnergyCapacity === undefined || params.minEnergyCapacity <= room.energyCapacityAvailable) &&
         (params.minEnergyAvailable === undefined || params.minEnergyAvailable <= room.energyAvailable) &&
         (room.name !== params.targetRoom || params.allowTargetRoom === true) &&

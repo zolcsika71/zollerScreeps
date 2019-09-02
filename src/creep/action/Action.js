@@ -46,7 +46,8 @@ let Action = function (actionName) {
     };
     // order for the creep to execute each tick, when assigned to that action
     this.step = function (creep) {
-        if (global.CHATTY) creep.say(this.name, global.SAY_PUBLIC);
+        if (global.CHATTY)
+            creep.say(this.name, global.SAY_PUBLIC);
         let range = creep.pos.getRangeTo(creep.target);
         if (range <= this.targetRange) {
             let workResult = this.work(creep);

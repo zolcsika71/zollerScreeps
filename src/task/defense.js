@@ -1,11 +1,5 @@
 "use strict";
 
-const
-    ROOT = {
-        flagDir: require('./flagDir')
-    };
-
-
 // Defense task handles spotted invaders. Spawns defenders and gives them special behaviour.
 let mod = {};
 module.exports = mod;
@@ -27,7 +21,7 @@ mod.handleNewInvader = invaderCreep => {
             (Flag.compare(flagEntry, global.FLAG_COLOR.invade.exploit)) ||
             (flagEntry.color === global.FLAG_COLOR.claim.color)
         );
-        let flag = ROOT.flagDir.find(validColor, invaderCreep.pos, true);
+        let flag = global.FlagDir.find(validColor, invaderCreep.pos, true);
 
         if (!flag) {
             global.logSystem(invaderCreep.pos.roomName, `Hostile Invaders not in range`);
@@ -39,9 +33,9 @@ mod.handleNewInvader = invaderCreep => {
     global.logSystem(invaderCreep.pos.roomName, `THREAT: ${invaderCreep.room.hostileThreatLevel} DEFENSE: ${invaderCreep.room.defenseLevel.sum}`);
 
     if (invaderCreep.room.defenseLevel.sum > invaderCreep.room.hostileThreatLevel) {
-        global.logSystem(invaderCreep.pos.roomName, `Defense HIGHER than Threat`);
         // room can handle that
-        return;
+        global.logSystem(invaderCreep.pos.roomName, `Defense HIGHER than Threat`);
+
     } else {
         // order a defender for each invader (if not happened yet)
         global.logSystem(invaderCreep.pos.roomName, `Defense LOWER than Threat`);
@@ -72,7 +66,7 @@ mod.handleGoneInvader = invaderId => {
         }
 
         // cleanup task memory
-        Task.clearMemory('defense', invaderId);
+        global.Task.clearMemory('defense', invaderId);
         // other existing creeps will recycle themself via nextAction (see below)
         //if (Game.time % 500 === 0)
         if (Object.keys(Memory.allocateProperties.lastAllocated).length > 0) {
