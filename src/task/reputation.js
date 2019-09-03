@@ -37,7 +37,7 @@ mod.score = username => {
 
 };
 mod.setScore = (username, score) => {
-    const name = username && username.toLowerCase();
+    let name = username && username.toLowerCase();
     mod.score()[name] = score;
     mod.playerMemory(name).score = score;
 };
@@ -47,7 +47,7 @@ mod.flush = () => {
 };
 mod.cache = table => global.Task.cache(mod.name, table);
 mod.killScoreCache = () => {
-    Task.clearCache(mod.name, 'score');
+    global.Task.clearCache(mod.name, 'score');
     return mod.score();
 };
 mod.killWhitelistCache = () => {
@@ -57,8 +57,7 @@ mod.killWhitelistCache = () => {
 };
 mod.memory = table => global.Task.memory(mod.name, table);
 mod.playerMemory = username => {
-    const
-        playerMemory = mod.memory('players'),
+    let playerMemory = mod.memory('players'),
         name = username && username.toLowerCase();
     if (playerMemory[name]) {
         return playerMemory[name];
@@ -97,7 +96,7 @@ mod._loadScore = () => {
 };
 mod._loadWhitelist = () => {
     let whitelist = mod.whitelist();
-    if(_.keys(whitelist).length !== global.PLAYER_WHITELIST.length) {
+    if (_.keys(whitelist).length !== global.PLAYER_WHITELIST.length) {
         whitelist = mod.killWhitelistCache();
 
         _.forEach(global.PLAYER_WHITELIST, playerName => {
@@ -105,6 +104,8 @@ mod._loadWhitelist = () => {
         });
     }
 };
+
+
 
 
 

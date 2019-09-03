@@ -5,7 +5,6 @@ let mod = {};
 module.exports = mod;
 // hook into events
 mod.register = () => {};
-
 // When a new invader has been spotted
 mod.handleNewInvader = invaderCreep => {
     // ignore if on blacklist
@@ -115,7 +114,7 @@ mod.creep = {
     }
 };
 // spawn defenses against an invader creep
-mod.orderDefenses = function (invaderCreep, GUID) {
+mod.orderDefenses = (invaderCreep, GUID) => {
 
     //global.BB(invaderCreep);
     //_.forEach(invaderCreep, function (value, key) {

@@ -7,12 +7,22 @@ const
 let mod = {},
     profiler;
 module.exports = mod;
+
+mod.initMemory = () => {
+
+    Object.keys(Memory).forEach(segment => {
+        console.log(segment);
+        delete Memory[segment];
+    });
+
+};
+
 /**
  * Translates an error code to the type
  * @param {Number} code - The error code / constant
  * @returns {string}
  */
-mod.translateErrorCode = function (code) {
+mod.translateErrorCode = code => {
     return {
         0: 'OK',
         1: 'ERR_NOT_OWNER',
@@ -38,16 +48,14 @@ mod.translateErrorCode = function (code) {
  * @param {...*} [args] - A list of arguments to pass if it's a function
  * @returns {*}
  */
-mod.fieldOrFunction =  function (value, ...args) {
-    return typeof value === 'function' ? value(...args) : value;
-};
+mod.fieldOrFunction = (value, ...args) => typeof value === 'function' ? value(...args) : value;
 
 /**
  * Checks if the value is an object or function
  * @param {*} value - The value to check
  * @returns {Boolean}
  */
-mod.isObject = function (value) {
+mod.isObject = value => {
     if (value === null)
         return false;
     return typeof value === 'function' || typeof value === 'object';
@@ -246,8 +254,8 @@ mod.getDistance = (point1, point2) => Math.sqrt(Math.pow(point2.x - point1.x, 2)
  * @returns {Number}
  */
 mod.routeRange = (fromRoom, toRoom) => {
-    if (fromRoom === toRoom) return 0;
-
+    if (fromRoom === toRoom)
+        return 0;
     return mod.get(Memory, `routeRange.${fromRoom}.${toRoom}`, () => {
         let room = fromRoom instanceof Room ? fromRoom : Game.rooms[fromRoom];
 
@@ -262,9 +270,17 @@ mod.routeRange = (fromRoom, toRoom) => {
         return route === ERR_NO_PATH ? Infinity : route.length;
     });
 };
+
 mod.creepData = creepName => {
     console.log('Explain');
     Game.creeps[creepName].explain();
     console.log('JSON');
     console.log(JSON.stringify(Game.creeps[creepName].data));
+};
+
+mod.diamond = () => {
+
+    global.Util.DiamondIterator.loop({x: 19, y: 7}, 3).map(i=> Game.rooms["SIM"].createConstructionSite(i.x, i.y, STRUCTURE_ROAD));
+    global.Task.hopper
+
 };

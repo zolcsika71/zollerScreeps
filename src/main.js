@@ -74,12 +74,19 @@ _.assign(global, {
     Visuals: require('./visuals')
 });
 
-// TASK assign
+// Task assign
 
 _.assign(global.Task, {
     mining: require('./task.mining'),
     reputation: require('./task.reputation'),
     defense: require('./task.defense')
+});
+
+// Util assign
+
+_.assign(global.Util, {
+    DiamondIterator: require('./util.diamond.iterator'),
+    SpiralIterator: require('./util.spiral.iterator')
 });
 
 Creep.Action = require('./creep.action.Action');

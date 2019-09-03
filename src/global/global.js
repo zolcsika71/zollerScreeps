@@ -119,7 +119,7 @@ mod.logError = (message, entityWhere) => {
  * @param {...string} message - The message to log
  */
 mod.logSystem = (preFix, ...message) => {
-    const text = mod.dye(global.CRAYON.system, preFix);
+    let text = mod.dye(global.CRAYON.system, preFix);
     console.log(mod.dye(global.CRAYON.system, `<a href="/a/#!/room/${Game.shard.name}/${preFix}">${text}</a> &gt;`), ...message, mod.stack());
 };
 
@@ -129,7 +129,7 @@ mod.BB = x => {
 mod.json = x => {
     return JSON.stringify(x, null, 2);
 };
-mod.len = number => ("00" + number).slice(-2);
+mod.len = number => (`00${number}`).slice(-2);
 mod.toLocalDate = date => {
     if (!date)
         date = new Date();
@@ -138,8 +138,8 @@ mod.toLocalDate = date => {
     return new Date(date.getTime() + (3600000 * offset));
 };
 // for notify mails: format dateTime (as date & time)
-mod.toDateTimeString = date => mod.len(date.getDate()) + "." + mod.len(date.getMonth() + 1) + "." + mod.len(date.getFullYear()) + " " + mod.len(date.getHours()) + ":" + mod.len(date.getMinutes()) + ":" + mod.len(date.getSeconds());
-mod.isSummerTime = ídate => {
+mod.toDateTimeString = date => `${mod.len(date.getDate())}.${mod.len(date.getMonth() + 1)}.${mod.len(date.getFullYear())} ${mod.len(date.getHours())}:${mod.len(date.getMinutes())}:${mod.len(date.getSeconds())}`;
+mod.isSummerTime = date => {
     let year = date.getFullYear();
     // last sunday of march
     let temp = new Date(year, 2, 31),
@@ -149,21 +149,6 @@ mod.isSummerTime = ídate => {
     let end = new Date(year, 9, temp.getDate() - temp.getDay(), 3, 0, 0);
 
     return begin < date && date < end;
-};
-mod.execute = () => {
-
-    //console.log(Parameter.DEBUG);
-
-    return true;
-
-};
-mod.initMemory = () => {
-
-    Object.keys(Memory).forEach(segment => {
-        console.log(segment);
-        delete Memory[segment];
-    });
-
 };
 // base class for events
 mod.LiteEvent = function () {
@@ -195,7 +180,7 @@ mod.addById = (array, id) => {
     return array;
 };
 mod.guid = () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    let r = Math.random() * 16 | 0, v = c == 'x' ? r : r & 0x3 | 0x8;
+    let r = Math.random() * 16 | 0, v = c === 'x' ? r : r & 0x3 | 0x8;
     return v.toString(16);
 });
 mod.LAB_REACTIONS = {};
