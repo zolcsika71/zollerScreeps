@@ -2,7 +2,7 @@
 
 let visuals = {};
 module.exports = visuals;
-visuals.extend = function () {
+visuals.extend = () => {
 
     RoomVisual.prototype.structure = function (x, y, type, opts = {}) {
 

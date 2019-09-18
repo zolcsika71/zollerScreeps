@@ -114,7 +114,7 @@ let Visuals = class {
         });
     }
 
-    drawLine(from, to, style) {
+    checkFromTo(from, to) {
 
         if (from instanceof RoomObject)
             from = from.pos;
@@ -123,23 +123,34 @@ let Visuals = class {
         if (!(from instanceof RoomPosition || to instanceof RoomPosition))
             throw new Error('Visuals: Point not a RoomPosition');
         if (from.roomName !== to.roomName)
-            return; // cannot draw lines to another room
-        let vis = new RoomVisual(from.roomName);
+            return false; // cannot draw lines to another room
+        return new RoomVisual(from.roomName);
+
+    }
+
+    drawLine(from, to, style) {
+
+        let vis,
+            checkFromTo = this.checkFromTo(from, to);
+
+        if (checkFromTo)
+            vis = checkFromTo;
+        else
+            return;
+
         style = style instanceof Creep ? this.creepPathStyle(style) : (style || {});
         vis.line(from, to, style);
     }
 
     drawArrow (from, to, style) {
 
-        if (from instanceof RoomObject)
-            from = from.pos;
-        if (to instanceof RoomObject)
-            to = to.pos;
-        if (!(from instanceof RoomPosition || to instanceof RoomPosition))
-            throw new Error('Visuals: Point not a RoomPosition');
-        if (from.roomName !== to.roomName)
-            return; // cannot draw lines to another room
-        let vis = new RoomVisual(from.roomName);
+        let vis,
+            checkFromTo = this.checkFromTo(from, to);
+
+        if (checkFromTo)
+            vis = checkFromTo;
+        else
+            return;
 
         if (global.VISUALS.DRAW_ARROW && global.ROOM_VISUALS) {
 
@@ -159,10 +170,9 @@ let Visuals = class {
 
         function getStructure(to) {
             let structures = to.lookFor(LOOK_STRUCTURES);
-            if (!_.isUndefined(structures[0]))
-                return structures[0];
-            else
+            if (_.isUndefined(structures[0])) {
                 return null;
+            } else return structures[0];
         }
 
         if (global.VISUALS.HIGHLIGHT_STRUCTURE && global.ROOM_VISUALS) {

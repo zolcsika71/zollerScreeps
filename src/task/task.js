@@ -3,6 +3,9 @@
 let mod = {},
     cache = {};
 
+global.Task.mining = require('./task.mining');
+
+
 module.exports = mod;
 
 mod.tasks = [];
