@@ -4,19 +4,15 @@ let action = new Creep.Action('uncharging'); // get from container/link
 module.exports = action;
 action.renewTarget = false;
 action.maxPerTarget = 1;
-action.isAddableAction = function (creep) {
-    return true;
-}
-action.isValidAction = function (creep) {
-    return creep.getStrategyHandler([action.name], 'isValidAction', creep);
-};
-action.isValidTarget = function (target, creep) {
+action.isAddableAction = creep => true;
+action.isValidAction = creep => creep.getStrategyHandler([action.name], 'isValidAction', creep);
+action.isValidTarget = (target, creep) => {
     if (!target) return false;
-    if (target.structureType == 'link') {
+    if (target.structureType === 'link') {
         return target.energy > 0;
-    } else if (target.structureType == 'container') {
+    } else if (target.structureType === 'container') {
         let min = 0;
-        if (target.source === true && target.controller == true) min = target.storeCapacity * MANAGED_CONTAINER_TRIGGER;
+        if (target.source === true && target.controller === true) min = target.storeCapacity * global.MANAGED_CONTAINER_TRIGGER;
         else if (creep.data.creepType.indexOf('remote') >= 0) min = 250;
         else min = 500;
         return target.sum > min;
@@ -46,7 +42,7 @@ action.newTarget = function (creep) {
             if (that.isValidTarget(cont, creep)) {
                 let available = cont.sum;
                 if (cont.targetOf)
-                    available -= _.sum(cont.targetOf.map(t => (t.actionName == 'uncharging' ? t.carryCapacityLeft : 0)));
+                    available -= _.sum(cont.targetOf.map(t => (t.actionName === 'uncharging' ? t.carryCapacityLeft : 0)));
                 if (available < Math.min(creep.carryCapacity - creep.sum, min)) return;
                 if (available > currMax) {
                     currMax = available;
@@ -58,11 +54,11 @@ action.newTarget = function (creep) {
         return target;
     }
 };
-action.work = function (creep) {
+action.work = creep => {
     let workResult = OK;
-    if (creep.target.source === true && creep.target.controller == true) {
+    if (creep.target.source === true && creep.target.controller === true) {
         // managed container fun...
-        let max = creep.target.sum - (creep.target.storeCapacity * (1 - MANAGED_CONTAINER_TRIGGER));
+        let max = creep.target.sum - (creep.target.storeCapacity * (1 - global.MANAGED_CONTAINER_TRIGGER));
         if (max < 1) workResult = ERR_NOT_ENOUGH_RESOURCES;
         else {
             let space = creep.carryCapacity - creep.sum;
@@ -87,6 +83,4 @@ action.work = function (creep) {
     creep.target = null;
     return workResult;
 };
-action.defaultStrategy.isValidAction = function (creep) {
-    return creep.sum < creep.carryCapacity || false;
-};
+action.defaultStrategy.isValidAction = creep => creep.sum < creep.carryCapacity || false;
