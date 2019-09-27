@@ -176,8 +176,7 @@ let Visuals = class {
         }
 
         if (global.VISUALS.HIGHLIGHT_STRUCTURE && global.ROOM_VISUALS) {
-
-            let targetStructure = getStructure(to);
+            let targetStructure = getStructure(to.pos);
 
             if (targetStructure === null) {
                 vis.structure(to.x, to.y, null);

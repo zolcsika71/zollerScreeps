@@ -87,8 +87,11 @@ _.assign(global.Task, {
 
 _.assign(global.Util, {
     DiamondIterator: require('./util.diamond.iterator'),
-    SpiralIterator: require('./util.spiral.iterator')
+    SpiralIterator: require('./util.spiral.iterator'),
+    experiment: require('./util.test')
 });
+
+
 
 //let iterator = new global.Util.DiamondIterator();
 
@@ -138,9 +141,6 @@ _.assign(Creep, {
 });
 
 inject(Creep, require('./creep.creep'));
-
-
-
 inject(Room, require('./room.room'));
 
 _.assign(Room, {
