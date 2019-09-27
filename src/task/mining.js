@@ -1,17 +1,5 @@
 "use strict";
 
-const
-    TASK = {
-        task: require('./task.task')
-    },
-    ROOT = {
-        population: require('./population'),
-        flagDir: require('./flagDir')
-    };
-
-
-
-
 let mod = {};
 module.exports = mod;
 mod.minControllerLevel = 2;
@@ -347,7 +335,7 @@ mod.creep = {
         queue: 'Medium' // not much point in hauling or working without a miner, and they're a cheap spawn.
     }
 };
-mod.setupCreep = function (roomName, definition) {
+mod.setupCreep = (roomName, definition) => {
     //definition = this.baseOf.internalViral.setupCreep.apply(this, [roomName, definition]);
 
     switch (definition.behaviour) {
@@ -386,10 +374,8 @@ mod.heal = function (roomName, partChange) {
     memory.healSize = (memory.healSize || 0) + (partChange || 0);
     return `Task.${this.name}: healing capacity for ${roomName} ${memory.healSize >= 0 ? 'increased' : 'decreased'} to ${Math.abs(memory.healSize)} per miner.`;
 };
-mod.getFlag = function (roomName) {
-    return ROOT.flagDir.find(global.FLAG_COLOR.claim.mining, new RoomPosition(25, 25, roomName));
-};
-mod.carry = function (roomName, partChange) {
+mod.getFlag = roomName => ROOT.flagDir.find(global.FLAG_COLOR.claim.mining, new RoomPosition(25, 25, roomName));
+mod.carry = (roomName, partChange) => {
     let memory = mod.memory(roomName);
     memory.carryParts = (memory.carryParts || 0) + (partChange || 0);
     const population = Math.round(mod.carryPopulation(roomName) * 100);
@@ -399,13 +385,13 @@ mod.carry = function (roomName, partChange) {
     }
     return `Task.${mod.name}: hauler carry capacity for ${roomName} ${memory.carryParts >= 0 ? 'increased' : 'decreased'} by ${Math.abs(memory.carryParts)}. Currently at ${population}% of desired capacity`;
 };
-mod.harvest = function (roomName, partChange) {
+mod.harvest = (roomName, partChange) => {
     const memory = mod.memory(roomName);
     memory.harvestSize = (memory.harvestSize || 0) + (partChange || 0);
     return `Task.${mod.name}: harvesting work capacity for ${roomName} ${memory.harvestSize >= 0 ? 'increased' : 'decreased'} by ${Math.abs(memory.harvestSize)} per miner.`;
 };
-mod.checkCapacity = function (roomName) {
-    const checkRoomCapacity = function (roomName, minPopulation, maxDropped) {
+mod.checkCapacity = roomName => {
+    const checkRoomCapacity = (roomName, minPopulation, maxDropped) => {
         let population = Math.round(mod.carryPopulation(roomName) * 100),
             room = Game.rooms[roomName],
             dropped = room ? room.find(FIND_DROPPED_RESOURCES) : null,
@@ -413,7 +399,7 @@ mod.checkCapacity = function (roomName) {
             totalDropped = 0;
         if (dropped) {
             totalDropped = _.sum(dropped, d => d.energy);
-            message = 'with ' + totalDropped + ' dropped energy.';
+            message = `with ${totalDropped} dropped energy.`;
         }
         if (population <= minPopulation || totalDropped >= maxDropped) {
             console.log(mod.carry(roomName), message, global.stack());

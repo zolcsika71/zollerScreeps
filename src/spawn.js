@@ -13,16 +13,16 @@ mod.priorityLow = [
     Creep.setup.privateer
 ];
 
-mod.register = function () {
+mod.register = () => {
     Creep.spawningCompleted.on(creep => mod.handleSpawningCompleted(creep));
 };
-mod.handleSpawningCompleted = function (creep) {
+mod.handleSpawningCompleted = creep => {
     if (global.DEBUG && global.TRACE)
         global.trace('Spawn', {behaviour: creep.data.creepType, creepName: creep.name, Spawn: 'Creep.spawningCompleted'});
     if (global.CENSUS_ANNOUNCEMENTS)
-        global.logSystem(creep.pos.roomName, global.dye(global.CRAYON.birth, 'Off to work ' + creep.name + '!'));
+        global.logSystem(creep.pos.roomName, global.dye(global.CRAYON.birth, `Off to work ${creep.name}!`));
 };
-mod.execute = function () {
+mod.execute = () => {
     let run = spawn => {
         if (spawn.room.my)
             spawn.execute();

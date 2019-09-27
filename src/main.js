@@ -82,12 +82,15 @@ _.assign(global.Task, {
     defense: require('./task.defense')
 });
 
+
 // Util assign
 
 _.assign(global.Util, {
     DiamondIterator: require('./util.diamond.iterator'),
     SpiralIterator: require('./util.spiral.iterator')
 });
+
+//let iterator = new global.Util.DiamondIterator();
 
 Creep.Action = require('./creep.action.Action');
 Creep.Behaviour = require('./creep.behaviour.Behaviour');
