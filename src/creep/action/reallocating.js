@@ -10,11 +10,11 @@ action.getLabOrder = function(lab) {
     let room = lab.room;
     if (!room.memory || !room.memory.resources) return null;
 
-    let data = room.memory.resources.lab.find( (s) => s.id == lab.id );
+    let data = room.memory.resources.lab.find( (s) => s.id === lab.id );
     if (data) {
         let orders = data.orders;
-        for (var i=0;i<orders.length;i++) {
-            if (orders[i].type != RESOURCE_ENERGY &&
+        for (let i=0;i<orders.length;i++) {
+            if (orders[i].type !== RESOURCE_ENERGY &&
                 (orders[i].orderRemaining > 0 ||
                     orders[i].storeAmount > 0)) {
                 order = orders[i];
@@ -25,7 +25,7 @@ action.getLabOrder = function(lab) {
 
     return order;
 };
-action.findNeeding = function(room, resourceType, amountMin, structureId){
+action.findNeeding = (room, resourceType, amountMin, structureId) => {
     if (!amountMin) amountMin = 1;
 //    if (!RESOURCES_ALL.find((r)=>{r==resourceType;})) return ERR_INVALID_ARGS;
 
@@ -35,7 +35,7 @@ action.findNeeding = function(room, resourceType, amountMin, structureId){
             const lab = Game.getObjectById(labs[i].id);
             let amount = 0;
             if (lab) amount = lab.getNeeds(resourceType);
-            if (amount >= amountMin && (lab.mineralAmount === 0 || lab.mineralType == resourceType || resourceType == RESOURCE_ENERGY) && lab.id != structureId) {
+            if (amount >= amountMin && (lab.mineralAmount === 0 || lab.mineralType === resourceType || resourceType === RESOURCE_ENERGY) && lab.id !== structureId) {
                 return { structure: lab, amount: amount};
             }
         }
@@ -46,7 +46,7 @@ action.findNeeding = function(room, resourceType, amountMin, structureId){
             const powerSpawn = Game.getObjectById(powerSpawns[i].id);
             let amount = 0;
             if (powerSpawn) amount = powerSpawn.getNeeds(resourceType);
-            if (amount >= amountMin && (resourceType == RESOURCE_POWER || resourceType == RESOURCE_ENERGY) && powerSpawn.id != structureId) {
+            if (amount >= amountMin && (resourceType === RESOURCE_POWER || resourceType === RESOURCE_ENERGY) && powerSpawn.id !== structureId) {
                 return { structure: powerSpawn, amount: amount};
             }
         }
@@ -54,7 +54,7 @@ action.findNeeding = function(room, resourceType, amountMin, structureId){
     for (const nuker of room.structures.nukers.all) {
         let amount = 0;
         if (nuker) amount = nuker.getNeeds(resourceType);
-        if (amount >= amountMin && (resourceType == RESOURCE_GHODIUM || resourceType == RESOURCE_ENERGY) && nuker.id != structureId) {
+        if (amount >= amountMin && (resourceType === RESOURCE_GHODIUM || resourceType === RESOURCE_ENERGY) && nuker.id !== structureId) {
             return { structure: nuker, amount: amount};
         }
     }
@@ -64,7 +64,7 @@ action.findNeeding = function(room, resourceType, amountMin, structureId){
             const container = Game.getObjectById(containers[i].id);
             let amount = 0;
             if (container) amount = container.getNeeds(resourceType);
-            if (amount >= amountMin && container.id != structureId) {
+            if (amount >= amountMin && container.id !== structureId) {
                 return { structure: container, amount: amount };
             }
         }
@@ -72,23 +72,23 @@ action.findNeeding = function(room, resourceType, amountMin, structureId){
     const terminal = room.terminal;
     if (terminal) {
         let amount = terminal.getNeeds(resourceType);
-        if (amount >= amountMin && terminal.id != structureId) {
+        if (amount >= amountMin && terminal.id !== structureId) {
             return { structure: terminal, amount: amount };
         }
     }
     let storage = room.storage;
     if (storage) {
         let amount = storage.getNeeds(resourceType);
-        if (amount >= amountMin && storage.id != structureId) {
+        if (amount >= amountMin && storage.id !== structureId) {
             return { structure: storage, amount: amount };
         }
     }
 
     // no specific needs found ... check for overflow availability
-    if (storage && (resourceType == RESOURCE_ENERGY || resourceType == RESOURCE_POWER) && storage.storeCapacity-storage.sum > amountMin) {
+    if (storage && (resourceType === RESOURCE_ENERGY || resourceType === RESOURCE_POWER) && storage.storeCapacity-storage.sum > amountMin) {
         return { structure: storage, amount: 0 };
     }
-    if (terminal && resourceType != RESOURCE_ENERGY && resourceType != RESOURCE_POWER && terminal.storeCapacity-terminal.sum > amountMin) {
+    if (terminal && resourceType !== RESOURCE_ENERGY && resourceType !== RESOURCE_POWER && terminal.storeCapacity-terminal.sum > amountMin) {
         return { structure: terminal, amount: 0 };
     }
 
@@ -100,7 +100,7 @@ action.newTargetLab = function(creep) {
     let data = room.memory;
     // check labs for needs and make sure to empty the lab before filling
     if (data && data.labs && data.labs.length > 0) {
-        for (var i=0;i<data.labs.length;i++) {
+        for (let i=0;i<data.labs.length;i++) {
             let d = data.labs[i];
             let lab = Game.getObjectById(d.id);
             if (!lab) continue;

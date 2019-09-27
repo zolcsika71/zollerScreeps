@@ -1,3 +1,4 @@
+// jscs:disable requireCamelCaseOrUpperCaseIdentifiers
 "use strict";
 
 
@@ -165,7 +166,7 @@ let Visuals = class {
             style = style instanceof Creep ? this.creepPathStyle(style) : (style || {});
 
             vis.line(to.x, to.y, to.x + length * Math.cos(theta_radians + base_angle), to.y + length * Math.sin(theta_radians + base_angle), style);
-            vis.line(to.x, to.y, to.x + length * Math.cos(theta_radians - base_angle), to.y + length * Math.sin(theta_radians - base_angle), style);
+            vis.line(to.x, to.y, to.x + length * Math.cos(theta_radians - base_angle), to.y + length * Math.sin(theta_radians - base_angle), style);// jscs:ignore requireCamelCaseOrUpperCaseIdentifiers
         }
 
         function getStructure(to) {
