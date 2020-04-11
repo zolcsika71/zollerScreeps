@@ -1,7 +1,9 @@
 "use strict";
 
 let mod = {};
+
 module.exports = mod;
+
 mod.priorityHigh = [
     Creep.setup.worker,
     Creep.setup.miner,

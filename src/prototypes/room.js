@@ -89,9 +89,7 @@ mod.extend = () => {
         let positions;
         if (findExit === 0) {
             // portals
-            positions = _.chain(this.find(FIND_STRUCTURES)).filter(function (s) {
-                return s.structureType === STRUCTURE_PORTAL;
-            }).map('pos').value();
+            positions = _.chain(this.find(FIND_STRUCTURES)).filter(s => s.structureType === STRUCTURE_PORTAL).map('pos').value();
         } else {
             positions = this.find(findExit);
         }
@@ -102,7 +100,7 @@ mod.extend = () => {
         let limit = -1;
         const ret = [];
         for (let i = 0; i < positions.length; i++) {
-            const pos = positions[i];
+            let pos = positions[i];
             if (!(_.get(map, [pos.x - 1, pos.y]) || _.get(map, [pos.x, pos.y - 1]))) {
                 if (point && limit !== -1) {
                     ret[limit].x += Math.ceil(point * (maxX - ret[limit].x));

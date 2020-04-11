@@ -1,6 +1,9 @@
 "use strict";
 
 let mod = {};
+
+module.exports = mod;
+
 mod.init = () => {
 
     // extensions.js
@@ -17,6 +20,5 @@ mod.init = () => {
     if (_.isUndefined(Memory.rooms))
         Memory.rooms = {};
 
-
 };
-module.exports = mod;
+

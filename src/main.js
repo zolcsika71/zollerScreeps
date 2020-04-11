@@ -1,4 +1,3 @@
-
 function wrapLoop(fn) {
     let memory,
         tick;
@@ -27,7 +26,7 @@ function wrapLoop(fn) {
     };
 }
 
-let //_ = require('lodash'),
+let _ = require('lodash'),
     cpuAtLoad = Game.cpu.getUsed(),
     inject = (base, alien, namespace) => {
     let keys = _.keys(alien);
@@ -172,7 +171,7 @@ if (global.mainInjection.extend)
 
 global.OCSMemory.activateSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, true);
 
-let Traveler = require('./traveler');
+let Traveler = require('./Traveler');[[]]
 //require('./traveler') ({exportTraveler: false, installTraveler: true, installPrototype: true, defaultStuckValue: global.TRAVELER_STUCK_TICKS, reportThreshold: global.TRAVELER_THRESHOLD});
 
 if (global.DEBUG)

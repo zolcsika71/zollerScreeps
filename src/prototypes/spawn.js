@@ -12,7 +12,7 @@ const
 
 let mod = {};
 module.exports = mod;
-mod.extend = function () {
+mod.extend = () => {
 
     Spawn.prototype.execute = function () {
 
@@ -138,6 +138,7 @@ mod.extend = function () {
         }
         return result;
     };
+
     Spawn.prototype.create = function (body, name, behaviour, destiny) {
         if (body.length === 0)
             return false;

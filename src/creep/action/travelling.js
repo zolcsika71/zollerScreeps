@@ -31,7 +31,7 @@ action.step = function (creep) {
         creep.say(this.name, global.SAY_PUBLIC);
     let targetRange = _.get(creep, ['data', 'travelRange'], this.targetRange);
     let target = creep.target;
-    if (GLOBAL.flagDir.isSpecialFlag(creep.target)) {
+    if (ROOT.flagDir.isSpecialFlag(creep.target)) {
         if (creep.data.travelRoom) {
             const room = Game.rooms[creep.data.travelRoom];
             if (room && (room.name === creep.pos.roomName)) { // TODO || room.getBorder(creep.pos.roomName))) {
@@ -42,7 +42,7 @@ action.step = function (creep) {
                 target = new RoomPosition(25, 25, creep.data.travelRoom);
             }
         } else {
-            global.logError(creep.name + 'Creep.action.travelling called with specialFlag target and travelRoom undefined.');
+            global.logError(`${creep.name}Creep.action.travelling called with specialFlag target and travelRoom undefined.`);
             target = null;
         }
     }

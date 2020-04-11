@@ -27,7 +27,7 @@ mod.bodyCosts = function (body) {
 
 // params: {minThreat, minWeight, maxWeight, minMulti, maxMulti}
 // calculates the multi that is above the smallest minimum, and below the largest maximum based on parameters
-mod.multi = function (room, params = {}) {
+mod.multi = (room, params = {}) => {
     let minMulti = params.minMulti || 0,
         fixedCosts = Creep.bodyCosts(params.fixedBody),
         multiCosts = Creep.bodyCosts(params.multiBody);

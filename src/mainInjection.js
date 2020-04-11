@@ -6,7 +6,7 @@ mod.extend = function () {
 };
 mod.flush = function() {
 
-    let cancelAllInactiveOrder = function () {
+    let cancelAllInactiveOrder = () => {
 
         let inactiveOrders = _.filter(Game.market.orders, order => {
             return !order.active && order.type === 'sell';

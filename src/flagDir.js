@@ -3,6 +3,8 @@
 let mod = {};
 module.exports = mod;
 
+
+
 mod.flagFilter = function (flagColour) {
     if (!flagColour) return;
     let filter;

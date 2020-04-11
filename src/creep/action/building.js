@@ -18,7 +18,7 @@ action.isAddableAction = function (creep) {
 action.isValidTarget = target => (target != null && (target.my || global.Task.reputation.allyOwner(target)) && target.progress && target.progress < target.progressTotal);
 action.isAddableTarget = function (target) {
     //  our site?
-    console.log(`reputation: ${global.Task.reputation.allyOwner(target)}`);
+    //console.log(`reputation: ${global.Task.reputation.allyOwner(target)}`);
     return target && (target.my || global.Task.reputation.allyOwner(target)) && (!target.targetOf || target.targetOf.length < this.maxPerTarget);
 };
 action.newTarget = function (creep) {

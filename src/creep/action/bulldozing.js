@@ -7,11 +7,11 @@ action.maxPerTarget = 1;
 action.isValidTarget = target => {
     if (!target.room.my && target.room.controller && target.room.controller.safeMode)
         return false;
-    console.log(`${target} is valid target for bulldozing: ${target instanceof ConstructionSite} ${global.Task.reputation.notAlly(target.owner.username)}`);
+    //console.log(`${target} is valid target for bulldozing: ${target instanceof ConstructionSite && global.Task.reputation.notAlly(target.owner.username)}`);
     return target instanceof ConstructionSite && global.Task.reputation.notAlly(target.owner.username);
 };
 action.newTarget = creep => {
-    console.log(`${creep.name}`);
+    //console.log(`getting new target: ${creep.name}`);
     const target = _(creep.room.constructionSites)
         .filter(action.isValidTarget)
         .max(target => {
